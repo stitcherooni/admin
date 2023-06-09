@@ -1,0 +1,38 @@
+{
+  "extends": ["airbnb", "airbnb-typescript", "plugin:react/recommended"],
+  "parserOptions": {
+    // "tsconfigRootDir": "./"
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "prefer-template": "off",
+    "no-var": 1,
+    "no-unused-vars": 1,
+    "camelcase": 1,
+    "no-nested-ternary": 1,
+    "no-console": 1,
+    "no-template-curly-in-string": 1,
+    "no-self-compare": 1,
+    "import/prefer-default-export": 0,
+    "arrow-body-style": 1,
+    "import/no-extraneous-dependencies": ["off", { "devDependencies": false }],
+    "react/function-component-definition": 0,
+    "react/jsx-props-no-spreading": 0,
+    "react/destructuring-assignment": 0,
+    "import/no-cycle": 0,
+    "no-param-reassign": [
+      "error",
+      {
+        "props": true,
+        "ignorePropertyModificationsFor": ["state"]
+      }
+    ]
+  },
+  "ignorePatterns": ["build", "node_modules", "config", "react-app-env.d.ts", "jest.config.js"],
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "plugins": ["prettier"]
+}
