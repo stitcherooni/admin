@@ -2,6 +2,8 @@ import React from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { createTheme, ThemeProvider as Mui } from '@mui/material/styles';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { theme } from './styles/defaultTheme';
 import GlobalStyle from './styles/globalStyles';
 import { router } from './router/router';
@@ -30,11 +32,13 @@ export const muiTheme = createTheme({
 
 export default function App() {
   return (
-    <Mui theme={muiTheme}>
-      <ThemeProvider theme={theme}>
-        <GlobalStyle />
-        <RouterProvider router={router} />
-      </ThemeProvider>
-    </Mui>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Mui theme={muiTheme}>
+        <ThemeProvider theme={theme}>
+          <GlobalStyle />
+          <RouterProvider router={router} />
+        </ThemeProvider>
+      </Mui>
+    </LocalizationProvider>
   );
 }

@@ -1,7 +1,7 @@
 import Avatar from '@mui/material/Avatar/Avatar';
 import Badge from '@mui/material/Badge/Badge';
 import styled from 'styled-components';
-import { Input } from '../Input/Input.styled';
+import { Input } from '../shared/Input/Input.styled';
 
 export const HeaderWrapper = styled.div`
   min-height: 64px;

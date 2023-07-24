@@ -4,14 +4,14 @@ import { PreloadedState } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
 import { ThemeProvider as Mui } from '@mui/material/styles';
-import { PersistGate } from 'redux-persist/integration/react';
+// import { PersistGate } from 'redux-persist/integration/react';
 import {
   AppStore, persistor, RootState, setupStore,
 } from '../redux/store';
 import { muiTheme } from '../App';
 import { theme } from '../styles/defaultTheme';
 import GlobalStyle from '../styles/globalStyles';
-import { BrowserRouter } from 'react-router-dom';
+// import { BrowserRouter } from 'react-router-dom';
 
 const mockedUsedNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({

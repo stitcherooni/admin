@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+import { theme } from './defaultTheme';
 
 const GlobalStyle = createGlobalStyle`
 
@@ -13,10 +14,11 @@ html, body {
 body {
   margin: 0;
   padding: 0;
+  background-color: ${theme.colors.main.background};
 }
 
 #root {
-  height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }

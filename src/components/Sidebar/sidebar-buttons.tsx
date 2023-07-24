@@ -9,37 +9,37 @@ import SupportIcon from '../../assets/icons/support-icon';
 
 export const sidebarButtons = [
   {
-    id: 1,
+    id: 'dashboard',
     name: 'Dashboard',
     img: <DashboardIcon />,
   },
   {
-    id: 2,
+    id: 'events',
     name: 'Events',
     img: <EventsIcon />,
   },
   {
-    id: 3,
+    id: 'listings',
     name: 'Listings',
     img: <ListingsIcon />,
   },
   {
-    id: 4,
+    id: 'admin',
     name: 'Admin',
     img: <AdminIcon />,
   },
   {
-    id: 5,
+    id: 'reporting',
     name: 'Reporting',
     img: <ReportingIcon />,
   },
   {
-    id: 6,
+    id: 'help',
     name: 'Help & Support',
     img: <SupportIcon />,
   },
   {
-    id: 7,
+    id: 'quick-link',
     name: 'Add quicklink to sidebar',
     img: <AddIcon />,
   },

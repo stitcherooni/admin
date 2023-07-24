@@ -1,7 +1,8 @@
 import React, { lazy, Suspense } from 'react';
-import { createBrowserRouter, Route, Routes } from 'react-router-dom';
-import LoadingOverlay from '../components/LoadingOverlay/LoadingOverlay';
+import { createBrowserRouter } from 'react-router-dom';
 import BasicLayout from '../layouts/BasicLayout/BasicLayout';
+import Reporting from '../components/Dashboard/Reporting/Reporting';
+import LoadingOverlay from '../components/shared/LoadingOverlay/LoadingOverlay';
 
 const Dashboard = lazy(
   () => import(
@@ -10,21 +11,32 @@ const Dashboard = lazy(
   ),
 );
 
-function Root() {
-  return (
-    <Routes>
-      <Route
-        path="/"
-        element={(
-          <BasicLayout>
-            <Suspense fallback={<LoadingOverlay />}>
-              <Dashboard />
-            </Suspense>
-          </BasicLayout>
-        )}
-      />
-    </Routes>
-  );
-}
-
-export const router = createBrowserRouter([{ path: '*', Component: Root }]);
+export const router = createBrowserRouter([
+  {
+    path: '/',
+    element:
+  <BasicLayout>
+    <Suspense fallback={<LoadingOverlay />}>
+      <Dashboard />
+    </Suspense>
+  </BasicLayout>,
+  },
+  {
+    path: '/dashboard',
+    element:
+  <BasicLayout>
+    <Suspense fallback={<LoadingOverlay />}>
+      <Dashboard />
+    </Suspense>
+  </BasicLayout>,
+  },
+  {
+    path: '/dashboard/reporting',
+    element:
+  <BasicLayout>
+    <Suspense fallback={<LoadingOverlay />}>
+      <Reporting />
+    </Suspense>
+  </BasicLayout>,
+  },
+]);

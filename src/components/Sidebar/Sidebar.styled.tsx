@@ -9,7 +9,7 @@ export const List = styled.div`
   }
 `;
 
-export const Item = styled.div<{ content: string; y?: number; height?: number }>`
+export const Item = styled.div<{ content: string }>`
   min-width: 72px;
   display: flex;
   padding: 16px 0;
@@ -53,29 +53,55 @@ export const Item = styled.div<{ content: string; y?: number; height?: number }>
     width: 100%;
     border: none;
     border-bottom: 1px solid ${(props) => props.theme.colors.gray.gray5};
+    background-color: ${(props) => props.theme.colors.main.white};
 
     &.settings {
       border-top: 1px solid ${(props) => props.theme.colors.gray.gray5};
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 72px;
+    }
+
+    &::after {
+      content: '${(props) => props.content}';
+      position: fixed;
+      left: 72px;
+      z-index: 10;
+      background-color: ${(props) => props.theme.colors.main.green};
+      min-width: 270px;
+      color: ${(props) => props.theme.colors.main.white};
+      font-family: ${(props) => props.theme.fonts.mainFont};
+      font-size: 20px;
+      line-height: 30px;
+      display: none;
+      align-items: center;
+      border-radius: 0px 8px 8px 0px;
+    }
+
+    &.dashboard::after {
+      height: 57px;
+    }
+
+    &.events::after, &.listings::after, &.quick-link::after {
+      height: 59px;
+    }
+
+    &.admin::after, &.reporting::after {
+      height: 55px;
+    }
+
+    &.help::after {
+      height: 60px;
+    }
+
+    &.settings::after {
+      height: 58px;
     }
 
     &:hover {
       &::after {
-        content: '${(props) => props.content}';
-        position: fixed;
-        top: ${(props) => props.y}px;
-        right: 0;
-        left: 72px;
-        z-index: 5;
-        background-color: ${(props) => props.theme.colors.main.green};
-        height: ${(props) => props.height}px;
-        max-width: 270px;
-        color: ${(props) => props.theme.colors.main.white};
-        font-family: ${(props) => props.theme.fonts.mainFont};
-        font-size: 20px;
-        line-height: 30px;
         display: flex;
-        align-items: center;
-        border-radius: 0px 8px 8px 0px;
       }
     }
   }
@@ -86,6 +112,11 @@ export const Wrapper = styled.div`
   background-color: ${(props) => props.theme.colors.main.white};
   display: flex;
   overflow: scroll;
+  scrollbar-color: transparent;
+
+  &::-webkit-scrollbar {
+    background-color: transparent;
+  }
 
   @media screen and (min-width: 1280px) {
     height: 100%;
@@ -99,4 +130,11 @@ export const Wrapper = styled.div`
 
 export const RootContainer = styled.div`
   overflow: hidden;
+
+  @media screen and (min-width: 1280px) {
+    position: fixed;
+    top: 72px;
+    z-index: 10;
+    height: calc(100% - 120px);
+  }
 `;
