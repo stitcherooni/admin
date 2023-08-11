@@ -1,17 +1,53 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import TableContainer from '@mui/material/TableContainer/TableContainer';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
+import { useDispatch } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material/Select/Select';
 import { useSortingTable } from '../../../../shared/Table/utils';
 import { Row, TableWrapper } from '../../../../shared/Table/Table.styled';
 import { TableCell, Head } from './ReportingTableProductSchoolSales.styled';
-import { rows, headCells } from './table-data';
+import { headCells } from './table-data';
 import TablePagination from '../../../../shared/Table/TablePagination/TablePagination';
+import { ProductSoldSchool } from '../../../../../types/reporting/sales';
+import { AppDispatch } from '../../../../../redux/store';
+import { getSalesStat } from '../../../../../redux/actions/reporting.actions';
+import { getCurrencyByCode } from '../../../../../utils/currency';
 
-const ReportingTableProductSchoolSales = () => {
-  const table = useSortingTable(rows);
-  const { page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
-    table.pagination;
+interface ReportingTableProductSchoolSalesProps extends ProductSoldSchool {
+  currency: string;
+}
+
+const ReportingTableProductSchoolSales = (props: ReportingTableProductSchoolSalesProps) => {
+  const table = useSortingTable(props.data || [], {
+    totalCount: props.totalCount,
+    totalPages: props.totalPages,
+    pageSize: props.pageSize,
+    currentPage: props.currentPage,
+  });
+  const dispatch = useDispatch<AppDispatch>();
+  const {
+    page, pagesCount, rowsPerPage,
+  } = table.pagination;
+
+  const changePage = (e: ChangeEvent, newPage?: number) => {
+    e.preventDefault();
+    dispatch(
+      getSalesStat({
+        page: newPage,
+        pageSize: rowsPerPage,
+      }),
+    );
+  };
+
+  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
+    dispatch(
+      getSalesStat({
+        page: 1,
+        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
+      }),
+    );
+  };
 
   return (
     <TableWrapper>
@@ -31,28 +67,28 @@ const ReportingTableProductSchoolSales = () => {
                   <p>{row.quantity}</p>
                 </TableCell>
                 <TableCell className="total-sales">
-                  <p>{`${row.currency}${row.totalSales}`}</p>
+                  <p>{`${getCurrencyByCode(props.currency)}${row.totalSales}`}</p>
                 </TableCell>
               </Row>
             ))}
             <Row>
               <TableCell className="school-name" />
               <TableCell className="percentage">
-                <strong>0%</strong>
+                <strong>{`${props.totalPercentage}%`}</strong>
               </TableCell>
               <TableCell className="quantity">
-                <strong>0</strong>
+                <strong>{props.totalQuantity}</strong>
               </TableCell>
               <TableCell className="total-sales">
-                <strong>£0</strong>
+                <strong>{`${getCurrencyByCode(props.currency)}${props.totalSales}`}</strong>
               </TableCell>
             </Row>
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
-        handleChangePage={handleChangePage}
-        handleChangeRowsPerPage={handleChangeRowsPerPage}
+        handleChangePage={changePage}
+        handleChangeRowsPerPage={changeRowsPerPage}
         page={page}
         pagesCount={pagesCount}
         rowsPerPage={rowsPerPage}

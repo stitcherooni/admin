@@ -13,8 +13,8 @@ interface StatisticBarProps {
 
 const StatisticBar = (props: StatisticBarProps) => (
   <Wrapper className="statistic">
-    {props.data.map((item) => (
-      <Item key={item.value} columns={props.data.length}>
+    {props.data.map((item, i) => (
+      <Item key={i} columns={props.data.length}>
         <CheckIconRounded />
         <p>
           {item.label}

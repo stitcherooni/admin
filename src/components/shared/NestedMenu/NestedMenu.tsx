@@ -54,34 +54,36 @@ const NestedMenu = (props: NestedMenuProps) => {
         open={openMenu}
         onClose={handleClose}
       >
-        <List>
-          {props.options.map((item) => (
-            <ListItem className={`list-item ${item.value.toString() === props.rootId ? 'selected' : ''}`} key={item.value}>
-              <ListItemWrapper>
-                <span className="list-item-title">{item.label}</span>
-                <ShevronRight className="arrow-right" />
-              </ListItemWrapper>
-              {item.subMenu && item.subMenu.length ? (
-                <SubList className="sub-list">
-                  {item.subMenu?.map((option) => (
-                    <ListItem
-                      className={`list-item sub-item ${option.value.toString() === props.selectedId ? 'selected' : ''}`}
-                      key={option.value}
-                      onClick={selectItem}
-                      data-rootid={item.value}
-                      data-value={option.value}
-                      data-label={option.label}
-                    >
-                      <ListItemWrapper>
-                        <span className="list-item-subtitle">{option.label}</span>
-                      </ListItemWrapper>
-                    </ListItem>
-                  ))}
-                </SubList>
-              ) : null}
-            </ListItem>
-          ))}
-        </List>
+        {!props.options.length ? null : (
+          <List>
+            {props.options.map((item) => (
+              <ListItem className={`list-item ${item.value.toString() === props.rootId ? 'selected' : ''}`} key={item.value}>
+                <ListItemWrapper>
+                  <span className="list-item-title">{item.label}</span>
+                  <ShevronRight className="arrow-right" />
+                </ListItemWrapper>
+                {item.subMenu && item.subMenu.length ? (
+                  <SubList className="sub-list">
+                    {item.subMenu?.map((option) => (
+                      <ListItem
+                        className={`list-item sub-item ${option.value.toString() === props.selectedId ? 'selected' : ''}`}
+                        key={option.value}
+                        onClick={selectItem}
+                        data-rootid={item.value}
+                        data-value={option.value}
+                        data-label={option.label}
+                      >
+                        <ListItemWrapper>
+                          <span className="list-item-subtitle">{option.label}</span>
+                        </ListItemWrapper>
+                      </ListItem>
+                    ))}
+                  </SubList>
+                ) : null}
+              </ListItem>
+            ))}
+          </List>
+        )}
       </SortMenuFilter>
     </>
   );

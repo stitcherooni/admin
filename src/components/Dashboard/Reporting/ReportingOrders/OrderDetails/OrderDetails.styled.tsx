@@ -30,6 +30,10 @@ export const Card = styled.div`
   background-color: ${(props) => props.theme.colors.gray.gray7};
   border-radius: 8px;
   margin-top: 16px;
+
+  &.mb {
+    margin-bottom: 16px;
+  }
 `;
 
 export const Row = styled.div`
@@ -123,6 +127,10 @@ export const TableCell = styled(Cell)`
     &.other {
       background-color: ${(props) => props.theme.colors.main.pink};
     }
+  }
+
+  & .refund {
+    color: ${(props) => props.theme.colors.main.red};
   }
 
   &.row-id {

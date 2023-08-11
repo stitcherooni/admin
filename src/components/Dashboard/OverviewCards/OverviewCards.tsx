@@ -5,14 +5,18 @@ import {
 import { SecondaryButton } from '../../shared/Buttons/Buttons.styled';
 import { cardsList } from './cards';
 
-const OverviewCards = () => (
+interface OverviewCardsProps {
+  data: Record<string, string | number>;
+}
+
+const OverviewCards = (props: OverviewCardsProps) => (
   <Wrapper>
     <List>
       {cardsList.map((item) => (
         <Card key={item.id}>
           <img src={item.img} alt="" />
           <CardWrapper>
-            <CardTitle>{item.count}</CardTitle>
+            <CardTitle>{props.data[item.id]}</CardTitle>
             <p>{item.title}</p>
             <SecondaryButton size="small">{item.btnText}</SecondaryButton>
           </CardWrapper>

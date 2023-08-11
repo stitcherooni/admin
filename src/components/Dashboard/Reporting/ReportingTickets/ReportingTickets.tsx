@@ -1,8 +1,12 @@
-import React, { SyntheticEvent, useState } from 'react';
+import React, {
+  ChangeEvent, SyntheticEvent, useMemo, useState,
+} from 'react';
 import TableContainer from '@mui/material/TableContainer/TableContainer';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
 import { createPortal } from 'react-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material/Select/Select';
 import {
   Col,
   Filters,
@@ -21,7 +25,7 @@ import {
 } from '../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
 import {
-  actionsOptions, eventOptions, groupByOptions, headCells, menuActionsOptions, rows,
+  actionsOptions, headCells, menuActionsOptions, rows,
 } from './table-data';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
 import QrCodeModal from './QrCodeModal/QrCodeModal';
@@ -30,6 +34,10 @@ import Label from '../../../shared/Label/Label';
 import NestedMenu from '../../../shared/NestedMenu/NestedMenu';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import Select from '../../../shared/Select/Select';
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { TicketItem } from '../../../../types/reporting/tickets';
+import { getTicketsStat, sortTicketsStat } from '../../../../redux/actions/reporting.actions';
+import { createEventsOptions, createSortByOptions } from './utils';
 
 interface Filter {
   value: number | string;
@@ -46,13 +54,20 @@ interface ReportingFilters {
 }
 
 const ReportingTickets = () => {
-  const table = useSortingTable(rows);
+  const dispatch = useDispatch<AppDispatch>();
+  const ticketsData = useSelector((state: RootState) => state.reporting.tickets);
+  const table = useSortingTable<TicketItem>(ticketsData.data, {
+    totalCount: ticketsData.totalCount,
+    totalPages: ticketsData.totalPages,
+    pageSize: ticketsData.pageSize,
+    currentPage: ticketsData.currentPage,
+  });
   const {
     selected, handleSelectAllClick, handleClick, checkIsSelected,
   } = table.selection;
   const { handleRequestSort } = table.sorting;
   const {
-    page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
+    page, pagesCount, rowsPerPage,
   } = table.pagination;
   const [filters, setSelectedFilters] = useState<ReportingFilters>({
     event: {
@@ -73,12 +88,24 @@ const ReportingTickets = () => {
         year: rootid,
       },
     }));
+    dispatch(sortTicketsStat({
+      EventIds: value,
+      GroupBy: filters.groupBy ?? '',
+      page: ticketsData.currentPage,
+      pageSize: ticketsData.pageSize,
+    }));
   };
 
   const handleSelectFilters = (e) => {
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
       groupBy: e.target.value,
+    }));
+    dispatch(sortTicketsStat({
+      EventIds: filters.event?.value ?? '',
+      GroupBy: e.target.value,
+      page: ticketsData.currentPage,
+      pageSize: ticketsData.pageSize,
     }));
   };
 
@@ -99,11 +126,43 @@ const ReportingTickets = () => {
     }
   };
 
+  const changePage = (e: ChangeEvent, newPage?: number) => {
+    e.preventDefault();
+    dispatch(
+      getTicketsStat({
+        page: newPage,
+        pageSize: rowsPerPage,
+      }),
+    );
+  };
+
+  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
+    dispatch(
+      getTicketsStat({
+        page: 1,
+        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
+      }),
+    );
+  };
+
+  const eventOptions = useMemo(
+    () => createEventsOptions(ticketsData?.filters?.year ?? {}),
+    [ticketsData?.filters?.year],
+  );
+
+  const groupByOptions = useMemo(
+    () => createSortByOptions(ticketsData?.filters?.filters ?? []),
+    [ticketsData?.filters?.filters],
+  );
+
   // to do
   // actions
   // sorting
   // table copy
   // search
+
+  // needs first, lastname, order id, booking info, winningData, date rename to scanDate,
+  // ticket should be blob, not link
 
   return (
     <Wrapper>
@@ -141,9 +200,8 @@ const ReportingTickets = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{rows.length}</strong>
-            {' '}
-            Tickets
+            <strong>{`${ticketsData.totalCount} `}</strong>
+            {`${ticketsData.totalCount === 0 || ticketsData.totalCount > 1 ? 'Tickets' : 'Ticket'}`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -169,7 +227,7 @@ const ReportingTickets = () => {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.id}
+                      key={row.num}
                       selected={isItemSelected}
                       sx={{ cursor: 'pointer' }}
                     >
@@ -183,7 +241,7 @@ const ReportingTickets = () => {
                         />
                       </TableCell>
                       <TableCell className="row-id">
-                        <p>{row['row-id']}</p>
+                        <p>{row.num}</p>
                       </TableCell>
                       <TableCell className="first-name">
                         <p>{row.firstName}</p>
@@ -198,7 +256,7 @@ const ReportingTickets = () => {
                         <p>{row.orderId}</p>
                       </TableCell>
                       <TableCell className="ticket-id">
-                        <p>{row.ticketId}</p>
+                        <p>{row.ticketNumber}</p>
                       </TableCell>
                       <TableCell className="booking-info">
                         <p>{row.bookingInfo}</p>
@@ -219,8 +277,8 @@ const ReportingTickets = () => {
             </Table>
           </TableContainer>
           <TablePagination
-            handleChangePage={handleChangePage}
-            handleChangeRowsPerPage={handleChangeRowsPerPage}
+            handleChangePage={changePage}
+            handleChangeRowsPerPage={changeRowsPerPage}
             page={page}
             pagesCount={pagesCount}
             rowsPerPage={rowsPerPage}

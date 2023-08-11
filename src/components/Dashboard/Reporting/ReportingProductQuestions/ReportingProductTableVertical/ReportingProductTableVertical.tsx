@@ -1,29 +1,53 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import TableContainer from '@mui/material/TableContainer/TableContainer';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
 import { Link } from 'react-router-dom';
-import {
-  TableCell,
-  Head,
-} from './ReportingProductTableVerticalstyled';
-import {
-  Row,
-  TableWrapper,
-} from '../../../../shared/Table/Table.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { TableCell, Head } from './ReportingProductTableVerticalstyled';
+import { Row, TableWrapper } from '../../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../../shared/Table/utils';
 import { headCells, rows } from './table-data';
 import TablePagination from '../../../../shared/Table/TablePagination/TablePagination';
+import { AppDispatch, RootState } from '../../../../../redux/store';
+import { ProductQuestionVertical } from '../../../../../types/reporting/productQuestions';
+import { getProductQuestionsStat } from '../../../../../redux/actions/reporting.actions';
 
 const ReportingProductTableVertical = () => {
-  const table = useSortingTable(rows);
-  const {
-    selected, handleSelectAllClick,
-  } = table.selection;
+  const dispatch = useDispatch<AppDispatch>();
+  const productQuestionsData = useSelector((state: RootState) => state.reporting.productQuestions);
+  const table = useSortingTable<ProductQuestionVertical>(
+    productQuestionsData.data as ProductQuestionVertical[],
+    {
+      totalCount: productQuestionsData.totalCount,
+      totalPages: productQuestionsData.totalPages,
+      pageSize: productQuestionsData.pageSize,
+      currentPage: productQuestionsData.currentPage,
+    }
+  );
+  const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const {
-    page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
-  } = table.pagination;
+  const { page, pagesCount, rowsPerPage } = table.pagination;
+
+  const changePage = (e: ChangeEvent, newPage?: number) => {
+    e.preventDefault();
+    dispatch(
+      getProductQuestionsStat({
+        page: newPage,
+        pageSize: rowsPerPage,
+      }),
+    );
+  };
+
+  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
+    dispatch(
+      getProductQuestionsStat({
+        page: 1,
+        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
+      }),
+    );
+  };
 
   return (
     <TableWrapper>
@@ -40,11 +64,11 @@ const ReportingProductTableVertical = () => {
           />
           <TableBody>
             {table.visibleRows.map((row) => (
-              <Row
-                key={row.id}
-              >
+              <Row key={row.num}>
                 <TableCell className="id">
-                  <Link to={`/dashboard/reporting?reportType=orders&orderId=${row.orderId}`}>{row.orderId}</Link>
+                  <Link to={`/dashboard/reporting?reportType=orders&orderId=${row.orderId}`}>
+                    {row.orderId}
+                  </Link>
                 </TableCell>
                 <TableCell className="booking-name">
                   <p>{row.bookingName}</p>
@@ -53,7 +77,9 @@ const ReportingProductTableVertical = () => {
                   <p>{row.className}</p>
                 </TableCell>
                 <TableCell className="booked-for">
-                  <Link to={`/dashboard/customers?customerId=${row.customerId}`}>{row.bookedFor}</Link>
+                  <Link to={`/dashboard/customers?customerId=${row.customerId}`}>
+                    {row.bookedFor}
+                  </Link>
                 </TableCell>
                 <TableCell className="phone">
                   <p>{row.phone}</p>
@@ -82,8 +108,8 @@ const ReportingProductTableVertical = () => {
         </Table>
       </TableContainer>
       <TablePagination
-        handleChangePage={handleChangePage}
-        handleChangeRowsPerPage={handleChangeRowsPerPage}
+        handleChangePage={changePage}
+        handleChangeRowsPerPage={changeRowsPerPage}
         page={page}
         pagesCount={pagesCount}
         rowsPerPage={rowsPerPage}

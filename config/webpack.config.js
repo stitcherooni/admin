@@ -69,5 +69,13 @@ module.exports = {
     port: 3001,
     open: true,
     historyApiFallback: true,
+    proxy: {      
+      '/api': {
+        target: 'https://ptaeventsgateway.azurewebsites.net/api',
+        secure: false,
+        pathRewrite: { '^/api': '' },
+        changeOrigin: true
+      }
+    },
   },
 };

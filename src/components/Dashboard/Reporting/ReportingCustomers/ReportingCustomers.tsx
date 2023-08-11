@@ -1,14 +1,16 @@
-import React, { SyntheticEvent, useMemo, useState } from 'react';
+import React, {
+  ChangeEvent, SyntheticEvent, useMemo, useState,
+} from 'react';
 import TableContainer from '@mui/material/TableContainer/TableContainer';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material/Select/Select';
+import dayjs from 'dayjs';
 import {
-  TableCell,
-  TableContent,
-  Head,
-  Wrapper,
+  TableCell, TableContent, Head, Wrapper,
 } from './ReportingCustomers.styled';
 import {
   Row,
@@ -19,7 +21,9 @@ import {
 } from '../../../shared/Table/Table.styled';
 import { SecondaryButton } from '../../../shared/Buttons/Buttons.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
-import { actionsOptions, headCells, menuActionsOptions, rows } from './table-data';
+import {
+  actionsOptions, headCells, menuActionsOptions, rows,
+} from './table-data';
 import { Overlay, StyledDrawer } from '../Reporting.styled';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
@@ -29,41 +33,52 @@ import TablePagination from '../../../shared/Table/TablePagination/TablePaginati
 import ApproveCustomerModal from './ApproveCustomerModal/ApproveCustomerModal';
 import DeleteCustomerModal from './DeleteCustomerModal/DeleteCustomerModal';
 import StatisticBar from '../StatisticBar/StatisticBar';
-
-const data = [
-  {
-    label: 'Total Customers:',
-    value: 47,
-  },
-  {
-    label: 'Total Orders:',
-    value: 14,
-  },
-  {
-    label: 'Total Order Value:',
-    value: '£2,224.98',
-  },
-];
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { CustomerItem } from '../../../../types/reporting/customers';
+import { getCustomersStat } from '../../../../redux/actions/reporting.actions';
+import { getCurrencyByCode } from '../../../../utils/currency';
+import { handleCloseModal } from '../ReportingBooking/utils';
 
 const ReportingCustomers = () => {
-  const table = useSortingTable(rows);
-  const { selected, handleSelectAllClick, handleClick, checkIsSelected } = table.selection;
+  const dispatch = useDispatch<AppDispatch>();
+  const customersData = useSelector((state: RootState) => state.reporting.customers);
+  const table = useSortingTable<CustomerItem>(customersData.data, {
+    totalCount: customersData.totalCount,
+    totalPages: customersData.totalPages,
+    pageSize: customersData.pageSize,
+    currentPage: customersData.currentPage,
+  });
+  const {
+    selected, handleSelectAllClick, checkIsSelected, handleClick,
+  } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const { page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
-    table.pagination;
+  const { page, pagesCount, rowsPerPage } = table.pagination;
 
-  const [open, setOpen] = useState(false);
+  const changePage = (e: ChangeEvent, newPage?: number) => {
+    e.preventDefault();
+    dispatch(
+      getCustomersStat({
+        page: newPage,
+        pageSize: rowsPerPage,
+      }),
+    );
+  };
 
-  const toggleOpen = () => setOpen(!open);
+  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
+    dispatch(
+      getCustomersStat({
+        page: 1,
+        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
+      }),
+    );
+  };
 
-  const handleClose = (e: SyntheticEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-    if (!target.className.length) return;
+  const toggleOpenDeleteModal = () => setOpenDeleteModal(!openDeleteModal);
 
-    if (target.className.includes('overlay')) {
-      toggleOpen();
-    }
+  const handleCloseDeletePopup = (e: SyntheticEvent<HTMLDivElement>) => {
+    handleCloseModal(e, toggleOpenDeleteModal);
   };
 
   const [openApprovalModal, setOpenApprovalModal] = useState(false);
@@ -80,12 +95,6 @@ const ReportingCustomers = () => {
     }
   };
 
-  const namesToDelete = useMemo(() => {
-    const names: string[] = [];
-    selected.forEach((id) => names.push(table.rowsListById[id].eventName));
-    return names.join(', ');
-  }, [selected, table.rowsListById]);
-
   const [filteringDrawerOpen, setFilteringDrawerOpen] = useState(false);
   const handleFilteringDrawer = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -94,19 +103,42 @@ const ReportingCustomers = () => {
     setFilteringDrawerOpen(!filteringDrawerOpen);
   };
 
+  const statistic = useMemo(() => [
+    {
+      label: 'Total Customers:',
+      value: 'n/a',
+    },
+    {
+      label: 'Total Orders:',
+      value: customersData.totalOrdersNumber,
+    },
+    {
+      label: 'Total Order Value:',
+      value: `${getCurrencyByCode(customersData.totalOrderValue.currency)}${customersData.totalOrderValue.amount}`,
+    },
+  ], [customersData.totalOrderValue, customersData.totalOrdersNumber]);
+
   // to do
   // actions (approve, remove, tinymce integration)
   // sorting
   // table copy
   // search
 
+  // needs fields: approved, currency
+  // need separate value for total customers count
+
   return (
     <Wrapper>
-      <StatisticBar data={data} />
+      <StatisticBar data={statistic} />
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{rows.length}</strong> Customers
+            <strong>{`${customersData.totalCount} `}</strong>
+            {`${
+              customersData.totalCount === 0 || customersData.totalCount > 1
+                ? 'Customers'
+                : 'Customer'
+            }`}
           </p>
           <SearchBarWrapper className="search-wrapper">
             <ActionsMenu options={menuActionsOptions} />
@@ -149,7 +181,7 @@ const ReportingCustomers = () => {
                         />
                       </TableCell>
                       <TableCell className="row-id">
-                        <p>{row['row-id']}</p>
+                        <p>{row.num}</p>
                       </TableCell>
                       <TableCell className="id">
                         <Link to={`/dashboard/customers/${row.id}`}>{row.id}</Link>
@@ -161,16 +193,16 @@ const ReportingCustomers = () => {
                         <p>{row.lastName}</p>
                       </TableCell>
                       <TableCell className="date">
-                        <p>{row.date}</p>
+                        <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
                       </TableCell>
                       <TableCell className="approved">
                         <SecondaryButton>{row.approved ? 'Yes' : 'No'}</SecondaryButton>
                       </TableCell>
                       <TableCell className="orders">
-                        <p>{row.count}</p>
+                        <p>{row.orders}</p>
                       </TableCell>
                       <TableCell className="order-value">
-                        <p>{`${row.currency}${row.amount}`}</p>
+                        <p>{`${getCurrencyByCode(row.value.currency)}${row.value.amount}`}</p>
                       </TableCell>
                       <TableCell className="actions">
                         <ActionsMenu options={actionsOptions} />
@@ -182,8 +214,8 @@ const ReportingCustomers = () => {
             </Table>
           </TableContainer>
           <TablePagination
-            handleChangePage={handleChangePage}
-            handleChangeRowsPerPage={handleChangeRowsPerPage}
+            handleChangePage={changePage}
+            handleChangeRowsPerPage={changeRowsPerPage}
             page={page}
             pagesCount={pagesCount}
             rowsPerPage={rowsPerPage}
@@ -191,35 +223,35 @@ const ReportingCustomers = () => {
           />
         </TableWrapper>
       </TableContent>
-      {open
+      {openDeleteModal
         ? createPortal(
-            <Overlay onClick={handleClose} className="overlay">
-              <DeleteConfirmationModal
-                confirm={console.log}
-                cancel={console.log}
-                confirmButtonName="Yes - Delete"
-                cancelButtonName="No - Cancel"
-              >
-                <DeleteCustomerModal />
-              </DeleteConfirmationModal>
-            </Overlay>,
-            document.body
-          )
+          <Overlay onClick={handleCloseDeletePopup} className="overlay">
+            <DeleteConfirmationModal
+              confirm={console.log}
+              cancel={handleCloseDeletePopup}
+              confirmButtonName="Yes - Delete"
+              cancelButtonName="No - Cancel"
+            >
+              <DeleteCustomerModal />
+            </DeleteConfirmationModal>
+          </Overlay>,
+          document.body,
+        )
         : null}
       {openApprovalModal
         ? createPortal(
-            <Overlay onClick={handleCloseApprovalModal} className="overlay">
-              <DeleteConfirmationModal
-                confirm={console.log}
-                cancel={console.log}
-                confirmButtonName={'Approve' ?? 'Unapprove'}
-                cancelButtonName="Cancel"
-              >
-                <ApproveCustomerModal type={'approve' ?? 'unapprove'} />
-              </DeleteConfirmationModal>
-            </Overlay>,
-            document.body,
-          )
+          <Overlay onClick={handleCloseApprovalModal} className="overlay">
+            <DeleteConfirmationModal
+              confirm={console.log}
+              cancel={handleCloseApprovalModal}
+              confirmButtonName={'Approve' ?? 'Unapprove'}
+              cancelButtonName="Cancel"
+            >
+              <ApproveCustomerModal type={'approve' ?? 'unapprove'} />
+            </DeleteConfirmationModal>
+          </Overlay>,
+          document.body,
+        )
         : null}
       <StyledDrawer anchor="right" open={filteringDrawerOpen} onClose={handleFilteringDrawer}>
         <DrawerOverlay handleClick={handleFilteringDrawer} handleKeydown={handleFilteringDrawer}>

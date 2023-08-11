@@ -11,13 +11,11 @@ interface Option {
   value: number | string;
   label: number | string;
   icon?: JSX.Element;
+  handleClick?: () => void;
 }
 
 interface ActionsMenuProps {
   options: Option[];
-  selectedValue: number | string;
-  handleChange: () => void;
-  children: React.ReactNode;
   menuName?: string;
 }
 
@@ -31,8 +29,8 @@ const ActionsMenu = (props: ActionsMenuProps) => {
     setAnchorEl(null);
   };
 
-  const handleChoose = (e) => {
-    // props.handleChange();
+  const handleChoose = (cb) => {
+    if (cb) cb();
     setAnchorEl(null);
   };
 
@@ -62,7 +60,7 @@ const ActionsMenu = (props: ActionsMenuProps) => {
         }}
       >
         {props.options.map((item) => (
-          <CustomizeMenuItem key={item.value} disableRipple onClick={handleChoose}>
+          <CustomizeMenuItem key={item.value} disableRipple onClick={() => handleChoose(item.handleClick)}>
             {item.icon ? item.icon : null}
             <p>{item.label}</p>
           </CustomizeMenuItem>

@@ -8,8 +8,14 @@ import { useSortingTable } from '../../../shared/Table/utils';
 import { Row, TableWrapper } from '../../../shared/Table/Table.styled';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 
-const MonthlyCustomersRegTable = () => {
-  const table = useSortingTable(rows);
+interface MonthlyCustomersRegTableProps {
+  data: any;
+  totalCount: number;
+  totalRegistrations: number;
+}
+
+const MonthlyCustomersRegTable = (props: MonthlyCustomersRegTableProps) => {
+  const table = useSortingTable(props.data);
   const { page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
     table.pagination;
 
@@ -26,7 +32,7 @@ const MonthlyCustomersRegTable = () => {
                     <p>{row.month}</p>
                   </TableCell>
                   <TableCell className="reg">
-                    <p>{row.reg}</p>
+                    <p>{row.registations}</p>
                   </TableCell>
                 </Row>
               ))}
@@ -35,7 +41,7 @@ const MonthlyCustomersRegTable = () => {
                   <strong>Total</strong>
                 </TableCell>
                 <TableCell className="reg">
-                  <strong>0</strong>
+                  <strong>{props.totalRegistrations}</strong>
                 </TableCell>
               </Row>
             </TableBody>

@@ -1,45 +1,19 @@
-// import { PreloadedState, combineReducers, configureStore } from '@reduxjs/toolkit';
-// import {
-//   persistStore, persistReducer, FLUSH,
-//   REHYDRATE,
-//   PAUSE,
-//   PERSIST,
-//   PURGE,
-//   REGISTER,
-// } from 'redux-persist';
-// import storage from 'redux-persist/lib/storage';
-// import signupReducer, { StateProps } from './signup.slice';
+import { PreloadedState, combineReducers, configureStore } from '@reduxjs/toolkit';
+import dashboardReducer from './slices/dashboard.slice';
+import reportingReducer from './slices/reporting.slice';
 
-// export interface RootState {
-//   signup: StateProps;
-// }
+const rootReducer = combineReducers({ dashboard: dashboardReducer, reporting: reportingReducer });
 
-// const persistConfig = {
-//   key: 'pta-events',
-//   storage,
-// };
+export const store = configureStore({
+  reducer: rootReducer,
+});
 
-// const rootReducer = combineReducers({ signup: signupReducer });
-// const persistedReducer = persistReducer(persistConfig, rootReducer);
+export const setupStore = (preloadedState?: PreloadedState<RootState>) => configureStore({
+  reducer: rootReducer,
+  preloadedState,
+});
 
-// export const store = configureStore({
-//   reducer: persistedReducer,
-//   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-//     serializableCheck: {
-//       ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-//     },
-//   }),
-// });
-
-// export const setupStore = (preloadedState?: PreloadedState<RootState>) => configureStore({
-//   reducer: persistedReducer,
-//   middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-//     serializableCheck: {
-//       ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-//     },
-//     preloadedState,
-//   }),
-// });
-
-// export type AppStore = ReturnType<typeof setupStore>;
-// export const persistor = persistStore(store);
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+export type AppStore = ReturnType<typeof setupStore>;

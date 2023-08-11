@@ -1,17 +1,54 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import TableContainer from '@mui/material/TableContainer/TableContainer';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
+import { useDispatch } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material/Select/Select';
+import dayjs from 'dayjs';
 import { useSortingTable } from '../../../../shared/Table/utils';
 import { Row, TableWrapper } from '../../../../shared/Table/Table.styled';
 import { TableCell, Head } from './ReportingTableProductDaySales.styled';
-import { rows, headCells } from './table-data';
+import { headCells } from './table-data';
 import TablePagination from '../../../../shared/Table/TablePagination/TablePagination';
+import { ProductsSoldByDayItem } from '../../../../../types/reporting/sales';
+import { AppDispatch } from '../../../../../redux/store';
+import { getSalesStat } from '../../../../../redux/actions/reporting.actions';
+import { getCurrencyByCode } from '../../../../../utils/currency';
 
-const ReportingTableProductDaySales = () => {
-  const table = useSortingTable(rows);
-  const { page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
-    table.pagination;
+interface ReportingTableProductDaySalesProps extends ProductsSoldByDayItem {
+  currency: string;
+}
+
+const ReportingTableProductDaySales = (props: ReportingTableProductDaySalesProps) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const table = useSortingTable(props.data || [], {
+    totalCount: props.totalCount,
+    totalPages: props.totalPages,
+    pageSize: props.pageSize,
+    currentPage: props.currentPage,
+  });
+  const {
+    page, pagesCount, rowsPerPage,
+  } = table.pagination;
+
+  const changePage = (e: ChangeEvent, newPage?: number) => {
+    e.preventDefault();
+    dispatch(
+      getSalesStat({
+        page: newPage,
+        pageSize: rowsPerPage,
+      }),
+    );
+  };
+
+  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
+    dispatch(
+      getSalesStat({
+        page: 1,
+        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
+      }),
+    );
+  };
 
   return (
     <TableWrapper>
@@ -22,7 +59,7 @@ const ReportingTableProductDaySales = () => {
             {table.visibleRows.map((row) => (
               <Row key={row.num}>
                 <TableCell className="date">
-                  <p>{row.date}</p>
+                  <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
                 </TableCell>
                 <TableCell className="percentage">
                   <p>{`${row.percentage}%`}</p>
@@ -34,37 +71,37 @@ const ReportingTableProductDaySales = () => {
                   <p>{row.quantityToDate}</p>
                 </TableCell>
                 <TableCell className="total-sales">
-                  <p>{`${row.currency}${row.totalSales}`}</p>
+                  <p>{`${getCurrencyByCode(props.currency)}${row.totalSales}`}</p>
                 </TableCell>
                 <TableCell className="to-date">
-                  <p>{`${row.currency}${row.toDate}`}</p>
+                  <p>{`${getCurrencyByCode(props.currency)}${row.toDate}`}</p>
                 </TableCell>
               </Row>
             ))}
             <Row>
               <TableCell className="date" />
               <TableCell className="percentage">
-                <strong>0%</strong>
+                <strong>{`${props.totalPercentage}%`}</strong>
               </TableCell>
               <TableCell className="quantity">
-                <strong>0</strong>
+                <strong>{props.totalQuantity}</strong>
               </TableCell>
               <TableCell className="quantity-to-date">
-                <strong>0</strong>
+                <strong>{props.totalQuantityToDate}</strong>
               </TableCell>
               <TableCell className="total-sales">
-                <strong>£0</strong>
+                <strong>{`${getCurrencyByCode(props.currency)}${props.totalSales}`}</strong>
               </TableCell>
               <TableCell className="to-date">
-                <strong>£0</strong>
+                <strong>{`${getCurrencyByCode(props.currency)}${props.totalToDate}`}</strong>
               </TableCell>
             </Row>
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
-        handleChangePage={handleChangePage}
-        handleChangeRowsPerPage={handleChangeRowsPerPage}
+        handleChangePage={changePage}
+        handleChangeRowsPerPage={changeRowsPerPage}
         page={page}
         pagesCount={pagesCount}
         rowsPerPage={rowsPerPage}

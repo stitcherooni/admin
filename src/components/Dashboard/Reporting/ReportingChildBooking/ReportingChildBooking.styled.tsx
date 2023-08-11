@@ -3,6 +3,7 @@ import { Cell } from '../../../shared/Table/Table.styled';
 import Alert from '../../../shared/Alert/Alert';
 import TableHeadSorting from '../../../shared/Table/TableHeadSorting/TableHeadSorting';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
+import { BaseButton } from '../../../shared/Buttons/Buttons.styled';
 
 export const Wrapper = styled.div``;
 
@@ -221,5 +222,14 @@ export const TableWrapper = styled.div`
     & .table-footer {
       width: 85.37%;
     }
+  }
+`;
+
+export const Button = styled(BaseButton)`
+  &.MuiButtonBase-root.MuiButton-root {
+    padding: 0;
+    border: none;
+    text-decoration: underline;
+    color: ${(props) => props.theme.colors.main.purple};
   }
 `;

@@ -1,6 +1,7 @@
-import React, { SyntheticEvent, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import AccordionSummary from '@mui/material/AccordionSummary/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails/AccordionDetails';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Wrapper,
   HorizontalAdv,
@@ -25,6 +26,10 @@ import LiveSalesTable from './DashboardTables/LiveSalesTable/LiveSalesTable';
 import MonthlyOrdersTable from './DashboardTables/MonthlyOrdersTable/MonthlyOrdersTable';
 import MonthlyCustomersRegTable from './DashboardTables/MonthlyCustomersRegTable/MonthlyCustomersRegTable';
 import LastSalesTable from './DashboardTables/LastSalesTable/LastSalesTable';
+import LoadingOverlay from '../shared/LoadingOverlay/LoadingOverlay';
+import { AppDispatch, RootState } from '../../redux/store';
+import { addCurrencyToStatistic } from './helpers';
+import { getDashboardStat } from '../../redux/actions/dashboard.actions';
 // import LegalInformationList from './LegalInformationList/LegalInformationList';
 // import AdvCard from './UserActionsCards/AdvCard/AdvCard';
 
@@ -61,7 +66,21 @@ const Dashboard = () => {
     setOpen(isExpanded ? name : false);
   };
 
-  return (
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(getDashboardStat());
+  }, []);
+
+  const dashboardData = useSelector((state: RootState) => state.dashboard);
+
+  // rename totqalOrders for Monthly Orders (shouldnt be 0), currency also should be string
+  // need eventId and productId for liveSales
+  // need to count total values manually? for liveSales
+  // rename registations to registrations for for monthly registrations
+  // totalCount, currentPage, pageSize needs for every table
+
+  return dashboardData.status === 'loading' ? <LoadingOverlay /> : (
     <Wrapper>
       <LegalInformation />
       <DashboardOverview>
@@ -70,34 +89,56 @@ const Dashboard = () => {
           <SecondaryButton size="small">Customise View</SecondaryButton>
         </CustomizerMenu> */}
       </DashboardOverview>
-      <OverviewCards />
+      <OverviewCards data={addCurrencyToStatistic(dashboardData.stat, '£')} />
       <TablesContainer>
         <SalesAccordion expanded={open === 'live-sales'} onChange={handleChange('live-sales')}>
           <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
             <h3>Current Live Sales</h3>
           </AccordionSummary>
           <AccordionDetails>
-            <ProductName type="success" className="product-name">
-              Product Name
-            </ProductName>
-            <br />
-            <LiveSalesTable />
+            {dashboardData.currentLiveSales.data.map((item) => (
+              <React.Fragment key={item.key}>
+                <ProductName type="success" className="product-name">
+                  {item.key}
+                </ProductName>
+                <br />
+                <LiveSalesTable
+                  data={item.value.data}
+                  totalQuantitySold={item.value.totalQuantitySold}
+                  totalQuantityLeft={item.value.totalQuantityLeft}
+                  totalSales={item.value.totalSales}
+                  currency={item.value.currency}
+                  currentPage={item.value}
+                  pageSize={0}
+                />
+                <br />
+              </React.Fragment>
+            ))}
           </AccordionDetails>
         </SalesAccordion>
-        <SalesAccordion expanded={open === 'month-orders'} onChange={handleChange('month-orders')}>
+        <SalesAccordion expanded={open === 'monthly-orders'} onChange={handleChange('monthly-orders')}>
           <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
             <h3>Monthly Orders</h3>
           </AccordionSummary>
           <AccordionDetails>
-            <MonthlyOrdersTable />
+            <MonthlyOrdersTable
+              data={dashboardData.monthlyOrders.data}
+              totalOrders={dashboardData.monthlyOrders.totqalOrders}
+              totalSales={dashboardData.monthlyOrders.totalSales}
+              currency="£"
+            />
           </AccordionDetails>
         </SalesAccordion>
-        <SalesAccordion expanded={open === 'month-customers-orders'} onChange={handleChange('month-customers-orders')}>
+        <SalesAccordion expanded={open === 'monthly-customers-orders'} onChange={handleChange('monthly-customers-orders')}>
           <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
             <h3>Monthly Customers Registrations</h3>
           </AccordionSummary>
           <AccordionDetails>
-            <MonthlyCustomersRegTable />
+            <MonthlyCustomersRegTable
+              data={dashboardData.monthlyCustomersRegistrations.data}
+              totalCount={0}
+              totalRegistrations={dashboardData.monthlyCustomersRegistrations.totalRegistrations}
+            />
           </AccordionDetails>
         </SalesAccordion>
         <SalesAccordion expanded={open === 'last-sales'} onChange={handleChange('last-sales')}>
@@ -105,7 +146,7 @@ const Dashboard = () => {
             <h3>Last 25 Orders</h3>
           </AccordionSummary>
           <AccordionDetails>
-            <LastSalesTable />
+            <LastSalesTable data={dashboardData.lastOrders} />
           </AccordionDetails>
         </SalesAccordion>
       </TablesContainer>

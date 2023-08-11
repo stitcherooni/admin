@@ -82,29 +82,9 @@ export const groupByOptions = [
 
 export const menuActionsOptions = [
   {
-    value: 'random',
-    label: 'Select Random',
-    icon: <ShuffleOutlinedIcon className="random" />,
-  },
-  {
-    value: 'email',
-    label: 'Email Bookings',
-    icon: <MessageIcon color={theme.colors.main.black} className="email" />,
-  },
-  {
-    value: 'customize-view',
-    label: 'Export Doors Validation List',
-    icon: <TuneOutlined className="customize-view" />,
-  },
-  {
     value: 'copy',
     label: 'Copy',
     icon: <ContentCopyOutlined className="copy" />,
-  },
-  {
-    value: 'excel',
-    label: 'Export Excel',
-    icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {
     value: 'pdf',

@@ -20,14 +20,3 @@ export const headCells = [
     className: 'total-sales',
   },
 ];
-
-export const rows = [
-  {
-    num: 1,
-    currency: '£',
-    schoolName: 'The Grave school PTA',
-    percentage: 100,
-    quantity: 2,
-    totalSales: 10,
-  },
-];

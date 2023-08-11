@@ -11,9 +11,17 @@ import { headCells, rows } from './table-data';
 import { useSortingTable } from '../../../shared/Table/utils';
 import { Row, TableWrapper } from '../../../shared/Table/Table.styled';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
+import { getCurrencyByCode } from '../../../../utils/currency';
 
-const MonthlyOrdersTable = () => {
-  const table = useSortingTable(rows);
+interface MonthlyOrdersTableProps {
+  data: any;
+  totalOrders: number;
+  totalSales: number;
+  currency: string;
+}
+
+const MonthlyOrdersTable = (props: MonthlyOrdersTableProps) => {
+  const table = useSortingTable(props.data);
   const {
     page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
   } = table.pagination;
@@ -39,7 +47,7 @@ const MonthlyOrdersTable = () => {
                     <p>{row.orders}</p>
                   </TableCell>
                   <TableCell className="sales">
-                    <p>{`${row.currency}${row.sales}`}</p>
+                    <p>{`${getCurrencyByCode(row.currency)}${row.sales}`}</p>
                   </TableCell>
                 </Row>
               ))}
@@ -48,10 +56,10 @@ const MonthlyOrdersTable = () => {
                   <strong>Total</strong>
                 </TableCell>
                 <TableCell className="orders">
-                  <strong>0</strong>
+                  <strong>{props.totalOrders}</strong>
                 </TableCell>
                 <TableCell className="sales">
-                  <strong>£0.00</strong>
+                  <strong>{`${getCurrencyByCode(props.currency)}${props.totalSales}`}</strong>
                 </TableCell>
               </Row>
             </TableBody>

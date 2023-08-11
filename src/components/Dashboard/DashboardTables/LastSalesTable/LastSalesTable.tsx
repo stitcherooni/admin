@@ -3,6 +3,7 @@ import TableContainer from '@mui/material/TableContainer/TableContainer';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
 import { Link } from 'react-router-dom';
+import dayjs from 'dayjs';
 import {
   TableCell,
   TableContent,
@@ -12,9 +13,14 @@ import { headCells, rows } from './table-data';
 import { useSortingTable } from '../../../shared/Table/utils';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import { Row, TableWrapper } from '../../../shared/Table/Table.styled';
+import { getCurrencyByCode } from '../../../../utils/currency';
 
-const LastSalesTable = () => {
-  const table = useSortingTable(rows);
+interface LastSalesTableProps {
+  data: any;
+}
+
+const LastSalesTable = (props: LastSalesTableProps) => {
+  const table = useSortingTable(props.data);
   const {
     page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
   } = table.pagination;
@@ -31,19 +37,19 @@ const LastSalesTable = () => {
             <TableBody>
               {table.visibleRows.map((row) => (
                 <Row
-                  key={row.id}
+                  key={row.orderId}
                 >
                   <TableCell className="id">
-                    <Link to='/'>{row.id}</Link>
+                    <Link to={`/dashboard/reporting?type=orders&orderId=${row.orderId}`}>{row.orderId}</Link>
                   </TableCell>
                   <TableCell className="date">
-                    <p>{row.date}</p>
+                    <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
                   </TableCell>
                   <TableCell className="customer-name">
-                    <p>{row.name}</p>
+                    <p>{row.customerName}</p>
                   </TableCell>
                   <TableCell className="value">
-                    <p>{`${row.currency}${row.value}`}</p>
+                    <p>{`${getCurrencyByCode(row.currency)}${row.value}`}</p>
                   </TableCell>
                 </Row>
               ))}

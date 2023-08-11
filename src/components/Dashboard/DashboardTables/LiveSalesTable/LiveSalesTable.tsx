@@ -3,6 +3,7 @@ import TableContainer from '@mui/material/TableContainer/TableContainer';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
 import { Link } from 'react-router-dom';
+import dayjs from 'dayjs';
 import {
   TableCell,
   TableContent,
@@ -12,12 +13,26 @@ import { headCells, rows } from './table-data';
 import { useSortingTable } from '../../../shared/Table/utils';
 import { Row, TableWrapper } from '../../../shared/Table/Table.styled';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
+import { getCurrencyByCode } from '../../../../utils/currency';
 
-const LiveSalesTable = () => {
-  const table = useSortingTable(rows);
+interface LiveSalesTableProps {
+  data: any;
+  totalQuantitySold: number;
+  totalQuantityLeft: number;
+  totalSales: number;
+  currency: string;
+  currentPage: number;
+  pageSize: number;
+}
+
+const LiveSalesTable = (props: LiveSalesTableProps) => {
+  const table = useSortingTable(props.data, { page: props.currentPage, pageSize: props.pageSize });
   const {
     page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
   } = table.pagination;
+
+  // need eventId and productId
+  // need to count total values manually?
 
   return (
     <TableContent>
@@ -34,28 +49,28 @@ const LiveSalesTable = () => {
                   key={row.id}
                 >
                   <TableCell className="name">
-                    <Link to="/">{row.name}</Link>
+                    <Link to="/event-products?eventId=&productId=">{row.name}</Link>
                   </TableCell>
                   <TableCell className="type">
                     <p>{row.type}</p>
                   </TableCell>
                   <TableCell className="start-date">
-                    <p>{row.startDate}</p>
+                    <p>{dayjs(row.startDate).format('DD/MM/YYYY HH:MM')}</p>
                   </TableCell>
                   <TableCell className="end-date">
-                    <p>{row.endDate}</p>
+                    <p>{dayjs(row.endDate).format('DD/MM/YYYY HH:MM')}</p>
                   </TableCell>
                   <TableCell className="price">
-                    <p>{`${row.currency}${row.price}`}</p>
+                    <p>{`${getCurrencyByCode(row.currency)}${row.price}`}</p>
                   </TableCell>
                   <TableCell className="quantity-sold">
-                    <p>{row.sold}</p>
+                    <p>{row.quantitySold}</p>
                   </TableCell>
                   <TableCell className="quantity-left">
-                    <p>{row.left}</p>
+                    <p>{row.quantityLeft}</p>
                   </TableCell>
                   <TableCell className="sales">
-                    <p>{`${row.currency}${row.sales}`}</p>
+                    <p>{`${getCurrencyByCode(row.currency)}${row.sales}`}</p>
                   </TableCell>
                 </Row>
               ))}
@@ -66,13 +81,13 @@ const LiveSalesTable = () => {
                 <TableCell className="end-date hidden" />
                 <TableCell className="price hidden" />
                 <TableCell className="quantity-sold">
-                  <strong>0</strong>
+                  <strong>{props.totalQuantitySold}</strong>
                 </TableCell>
                 <TableCell className="quantity-left">
-                  <strong>0</strong>
+                  <strong>{props.totalQuantityLeft}</strong>
                 </TableCell>
                 <TableCell className="sales">
-                  <strong>£0.00</strong>
+                  <strong>{`${getCurrencyByCode(props.currency)}${props.totalSales}`}</strong>
                 </TableCell>
               </Row>
             </TableBody>

@@ -120,6 +120,9 @@ export const TableCell = styled(Cell)`
 
   &.date {
     width: 105px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
   }
 
   &.customer-name {

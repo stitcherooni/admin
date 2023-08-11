@@ -34,7 +34,8 @@ export const CustomizeMenuItem = styled(MenuItem)`
     }
 
     & .customize-view,
-    & .random {
+    & .random,
+    & .test-orders {
       width: 18px;
     }
 

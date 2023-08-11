@@ -9,13 +9,19 @@ import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
 import DesktopWindowsOutlinedIcon from '@mui/icons-material/DesktopWindowsOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import StayCurrentPortraitOutlinedIcon from '@mui/icons-material/StayCurrentPortraitOutlined';
+import dayjs from 'dayjs';
 import { Wrapper, Row, ArrowIcon, CheckedIcon, EmailIcon, StepTitle } from './ReportingEmailStepper.styled';
+import { EmailTrackerItem } from '../../../../../../types/reporting/emailTracker';
 
 const ArrowIconComponent = () => <ArrowIcon />;
 const CheckedIconComponent = () => <CheckedIcon />;
 const EmailIconComponent = () => <EmailIcon />;
 
-const ReportingEmailStepper = () => (
+interface ReportingEmailStepperProps {
+  data: EmailTrackerItem;
+}
+
+const ReportingEmailStepper = (props: ReportingEmailStepperProps) => (
   <Wrapper>
     <Stepper orientation="vertical">
       <Step active>
@@ -25,37 +31,37 @@ const ReportingEmailStepper = () => (
         <StepContent>
           <Row>
             <AccessTimeOutlinedIcon />
-            <p>27/10/2020 14:40:00</p>
+            <p>{dayjs(props.data.dateSent).format('DD/MM/YYYY HH:MM')}</p>
           </Row>
         </StepContent>
       </Step>
       <Step active>
         <StepTitle StepIconComponent={CheckedIconComponent}>
-          <h3>Delivered (support@pta-events.co.uk)</h3>
+          <h3>{`Delivered (${props.data.email})`}</h3>
         </StepTitle>
         <StepContent>
           <Row>
             <AccessTimeOutlinedIcon />
-            <p>27/10/2020 14:40:00</p>
+            <p>{dayjs(props.data.deliveredDate).format('DD/MM/YYYY HH:MM')}</p>
           </Row>
         </StepContent>
       </Step>
       <Step active>
         <StepTitle StepIconComponent={EmailIconComponent}>
-          <h3>Opened (support@pta-events.co.uk)</h3>
+          <h3>{`Opened (${props.data.email})`}</h3>
         </StepTitle>
         <StepContent>
           <Row>
             <AccessTimeOutlinedIcon />
-            <p>27/10/2020 14:40:00</p>
+            <p>{dayjs(props.data.openedDate).format('DD/MM/YYYY HH:MM')}</p>
           </Row>
           <Row>
             <CloudQueueOutlinedIcon />
-            <p>66.22.33.89</p>
+            <p>{props.data.ip}</p>
           </Row>
           <Row>
             <PlaceOutlinedIcon />
-            <p>Unknown, Unknown, Unknown</p>
+            <p>{props.data.location}</p>
           </Row>
           <Row>
             <PublicOutlinedIcon />

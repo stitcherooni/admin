@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { Cell } from '../../../shared/Table/Table.styled';
 import Alert from '../../../shared/Alert/Alert';
 import TableHeadSorting from '../../../shared/Table/TableHeadSorting/TableHeadSorting';
+import { BaseButton } from '../../../shared/Buttons/Buttons.styled';
 
 export const Wrapper = styled.div``;
 
@@ -363,5 +364,14 @@ export const StyledAlert = styled(Alert)`
     &.booking-alert {
       margin: 24px 0 0 0;
     }
+  }
+`;
+
+export const Button = styled(BaseButton)`
+  &.MuiButtonBase-root.MuiButton-root {
+    padding: 0;
+    border: none;
+    text-decoration: underline;
+    color: ${(props) => props.theme.colors.main.purple};
   }
 `;

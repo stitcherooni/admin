@@ -1,7 +1,10 @@
-import React, { SyntheticEvent, useMemo, useState } from 'react';
+import React, { ChangeEvent, SyntheticEvent, useMemo, useState } from 'react';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
 import { createPortal } from 'react-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material/Select/Select';
+import dayjs from 'dayjs';
 import {
   Col,
   Filters,
@@ -13,6 +16,7 @@ import {
   TableContent,
   Head,
   Wrapper,
+  Button,
 } from './ReportingBooking.styled';
 import {
   Row,
@@ -21,11 +25,8 @@ import {
   TableWrapper,
 } from '../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
-import {
-  eventOptions, groupByOptions, headCells, menuActionsOptions,
-  productsOptions, rows, tableActionsOptions,
-} from './table-data';
-import { Overlay } from '../Reporting.styled';
+import { headCells, menuActionsOptions, tableActionsOptions } from './table-data';
+import { Overlay, StyledDrawer } from '../Reporting.styled';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
 import BookingEditModal from './BookingEditModal/BookingEditModal';
 import QflowModal from '../QflowModal/QflowModal';
@@ -33,6 +34,17 @@ import Label from '../../../shared/Label/Label';
 import NestedMenu from '../../../shared/NestedMenu/NestedMenu';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import Select from '../../../shared/Select/Select';
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { getBookingStat, sortBookingStat } from '../../../../redux/actions/reporting.actions';
+import {
+  createEventsOptions,
+  createProductOptions,
+  createSortByOptions,
+  handleCloseModal,
+} from './utils';
+import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
+import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
+import { BookingStatItem } from '../../../../types/reporting/bookings';
 
 interface Filter {
   value: number | string;
@@ -50,48 +62,30 @@ interface ReportingFilters {
 }
 
 const ReportingBooking = () => {
-  const table = useSortingTable(rows);
-  const {
-    selected, handleSelectAllClick, handleClick, checkIsSelected,
-  } = table.selection;
+  const dispatch = useDispatch<AppDispatch>();
+  const bookingData = useSelector((state: RootState) => state.reporting.bookings);
+  const table = useSortingTable<BookingStatItem>(bookingData.data, {
+    totalCount: bookingData.totalCount,
+    totalPages: bookingData.totalPages,
+    pageSize: bookingData.pageSize,
+    currentPage: bookingData.currentPage,
+  });
+  const { page, pagesCount, rowsPerPage } = table.pagination;
+  const { selected, handleSelectAllClick, checkIsSelected, handleClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const {
-    page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
-  } = table.pagination;
+  const [openUpdateBooking, setOpenUpdateBooking] = useState(false);
+  const toggleOpenUpdateBooking = () => setOpenUpdateBooking(!openUpdateBooking);
 
-  const [open, setOpen] = useState(false);
-
-  const toggleOpen = () => setOpen(!open);
-
-  const handleClose = (e: SyntheticEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-
-    if (!target.className.length) return;
-
-    if (target.className.includes('overlay')) {
-      toggleOpen();
-    }
+  const handleCloseUpdateBooking = (e: SyntheticEvent<HTMLDivElement>) => {
+    handleCloseModal(e, toggleOpenUpdateBooking);
   };
 
   const [openQflowModal, setQflowModalOpen] = useState(false);
-
   const toggleOpenQflowModal = () => setQflowModalOpen(!openQflowModal);
 
   const handleCloseQflowModal = (e: SyntheticEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-
-    if (!target.className.length) return;
-
-    if (target.className.includes('overlay')) {
-      toggleOpenQflowModal();
-    }
+    handleCloseModal(e, toggleOpenQflowModal);
   };
-
-  const namesToDelete = useMemo(() => {
-    const names: string[] = [];
-    selected.forEach((id) => names.push(table.rowsListById[id].eventName));
-    return names.join(', ');
-  }, [selected, table.rowsListById]);
 
   const [filters, setSelectedFilters] = useState<ReportingFilters>({
     event: {
@@ -103,6 +97,8 @@ const ReportingBooking = () => {
     groupBy: '',
   });
 
+  // for sorting we neednt all fields are required
+
   const handleChooseEvent = (e) => {
     const { value, label, rootid } = e.currentTarget.dataset;
     setSelectedFilters((currentFilters) => ({
@@ -113,6 +109,13 @@ const ReportingBooking = () => {
         year: rootid,
       },
     }));
+    dispatch(sortBookingStat({
+      EventIds: value,
+      ProductIds: filters.product ?? '',
+      GroupBy: filters.groupBy ?? '',
+      page: bookingData.currentPage,
+      pageSize: bookingData.pageSize,
+    }));
   };
 
   const handleSelectFilters = (e, type: string) => {
@@ -120,11 +123,64 @@ const ReportingBooking = () => {
       ...currentFilters,
       [type]: e.target.value,
     }));
+
+    dispatch(sortBookingStat({
+      EventIds: filters.event?.value,
+      ProductIds: type === 'product' ? e.target.value : filters.product,
+      GroupBy: type === 'groupBy' ? e.target.value : filters.groupBy ?? '',
+      page: bookingData.currentPage,
+      pageSize: bookingData.pageSize,
+    }));
   };
 
   const handleEventChange = (e) => handleChooseEvent(e);
   const handleProductChange = (e) => handleSelectFilters(e, 'product');
   const handleGroupByChange = (e) => handleSelectFilters(e, 'groupBy');
+
+  const changePage = (e: ChangeEvent, newPage?: number) => {
+    e.preventDefault();
+    dispatch(
+      getBookingStat({
+        page: newPage,
+        pageSize: rowsPerPage,
+      })
+    );
+  };
+
+  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
+    dispatch(
+      getBookingStat({
+        page: 1,
+        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
+      })
+    );
+  };
+
+  const eventOptions = useMemo(
+    () => createEventsOptions(bookingData?.filters?.events ?? ([] as BookingEvents[])),
+    [bookingData?.filters?.events]
+  );
+
+  const productsOptions = useMemo(
+    () => createProductOptions(bookingData?.filters?.products ?? []),
+    [bookingData?.filters?.products]
+  );
+
+  const groupByOptions = useMemo(
+    () => createSortByOptions(bookingData?.filters?.groupBy ?? ([] as BookingGroupByFilter)),
+    [bookingData?.filters  ?.groupBy]
+  );
+
+  const [orderDetails, setOrderDetails] = useState<Order | null>(null);
+
+  const [orderDetailOpen, setOrderDetailOpen] = useState(false);
+  const handleOrderDetailDrawer = (e: React.SyntheticEvent, order: Order | null = null) => {
+    e.preventDefault();
+    // close just if click by overlay
+    if (orderDetailOpen && ![...e.currentTarget.classList].includes('MuiBackdrop-root')) return;
+    setOrderDetailOpen(!orderDetailOpen);
+    setOrderDetails(order);
+  };
 
   // add button 'show test bookings'
   // add logic for column sorting
@@ -133,23 +189,32 @@ const ReportingBooking = () => {
   // add tinymce integration
   // add 'select random' button
 
-  return (
+  // needs firstName, lastName, remove customerName
+  // needs className, bookingInfo, SKU, price, quantity, orderId, bookedBy, phone, email, paymentMethod, remove contact, order
+
+  // filters
+  // group by should be array of objects
+  // events - obj , key year, value: array of events
+
+  // click by first, last name - show update booking / order popup
+  // filters group by should be array, not object
+
+  // we neednt high requirements for filters, group by or other not required
+
+  return !bookingData.filters ? null : (
     <Wrapper>
       <StyledAlert type="success" className="booking-alert">
         <p>
-          Good news
-          {' '}
-          <strong>Test User</strong>
-          , we’ve integrated with
-          {' '}
+          Good news <strong>Test User</strong>, we’ve integrated with{' '}
           <a href="https://www.getqflow.com/features" target="_blank" rel="noreferrer">
             Qflow
-          </a>
-          {' '}
+          </a>{' '}
           which is a simple and intuitive ticket scanning and guest list app that you can use to
           scan your guests in to your events.
           <br />
-          <a href="#">See more information</a>
+          <Button type="button" onClick={toggleOpenQflowModal}>
+            See more information
+          </Button>
         </p>
       </StyledAlert>
       <Filters>
@@ -195,9 +260,8 @@ const ReportingBooking = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>32</strong>
-            {' '}
-            Entries
+            <strong>{`${bookingData.totalCount} `}</strong>
+            {`${bookingData.totalCount === 0 || bookingData.totalCount > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -207,7 +271,7 @@ const ReportingBooking = () => {
                 numSelected={selected.length}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={rows.length}
+                rowCount={bookingData.data.length}
                 cells={headCells}
                 className="table-head"
               />
@@ -223,7 +287,7 @@ const ReportingBooking = () => {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.id}
+                      key={row.num}
                       selected={isItemSelected}
                       sx={{ cursor: 'pointer' }}
                     >
@@ -237,7 +301,7 @@ const ReportingBooking = () => {
                         />
                       </TableCell>
                       <TableCell className="row-id">
-                        <p>{row['row-id']}</p>
+                        <p>{row.num}</p>
                       </TableCell>
                       <TableCell className="first-name">
                         <p>{row.firstName}</p>
@@ -270,7 +334,7 @@ const ReportingBooking = () => {
                         <p>{row.orderId}</p>
                       </TableCell>
                       <TableCell className="order-date">
-                        <p>{row.orderDate}</p>
+                        <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
                       </TableCell>
                       <TableCell className="booked-by">
                         <p>{row.bookedBy}</p>
@@ -294,8 +358,8 @@ const ReportingBooking = () => {
             </Table>
           </StyledTableWrapper>
           <TablePagination
-            handleChangePage={handleChangePage}
-            handleChangeRowsPerPage={handleChangeRowsPerPage}
+            handleChangePage={changePage}
+            handleChangeRowsPerPage={changeRowsPerPage}
             page={page}
             pagesCount={pagesCount}
             rowsPerPage={rowsPerPage}
@@ -303,22 +367,36 @@ const ReportingBooking = () => {
           />
         </TableWrapper>
       </TableContent>
-      {open
+      {openUpdateBooking
         ? createPortal(
-          <Overlay onClick={handleClose} className="overlay">
-            <BookingEditModal />
-          </Overlay>,
-          document.body,
-        )
+            <Overlay onClick={handleCloseUpdateBooking} className="overlay">
+              <BookingEditModal />
+            </Overlay>,
+            document.body
+          )
         : null}
       {openQflowModal
         ? createPortal(
-          <Overlay onClick={handleCloseQflowModal} className="overlay">
-            <QflowModal />
-          </Overlay>,
-          document.body,
-        )
+            <Overlay onClick={handleCloseQflowModal} className="overlay">
+              <QflowModal handleClose={toggleOpenQflowModal} />
+            </Overlay>,
+            document.body
+          )
         : null}
+      {!orderDetails ? null : (
+        <StyledDrawer
+          anchor="right"
+          open={orderDetailOpen}
+          onClose={(e) => handleOrderDetailDrawer(e, null)}
+        >
+          <DrawerOverlay
+            handleClick={handleOrderDetailDrawer}
+            handleKeydown={handleOrderDetailDrawer}
+          >
+            <OrderDetails data={orderDetails} needsActions={false} />
+          </DrawerOverlay>
+        </StyledDrawer>
+      )}
     </Wrapper>
   );
 };

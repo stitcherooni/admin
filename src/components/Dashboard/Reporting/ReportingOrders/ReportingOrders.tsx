@@ -1,14 +1,15 @@
-import React, { SyntheticEvent, useMemo, useState } from 'react';
+import React, {
+  ChangeEvent, SyntheticEvent, useMemo, useState,
+} from 'react';
 import TableContainer from '@mui/material/TableContainer/TableContainer';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
 import { createPortal } from 'react-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material/Select/Select';
+import dayjs from 'dayjs';
 import {
-  TableCell,
-  TableContent,
-  Head,
-  Wrapper,
-  OrderStatusBadge,
+  TableCell, TableContent, Head, Wrapper, OrderStatusBadge,
 } from './ReportingOrders.styled';
 import {
   Row,
@@ -18,7 +19,7 @@ import {
   TableWrapper,
 } from '../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
-import { actionsOptions, headCells, menuActionsOptions, rows } from './table-data';
+import { actionsOptions, headCells, menuActionsOptions } from './table-data';
 import { Overlay, StyledDrawer } from '../Reporting.styled';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import OrderDetails from './OrderDetails/OrderDetails';
@@ -28,6 +29,11 @@ import FilteringReportingOrdersModal from './FIlteringReportingOrdersModal/FIlte
 import DeleteConfirmationModal from '../../../shared/Modals/DeleteConfirmationModal/DeleteConfirmationModal';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import StatisticBar from '../StatisticBar/StatisticBar';
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { Order } from '../../../../types/reporting/orders';
+import { getOrdersStat } from '../../../../redux/actions/reporting.actions';
+import { getCurrencyByCode } from '../../../../utils/currency';
+import { downloadFile } from '../../../../utils/file';
 
 const data = [
   {
@@ -48,35 +54,65 @@ const data = [
   },
 ];
 
+const createTableActions = (order: Order, params) => {
+  const { selectOrderDetails } = params;
+
+  return actionsOptions.map((item) => {
+    switch (true) {
+      case item.label === 'View Order':
+        return { ...item, handleClick: () => selectOrderDetails(order) };
+      default: return item;
+    }
+  });
+};
+
 const ReportingOrders = () => {
-  const table = useSortingTable(rows);
+  const dispatch = useDispatch<AppDispatch>();
+  const ordersData = useSelector((state: RootState) => state.reporting.orders);
+  const table = useSortingTable<Order>(ordersData.data, {
+    totalCount: ordersData.totalCount,
+    totalPages: ordersData.totalPages,
+    pageSize: ordersData.pageSize,
+    currentPage: ordersData.currentPage,
+  });
   const {
-    selected, handleSelectAllClick, handleClick, checkIsSelected,
+    selected, handleSelectAllClick, checkIsSelected, handleClick,
   } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const {
-    page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
-  } = table.pagination;
+  const { page, pagesCount, rowsPerPage } = table.pagination;
 
-  const [open, setOpen] = useState(false);
+  const changePage = (e: ChangeEvent, newPage?: number) => {
+    e.preventDefault();
+    dispatch(
+      getOrdersStat({
+        page: newPage,
+        pageSize: rowsPerPage,
+      }),
+    );
+  };
 
-  const toggleOpen = () => setOpen(!open);
+  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
+    dispatch(
+      getOrdersStat({
+        page: 1,
+        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
+      }),
+    );
+  };
 
-  const handleClose = (e: SyntheticEvent<HTMLDivElement>) => {
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+
+  const toggleFilterModalOpen = () => setFilterModalOpen(!filterModalOpen);
+
+  const handleCloseFilterModal = (e: SyntheticEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
 
     if (!target.className.length) return;
 
     if (target.className.includes('overlay')) {
-      toggleOpen();
+      toggleFilterModalOpen();
     }
   };
-
-  const namesToDelete = useMemo(() => {
-    const names: string[] = [];
-    selected.forEach((id) => names.push(table.rowsListById[id].eventName));
-    return names.join(', ');
-  }, [selected, table.rowsListById]);
 
   const [helperDrawerOpen, setHelperDrawerOpen] = useState(false);
   const handleHelperDrawer = (e: React.SyntheticEvent) => {
@@ -94,11 +130,47 @@ const ReportingOrders = () => {
     setFilteringDrawerOpen(!filteringDrawerOpen);
   };
 
+  const [orderDetails, setOrderDetails] = useState<null | Order>(null);
+
+  const selectOrderDetails = (order: Order) => {
+    setOrderDetails(order);
+    setHelperDrawerOpen(true);
+  };
+
+  const manageMenu = useMemo(
+    () => menuActionsOptions.map((item) => {
+      switch (true) {
+        case item.label === 'Excel':
+          return {
+            ...item,
+            handleClick: () => downloadFile(
+              '/api/Report/ordersexcel?Ids=1&Ids=0&Columns=string&Ordering=%7B%0A%20%20%22additionalProp1%22%3A%20%22string%22%2C%0A%20%20%22additionalProp2%22%3A%20%22string%22%2C%0A%20%20%22additionalProp3%22%3A%20%22string%22%0A%7D',
+              'name.xls',
+            ),
+          };
+        case item.label === 'Export Pdf':
+          return {
+            ...item,
+            handleClick: () => downloadFile(
+              '/api/Report/ordersexcel?Ids=1&Ids=0&Columns=string&Ordering=%7B%0A%20%20%22additionalProp1%22%3A%20%22string%22%2C%0A%20%20%22additionalProp2%22%3A%20%22string%22%2C%0A%20%20%22additionalProp3%22%3A%20%22string%22%0A%7D',
+              'name.xls',
+            ),
+          };
+        case item.label === 'Search & Advanced Filtering':
+          return { ...item, handleClick: () => setFilteringDrawerOpen(true) };
+        default: return item;
+      }
+    }),
+    [],
+  );
+
   // to do
   // actions
   // sorting
   // table copy
   // search
+
+  // needs totalOrders, avgOrderValue, totalOrderValue, refunded
 
   return (
     <Wrapper>
@@ -106,12 +178,11 @@ const ReportingOrders = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{rows.length}</strong>
-            {' '}
-            Customers
+            <strong>{`${ordersData.totalCount} `}</strong>
+            {`${ordersData.totalCount === 0 || ordersData.totalCount > 1 ? 'Entries' : 'Entry'}`}
           </p>
           <SearchBarWrapper className="search-wrapper">
-            <ActionsMenu options={menuActionsOptions} />
+            <ActionsMenu options={manageMenu} />
           </SearchBarWrapper>
         </TableCaption>
         <TableWrapper>
@@ -121,14 +192,14 @@ const ReportingOrders = () => {
                 numSelected={selected.length}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={rows.length}
+                rowCount={table.visibleRows.length}
                 cells={headCells}
                 className="table-head"
               />
               <TableBody>
-                {table.visibleRows.map((row, index) => {
+                {table.visibleRows.map((row) => {
                   const isItemSelected = checkIsSelected(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                  const labelId = `enhanced-table-checkbox-${row.num}`;
 
                   return (
                     <Row
@@ -137,7 +208,7 @@ const ReportingOrders = () => {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.id}
+                      key={row.num}
                       selected={isItemSelected}
                       sx={{ cursor: 'pointer' }}
                     >
@@ -151,12 +222,15 @@ const ReportingOrders = () => {
                         />
                       </TableCell>
                       <TableCell className="row-id">
-                        <p>{row['row-id']}</p>
+                        <p>{row.num}</p>
                       </TableCell>
-                      <TableCell className="id">
-                        <a href="/">{row.id}</a>
+                      <TableCell className="id" onClick={() => selectOrderDetails(row)}>
+                        <p className="link">{row.id}</p>
                       </TableCell>
-                      <TableCell className="date">{row.date}</TableCell>
+                      <TableCell className="date">
+                        <p>{dayjs(row.date).format('DD/MM/YYYY')}</p>
+                        <p>{dayjs(row.date).format('HH:MM')}</p>
+                      </TableCell>
                       <TableCell className="status">
                         <OrderStatusBadge
                           className={`order-status ${getOrderStatus(row.status.toLowerCase())}`}
@@ -167,15 +241,12 @@ const ReportingOrders = () => {
                       <TableCell className="customer-name">
                         <p>{row.customerName}</p>
                       </TableCell>
-                      <TableCell className="payment-method">{row.method}</TableCell>
+                      <TableCell className="payment-method">{row.paymentMethod}</TableCell>
                       <TableCell className="type">
                         <p>{row.type}</p>
                       </TableCell>
-                      {/* <TableCell className="orders">
-                        <p>{row.count}</p>
-                      </TableCell> */}
                       <TableCell className="orders-value">
-                        <p>{`${row.currency}${row.amount}`}</p>
+                        <p>{`${getCurrencyByCode(row.value.currency)}${row.value.amount}`}</p>
                       </TableCell>
                       <TableCell className="platform-fee">
                         <p>{`${row.currency}${row.platformFee}`}</p>
@@ -184,7 +255,8 @@ const ReportingOrders = () => {
                         <p>{`${row.currency}${row.refunded}`}</p>
                       </TableCell>
                       <TableCell className="actions">
-                        <ActionsMenu options={actionsOptions} />
+                        <ActionsMenu options={createTableActions(row, { selectOrderDetails })}
+                        />
                       </TableCell>
                     </Row>
                   );
@@ -193,8 +265,8 @@ const ReportingOrders = () => {
             </Table>
           </TableContainer>
           <TablePagination
-            handleChangePage={handleChangePage}
-            handleChangeRowsPerPage={handleChangeRowsPerPage}
+            handleChangePage={changePage}
+            handleChangeRowsPerPage={changeRowsPerPage}
             page={page}
             pagesCount={pagesCount}
             rowsPerPage={rowsPerPage}
@@ -202,23 +274,25 @@ const ReportingOrders = () => {
           />
         </TableWrapper>
       </TableContent>
-      {open
+      {filterModalOpen
         ? createPortal(
-          <Overlay onClick={handleClose} className="overlay">
+          <Overlay onClick={handleCloseFilterModal} className="overlay">
             <DeleteConfirmationModal
               deleteItemName={namesToDelete}
               confirm={console.log}
-              cancel={console.log}
+              cancel={handleCloseFilterModal}
             />
           </Overlay>,
           document.body,
         )
         : null}
-      <StyledDrawer anchor="right" open={helperDrawerOpen} onClose={handleHelperDrawer}>
-        <DrawerOverlay handleClick={handleHelperDrawer} handleKeydown={handleHelperDrawer}>
-          <OrderDetails />
-        </DrawerOverlay>
-      </StyledDrawer>
+      {!orderDetails ? null : (
+        <StyledDrawer anchor="right" open={helperDrawerOpen} onClose={handleHelperDrawer}>
+          <DrawerOverlay handleClick={handleHelperDrawer} handleKeydown={handleHelperDrawer}>
+            <OrderDetails data={orderDetails} needsActions type="orders" />
+          </DrawerOverlay>
+        </StyledDrawer>
+      )}
       <StyledDrawer anchor="right" open={filteringDrawerOpen} onClose={handleFilteringDrawer}>
         <DrawerOverlay handleClick={handleFilteringDrawer} handleKeydown={handleFilteringDrawer}>
           <FilteringReportingOrdersModal />

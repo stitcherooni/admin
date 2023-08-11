@@ -35,28 +35,3 @@ export const headCells = [
     className: 'total-sales',
   },
 ];
-
-export const rows = [
-  {
-    num: 1,
-    product: 'Big PTA Quiz 2020 Ticket',
-    quantity: 20,
-    targetQuantity: 0,
-    difference: -20,
-    attaintment: '0%',
-    totalSales: 54,
-    toDate: 200,
-    currency: '£',
-  },
-  {
-    num: 2,
-    product: 'Big PTA Quiz 2020 Ticket',
-    quantity: 30,
-    targetQuantity: 0,
-    difference: -30,
-    attaintment: '0%',
-    totalSales: 54,
-    toDate: 200,
-    currency: '£',
-  },
-];

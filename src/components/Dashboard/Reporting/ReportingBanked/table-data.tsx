@@ -1,6 +1,7 @@
 import React from 'react';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ButtonIconPdf from '../../../../assets/icons/button-icon-pdf';
 import { theme } from '../../../../styles/defaultTheme';
 
@@ -63,6 +64,11 @@ export const rows = [
 
 export const actionsOptions = [
   {
+    value: 'test-transactions',
+    label: 'Show Test Transactions',
+    icon: <ShoppingCartOutlinedIcon className="test-orders" />,
+  },
+  {
     value: 'customize-view',
     label: 'Customize View',
     icon: <TuneOutlinedIcon className="customize-view" />,
@@ -81,24 +87,5 @@ export const actionsOptions = [
     value: 'pdf',
     label: 'Export Pdf',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
-  },
-];
-
-export const bankedStatisticData = [
-  {
-    label: 'No of Orders:',
-    value: 47,
-  },
-  {
-    label: 'Total:',
-    value: '£38.99',
-  },
-  {
-    label: 'Banked Fee:',
-    value: '£0.26',
-  },
-  {
-    label: 'Platform Fee:',
-    value: '£0.15',
   },
 ];

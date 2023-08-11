@@ -30,16 +30,3 @@ export const headCells = [
     className: 'to-date',
   },
 ];
-
-export const rows = [
-  {
-    num: 1,
-    currency: '£',
-    date: '28/11/2020',
-    percentage: 100,
-    quantity: 2,
-    quantityToDate: 2,
-    totalSales: 10,
-    toDate: 10,
-  },
-];

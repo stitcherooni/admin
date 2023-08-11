@@ -118,38 +118,6 @@ export const rows = [
   },
 ];
 
-export const eventOptions = [
-  {
-    value: 2020,
-    label: 2020,
-    subMenu: [
-      {
-        value: 10,
-        label: 'Fireworks / Bonfire night',
-      },
-      {
-        value: 11,
-        label: 'Cinema',
-      },
-    ],
-  },
-];
-
-export const productsOptions = [
-  {
-    value: 1,
-    label: 'All Products',
-  },
-  {
-    value: 2,
-    label: '£1 Ticket (36)',
-  },
-  {
-    value: 3,
-    label: 'Prize Draw Entry',
-  },
-];
-
 export const groupByOptions = [
   {
     value: 'className',

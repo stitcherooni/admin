@@ -14,22 +14,23 @@ import ReportingBanked from './ReportingBanked/ReportingBanked';
 import ReportingEmailTracker from './ReportingEmailTracker/ReportingEmailTracker';
 import ReportingProductQuestions from './ReportingProductQuestions/ReportingProductQuestions';
 import ReportingInvoices from './ReportingInvoices/ReportingInvoices';
+import { ReportTypes } from './tabs';
 
 export const getReportComponent = (type: string) => {
   switch (type) {
-    case 'customers': return <ReportingCustomers />;
-    case 'sales': return <ReportingSales />;
-    case 'orders': return <ReportingOrders />;
-    case 'event-treasurer': return <ReportingTreasurerByEvent />;
-    case 'date-treasurer': return <ReportingTreasurerByDate />;
-    case 'tickets': return <ReportingTickets />;
-    case 'volunteers': return <ReportingVolunteers />;
-    case 'booking': return <ReportingBooking />;
-    case 'child-booking': return <ReportingChildBooking />;
-    case 'banked': return <ReportingBanked />;
-    case 'email-tracker': return <ReportingEmailTracker />;
-    case 'product-questions': return <ReportingProductQuestions />;
-    case 'invoices': return <ReportingInvoices />;
+    case ReportTypes.CUSTOMERS: return <ReportingCustomers />;
+    case ReportTypes.SALES: return <ReportingSales />;
+    case ReportTypes.ORDERS: return <ReportingOrders />;
+    case ReportTypes.TREASURER_BY_EVENT: return <ReportingTreasurerByEvent />;
+    case ReportTypes.TREASURER_BY_DATE: return <ReportingTreasurerByDate />;
+    case ReportTypes.TICKETS: return <ReportingTickets />;
+    case ReportTypes.VOLUNTEERS: return <ReportingVolunteers />;
+    case ReportTypes.BOOKINGS: return <ReportingBooking />;
+    case ReportTypes.CHILD_BOOKINGS: return <ReportingChildBooking />;
+    case ReportTypes.BANKED: return <ReportingBanked />;
+    case ReportTypes.EMAIL_TRACKER: return <ReportingEmailTracker />;
+    case ReportTypes.PRODUCT_QUESTIONS: return <ReportingProductQuestions />;
+    case ReportTypes.INVOICES: return <ReportingInvoices />;
     default: return null;
   }
 };

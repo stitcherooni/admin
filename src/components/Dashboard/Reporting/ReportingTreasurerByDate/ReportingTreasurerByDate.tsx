@@ -66,12 +66,6 @@ const ReportingTreasurerByDate = () => {
     }
   };
 
-  const namesToDelete = useMemo(() => {
-    const names: string[] = [];
-    selected.forEach((id) => names.push(table.rowsListById[id].eventName));
-    return names.join(', ');
-  }, [selected, table.rowsListById]);
-
   const [filteringDrawerOpen, setFilteringDrawerOpen] = useState(false);
   const handleFilteringDrawer = (e: React.SyntheticEvent) => {
     e.preventDefault();

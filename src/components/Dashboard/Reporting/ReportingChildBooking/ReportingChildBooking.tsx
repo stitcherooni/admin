@@ -1,7 +1,11 @@
-import React, { SyntheticEvent, useMemo, useState } from 'react';
+import React, {
+  ChangeEvent, SyntheticEvent, useMemo, useState,
+} from 'react';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
 import { createPortal } from 'react-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material/Select/Select';
 import {
   Col,
   Filters,
@@ -14,15 +18,11 @@ import {
   Head,
   Wrapper,
   TableWrapper,
+  Button,
 } from './ReportingChildBooking.styled';
-import {
-  Row,
-  StyledTableWrapper,
-} from '../../../shared/Table/Table.styled';
+import { Row, StyledTableWrapper } from '../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
-import {
-  eventOptions, groupByOptions, headCells, menuActionsOptions, rows,
-} from './table-data';
+import { headCells, menuActionsOptions, rows } from './table-data';
 import { Overlay } from '../Reporting.styled';
 import Label from '../../../shared/Label/Label';
 import NestedMenu from '../../../shared/NestedMenu/NestedMenu';
@@ -30,6 +30,12 @@ import DeleteConfirmationModal from '../../../shared/Modals/DeleteConfirmationMo
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import Select from '../../../shared/Select/Select';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { BookingEvents, ChildBooking } from '../../../../types/reporting/bookings';
+import { createEventsOptions, handleCloseModal } from '../ReportingBooking/utils';
+import { getChildBookingStat, sortChildBookingStat } from '../../../../redux/actions/reporting.actions';
+import { createSortByOptions } from './utils';
+import QflowModal from '../QflowModal/QflowModal';
 
 interface Filter {
   value: number | string;
@@ -46,34 +52,30 @@ interface ReportingFilters {
 }
 
 const ReportingChildBooking = () => {
-  const table = useSortingTable(rows);
-  const {
-    selected, handleSelectAllClick,
-  } = table.selection;
+  const dispatch = useDispatch<AppDispatch>();
+  const childBookingData = useSelector((state: RootState) => state.reporting.childBookings);
+  const table = useSortingTable<ChildBooking>(childBookingData.data, {
+    totalCount: childBookingData.totalCount,
+    totalPages: childBookingData.totalPages,
+    pageSize: childBookingData.pageSize,
+    currentPage: childBookingData.currentPage,
+  });
+  const { page, pagesCount, rowsPerPage } = table.pagination;
+  const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const {
-    page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
-  } = table.pagination;
+  const [openUpdateBooking, setOpenUpdateBooking] = useState(false);
+  const toggleOpenUpdateBooking = () => setOpenUpdateBooking(!openUpdateBooking);
 
-  const [open, setOpen] = useState(false);
-
-  const toggleOpen = () => setOpen(!open);
-
-  const handleClose = (e: SyntheticEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-
-    if (!target.className.length) return;
-
-    if (target.className.includes('overlay')) {
-      toggleOpen();
-    }
+  const handleCloseUpdateBooking = (e: SyntheticEvent<HTMLDivElement>) => {
+    handleCloseModal(e, toggleOpenUpdateBooking);
   };
 
-  const namesToDelete = useMemo(() => {
-    const names: string[] = [];
-    selected.forEach((id) => names.push(table.rowsListById[id].eventName));
-    return names.join(', ');
-  }, [selected, table.rowsListById]);
+  const [openQflowModal, setQflowModalOpen] = useState(false);
+  const toggleOpenQflowModal = () => setQflowModalOpen(!openQflowModal);
+
+  const handleCloseQflowModal = (e: SyntheticEvent<HTMLDivElement>) => {
+    handleCloseModal(e, toggleOpenQflowModal);
+  };
 
   const [filters, setSelectedFilters] = useState<ReportingFilters>({
     event: {
@@ -93,6 +95,12 @@ const ReportingChildBooking = () => {
         year: rootid,
       },
     }));
+    dispatch(sortChildBookingStat({
+      EventIds: value,
+      GroupBy: filters.groupBy ?? '',
+      page: childBookingData.currentPage,
+      pageSize: childBookingData.pageSize,
+    }));
   };
 
   const handleSelectFilters = (e) => {
@@ -100,10 +108,62 @@ const ReportingChildBooking = () => {
       ...currentFilters,
       groupBy: e.target.value,
     }));
+    dispatch(sortChildBookingStat({
+      EventIds: filters.event?.value ?? '',
+      GroupBy: filters.groupBy ?? '',
+      page: childBookingData.currentPage,
+      pageSize: childBookingData.pageSize,
+    }));
   };
 
   const handleEventChange = (e) => handleChooseEvent(e);
   const handleGroupByChange = (e) => handleSelectFilters(e);
+
+  const changePage = (e: ChangeEvent, newPage?: number) => {
+    e.preventDefault();
+    dispatch(
+      getChildBookingStat({
+        page: newPage,
+        pageSize: rowsPerPage,
+      }),
+    );
+  };
+
+  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
+    dispatch(
+      getChildBookingStat({
+        page: 1,
+        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
+      }),
+    );
+  };
+
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+
+  const toggleOpenDeleteModal = () => setOpenDeleteModal(!openDeleteModal);
+
+  const handleCloseDeleteModal = (e: SyntheticEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+
+    if (!target.className.length) return;
+
+    if (target.className.includes('overlay')) {
+      toggleOpenDeleteModal();
+    }
+  };
+
+  const eventOptions = useMemo(
+    () => createEventsOptions(childBookingData?.filters?.events ?? ([] as BookingEvents[])),
+    [childBookingData?.filters?.events],
+  );
+
+  const groupByOptions = useMemo(
+    () => createSortByOptions(childBookingData?.filters?.groupBy ?? ([] as BookingGroupByFilter)),
+    [childBookingData?.filters?.groupBy],
+  );
+
+  // group by filter should be array
+  // not need on url product id params
 
   return (
     <Wrapper>
@@ -121,7 +181,7 @@ const ReportingChildBooking = () => {
           which is a simple and intuitive ticket scanning and guest list app that you can use to
           scan your guests in to your events.
           <br />
-          <a href="#">See more information</a>
+          <Button onClick={toggleOpenQflowModal}>See more information</Button>
         </p>
       </StyledAlert>
       <Filters>
@@ -159,9 +219,8 @@ const ReportingChildBooking = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{rows.length}</strong>
-            {' '}
-            Entries
+            <strong>{`${childBookingData.totalCount} `}</strong>
+            {`${childBookingData.totalCount === 0 || childBookingData.totalCount > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -183,7 +242,7 @@ const ReportingChildBooking = () => {
                   </TableCell>
                 </Row>
                 {table.visibleRows.map((row) => (
-                  <Row key={row.id}>
+                  <Row key={row.num}>
                     <TableCell className="first-name">
                       <p>{row.firstName}</p>
                     </TableCell>
@@ -194,7 +253,7 @@ const ReportingChildBooking = () => {
                       <p>{row.bookedBy}</p>
                     </TableCell>
                     <TableCell className="medical">
-                      <p>{row.medical}</p>
+                      <p>{row.allergies}</p>
                     </TableCell>
                     <TableCell className="phone">
                       <p>{row.phone}</p>
@@ -205,8 +264,8 @@ const ReportingChildBooking = () => {
             </Table>
           </StyledTableWrapper>
           <TablePagination
-            handleChangePage={handleChangePage}
-            handleChangeRowsPerPage={handleChangeRowsPerPage}
+            handleChangePage={changePage}
+            handleChangeRowsPerPage={changeRowsPerPage}
             page={page}
             pagesCount={pagesCount}
             rowsPerPage={rowsPerPage}
@@ -214,14 +273,22 @@ const ReportingChildBooking = () => {
           />
         </TableWrapper>
       </TableContent>
-      {open
+      {openDeleteModal
         ? createPortal(
-          <Overlay onClick={handleClose} className="overlay">
+          <Overlay onClick={handleCloseDeleteModal} className="overlay">
             <DeleteConfirmationModal
               deleteItemName={namesToDelete}
               confirm={console.log}
               cancel={console.log}
             />
+          </Overlay>,
+          document.body,
+        )
+        : null}
+      {openQflowModal
+        ? createPortal(
+          <Overlay onClick={handleCloseQflowModal} className="overlay">
+            <QflowModal handleClose={toggleOpenQflowModal} />
           </Overlay>,
           document.body,
         )

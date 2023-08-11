@@ -1,58 +1,75 @@
+export enum ReportTypes {
+  MI_WIZARD = 'mi_wizard',
+  BANKED = 'banked',
+  BOOKINGS = 'bookings',
+  CHILD_BOOKINGS = 'child_only_bookings',
+  CUSTOMERS = 'customers',
+  EMAIL_TRACKER = 'email_tracker',
+  INVOICES = 'invoices',
+  ORDERS = 'orders',
+  PRODUCT_QUESTIONS = 'product_questionhorizontal',
+  SALES = 'sales',
+  TICKETS = 'tickets',
+  TREASURER_BY_EVENT = 'treasurer_by_event',
+  TREASURER_BY_DATE = 'treasurer_by_date',
+  VOLUNTEERS = 'volunteers',
+}
+
 export const tabsList = [
   // {
-  //   value: 'miwizard',
+  //   value: ReportTypes.MI_WIZARD,
   //   label: 'Mi Wizard',
   // },
   {
-    value: 'banked',
+    value: ReportTypes.BANKED,
     label: 'Banked',
   },
   {
-    value: 'booking',
+    value: ReportTypes.BOOKINGS,
     label: 'Bookings',
   },
   {
-    value: 'child-booking',
+    value: ReportTypes.CHILD_BOOKINGS,
     label: 'Child only bookings',
   },
   {
-    value: 'customers',
+    value: ReportTypes.CUSTOMERS,
     label: 'Customers',
   },
   {
-    value: 'email-tracker',
+    value: ReportTypes.EMAIL_TRACKER,
     label: 'Email tracker',
   },
   {
-    value: 'invoices',
+    value: ReportTypes.INVOICES,
     label: 'Invoices',
   },
   {
-    value: 'orders',
+    value: ReportTypes.ORDERS,
     label: 'Orders',
   },
   {
-    value: 'product-questions',
+    value: ReportTypes.PRODUCT_QUESTIONS,
     label: 'Product Questions',
   },
   {
-    value: 'sales',
+    value: ReportTypes.SALES,
     label: 'Sales',
   },
   {
-    value: 'tickets',
+    value: ReportTypes.TICKETS,
     label: 'Tickets',
   },
   {
-    value: 'event-treasurer',
+    value: ReportTypes.TREASURER_BY_EVENT,
     label: 'Treasurer by event',
   },
   {
-    value: 'date-treasurer',
+    value: ReportTypes.TREASURER_BY_DATE,
     label: 'Treasurer by date',
   },
   {
-    value: 'volunteers',
+    value: ReportTypes.VOLUNTEERS,
     label: 'Volunteers',
   },
 ];

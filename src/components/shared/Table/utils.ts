@@ -4,10 +4,17 @@ import {
 import _orderBy from 'lodash.orderby';
 import { Order } from './ReportingTable';
 
-export const useSortingTable = <T>(rows: T) => {
+interface SortingTableProps {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
+
+export const useSortingTable = <T>(rows: T[], other?: SortingTableProps) => {
   const [selected, setSelected] = useState<readonly string[]>([]);
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState(!other?.currentPage ? 1 : other?.currentPage);
+  const [rowsPerPage, setRowsPerPage] = useState(!other?.pageSize ? 10 : other?.pageSize);
   const [sort, setSort] = useState<Array<string | Order>[]>([]);
 
   const handleRequestSort = (property: string, order: Order) => {
@@ -80,21 +87,12 @@ export const useSortingTable = <T>(rows: T) => {
   }, [sort]);
 
   const visibleRows = useMemo(
-    () => _orderBy(rows, convertedSort.fields, convertedSort.orders).slice(
+    () => (!other ? _orderBy(rows, convertedSort.fields, convertedSort.orders).slice(
       (page - 1) * rowsPerPage,
       (page - 1) * rowsPerPage + rowsPerPage,
-    ),
-    [convertedSort, page, rowsPerPage],
+    ) : _orderBy(rows, convertedSort.fields, convertedSort.orders)),
+    [convertedSort, page, rowsPerPage, rows, other],
   );
-
-  const rowsListById = useMemo(() => {
-    const data = {};
-    rows.forEach((row) => {
-      data[row.id] = row;
-    });
-
-    return data;
-  }, [rows]);
 
   const pagesCount = useMemo(() => Math.ceil(rows.length / rowsPerPage), [rows.length, rowsPerPage]);
 
@@ -107,16 +105,16 @@ export const useSortingTable = <T>(rows: T) => {
     },
     sorting: {
       handleRequestSort,
+      filters: convertedSort,
     },
     pagination: {
-      page,
+      page: other?.currentPage ? other.currentPage : page,
       handleChangePage,
-      rowsPerPage,
+      rowsPerPage: other?.pageSize ? other.pageSize : rowsPerPage,
       handleChangeRowsPerPage,
-      pagesCount,
+      pagesCount: other?.totalPages ? other.totalPages : pagesCount,
       pageSizes: [10, 25, 50, 100],
     },
     visibleRows,
-    rowsListById,
   };
 };

@@ -5,7 +5,11 @@ import IosLogo from '../../../../assets/images/ios-logo.png';
 import AndroidLogo from '../../../../assets/images/android-logo.png';
 import { GreenButton, SecondaryButton } from '../../../shared/Buttons/Buttons.styled';
 
-const QflowModal = () => (
+interface QflowModalProps {
+  handleClose: () => void;
+}
+
+const QflowModal = (props: QflowModalProps) => (
   <Wrapper>
     <img src={QflowLogo} alt="" className="logo" />
     <h3>Sync to Qflow</h3>
@@ -27,7 +31,7 @@ const QflowModal = () => (
     </p>
     <div className="buttons-wrapper">
       <GreenButton>Head to Tickets</GreenButton>
-      <SecondaryButton>Close</SecondaryButton>
+      <SecondaryButton onClick={props.handleClose}>Close</SecondaryButton>
     </div>
     <div className="logo-wrapper">
       <a href="">

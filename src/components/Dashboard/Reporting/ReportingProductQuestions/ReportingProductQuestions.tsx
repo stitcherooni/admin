@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Col,
   ButtonsWrapper,
@@ -8,22 +9,19 @@ import {
   Wrapper,
   SearchBarWrapper,
 } from './ReportingProductQuestions.styled';
-import {
-  TableCaption,
-} from '../../../shared/Table/Table.styled';
-import CustomizerMenu from '../../../shared/CustomizerMenu/CustomizerMenu';
-import { SecondaryButton } from '../../../shared/Buttons/Buttons.styled';
-import ButtonIconPdf from '../../../../assets/icons/button-icon-pdf';
+import { TableCaption } from '../../../shared/Table/Table.styled';
 import ReportingProductTableHorizontal from './ReportingProductTableHorizontal/ReportingProductTableHorizontal';
 import ReportingProductTableVertical from './ReportingProductTableVertical/ReportingProductTableVertical';
 import { rows } from './ReportingProductTableHorizontal/table-data';
-import { fakeState } from '../../Dashboard';
-import { eventOptions, menuActionsOptions, productsOptions } from './table-data';
-import ReportingMenu from '../ReportingMenu/ReportingMenu';
+import { menuActionsOptions } from './table-data';
 import Label from '../../../shared/Label/Label';
 import NestedMenu from '../../../shared/NestedMenu/NestedMenu';
 import Select from '../../../shared/Select/Select';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { createEventsOptions, createProductOptions, createSortByOptions } from './utils';
+import { ProductQuestionsEvents, ProductQuestionsFormat } from '../../../../types/reporting/productQuestions';
+import { sortProductQuestionsStat } from '../../../../redux/actions/reporting.actions';
 
 interface Filter {
   value: number | string;
@@ -52,8 +50,8 @@ const formatOptions = [
 ];
 
 const ReportingProductQuestions = () => {
-  const [format, setTableFormat] = useState('vertical');
-  const handleChangeTableFormat = (e) => setTableFormat(e.target.value);
+  const dispatch = useDispatch<AppDispatch>();
+  const productQuestionsData = useSelector((state: RootState) => state.reporting.productQuestions);
   const [filters, setSelectedFilters] = useState<ReportingFilters>({
     event: {
       value: '',
@@ -74,6 +72,13 @@ const ReportingProductQuestions = () => {
         year: rootid,
       },
     }));
+    dispatch(sortProductQuestionsStat({
+      page: productQuestionsData.currentPage,
+      pageSize: productQuestionsData.pageSize,
+      eventId: value,
+      productId: filters.product ?? '',
+      groupBy: filters.groupBy ?? 'horizontal',
+    }));
   };
 
   const handleSelectFilters = (e, type: string) => {
@@ -81,11 +86,38 @@ const ReportingProductQuestions = () => {
       ...currentFilters,
       [type]: e.target.value,
     }));
+
+    dispatch(sortProductQuestionsStat({
+      page: productQuestionsData.currentPage,
+      pageSize: productQuestionsData.pageSize,
+      eventId: filters.event?.value,
+      productId: type === 'product' ? e.target.value : filters.product,
+      groupBy: type === 'groupBy' ? e.target.value : filters.groupBy ?? 'horizontal',
+    }));
   };
 
   const handleEventChange = (e) => handleChooseEvent(e);
   const handleProductChange = (e) => handleSelectFilters(e, 'product');
   const handleGroupByChange = (e) => handleSelectFilters(e, 'groupBy');
+
+  const eventOptions = useMemo(
+    () => createEventsOptions(productQuestionsData?.filters?.events ?? ([] as [])),
+    [productQuestionsData?.filters?.events],
+  );
+
+  const productsOptions = useMemo(
+    () => createProductOptions(
+      productQuestionsData?.filters?.products ?? ([] as ProductQuestionsEvents[]),
+    ),
+    [productQuestionsData?.filters?.products],
+  );
+
+  const groupByOptions = useMemo(
+    () => createSortByOptions(
+      productQuestionsData?.filters?.groupBy ?? ([] as ProductQuestionsFormat[]),
+    ),
+    [productQuestionsData?.filters?.groupBy],
+  );
 
   // to do
   // sorting
@@ -93,6 +125,10 @@ const ReportingProductQuestions = () => {
   // search
   // add button show test answers,
   // when click by the button we need to show warning 'Warning: You are viewing test answers
+  // needs format filters as array
+  // answers should be as questions
+  // needs customer id, currency
+  // for vertical table - 1 answer and one question per row
 
   return (
     <Wrapper>
@@ -140,11 +176,15 @@ const ReportingProductQuestions = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{rows.length}</strong>
-            {` ${rows.length === 0 || rows.length > 1 ? 'Entries' : 'Entry'}`}
+            <strong>{productQuestionsData.totalCount}</strong>
+            {` ${productQuestionsData.totalCount === 0 || productQuestionsData.totalCount > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>
-        {format === 'horizontal' ? <ReportingProductTableHorizontal /> : <ReportingProductTableVertical />}
+        {(filters.groupBy === '' || filters.groupBy === 'horizontal') ? (
+          <ReportingProductTableHorizontal />
+        ) : (
+          <ReportingProductTableVertical />
+        )}
       </TableContent>
     </Wrapper>
   );

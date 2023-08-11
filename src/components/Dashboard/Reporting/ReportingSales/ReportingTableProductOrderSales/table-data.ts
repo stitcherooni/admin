@@ -15,12 +15,3 @@ export const headCells = [
     className: 'product-count',
   },
 ];
-
-export const rows = [
-  {
-    num: 1,
-    percentage: 100,
-    quantity: 2,
-    productCount: 10,
-  },
-];

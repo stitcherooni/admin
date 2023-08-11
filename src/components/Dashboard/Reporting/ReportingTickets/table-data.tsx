@@ -76,38 +76,6 @@ export const rows = [
   },
 ];
 
-export const eventOptions = [
-  {
-    value: 2020,
-    label: 2020,
-    subMenu: [
-      {
-        value: 10,
-        label: 'Fireworks / Bonfire night',
-      },
-      {
-        value: 11,
-        label: 'Cinema',
-      },
-    ],
-  },
-];
-
-export const groupByOptions = [
-  {
-    value: 'tickets',
-    label: 'Tickets',
-  },
-  {
-    value: 'vouchers',
-    label: 'Vouchers',
-  },
-  {
-    value: 'Prize Draws',
-    label: 'Prize Draws',
-  },
-];
-
 export const actionsOptions = [
   {
     value: 'qr',

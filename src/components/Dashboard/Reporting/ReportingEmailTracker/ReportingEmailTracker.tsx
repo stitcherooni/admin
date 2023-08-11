@@ -1,8 +1,13 @@
-import React, { SyntheticEvent, useState } from 'react';
+import React, {
+  ChangeEvent, SyntheticEvent, useMemo, useState,
+} from 'react';
 import TableContainer from '@mui/material/TableContainer/TableContainer';
 import Table from '@mui/material/Table/Table';
 import TableBody from '@mui/material/TableBody/TableBody';
 import { createPortal } from 'react-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material/Select/Select';
+import dayjs from 'dayjs';
 import {
   TableCell,
   TableContent,
@@ -29,6 +34,10 @@ import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import FilteringReportingEmailsModal from './FIlteringReportingEmailsModal/FIlteringReportingEmailsModal';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import StatisticBar from '../StatisticBar/StatisticBar';
+import { AppDispatch, RootState } from '../../../../redux/store';
+import { EmailTrackerItem } from '../../../../types/reporting/emailTracker';
+import { getEmailTrackerStat } from '../../../../redux/actions/reporting.actions';
+import { handleCloseModal } from '../ReportingBooking/utils';
 
 const getStatusIcon = (row, field) => {
   switch (true) {
@@ -43,41 +52,51 @@ const getStatusIcon = (row, field) => {
   }
 };
 
-const data = [
-  {
-    label: 'Total emails sent:',
-    value: 46,
-  },
-  {
-    label: 'Total emails delivered:',
-    value: '44 (95.65%)',
-  },
-  {
-    label: 'Total emails opened:',
-    value: '35 (76.09%)',
-  },
-];
-
 const ReportingEmailTracker = () => {
-  const table = useSortingTable(rows);
+  const dispatch = useDispatch<AppDispatch>();
+  const emailtrackerData = useSelector((state: RootState) => state.reporting.emailTracker);
+  const table = useSortingTable<EmailTrackerItem>(emailtrackerData.data, {
+    totalCount: emailtrackerData.totalCount,
+    totalPages: emailtrackerData.totalPages,
+    pageSize: emailtrackerData.pageSize,
+    currentPage: emailtrackerData.currentPage,
+  });
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const {
-    page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
-  } = table.pagination;
+  const { page, pagesCount, rowsPerPage } = table.pagination;
 
-  const [open, setOpen] = useState(false);
+  const changePage = (e: ChangeEvent, newPage?: number) => {
+    e.preventDefault();
+    dispatch(
+      getEmailTrackerStat({
+        page: newPage,
+        pageSize: rowsPerPage,
+      }),
+    );
+  };
 
-  const toggleOpen = () => setOpen(!open);
+  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
+    dispatch(
+      getEmailTrackerStat({
+        page: 1,
+        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
+      }),
+    );
+  };
 
-  const handleClose = (e: SyntheticEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
+  const [openEmailDetails, setOpenEmailDetails] = useState(false);
+  const [emailDetails, setEmailDetails] = useState<EmailTrackerItem | null>(null);
 
-    if (!target.className.length) return;
+  const toggleOpenEmailDetails = () => setOpenEmailDetails(!openEmailDetails);
 
-    if (target.className.includes('overlay')) {
-      toggleOpen();
-    }
+  const handleCloseEmailDetails = (e: SyntheticEvent<HTMLDivElement>) => {
+    handleCloseModal(e, toggleOpenEmailDetails);
+    setEmailDetails(null);
+  };
+
+  const selectEmailDetail = (detail: EmailTrackerItem) => {
+    setEmailDetails(detail);
+    toggleOpenEmailDetails();
   };
 
   const [filteringDrawerOpen, setFilteringDrawerOpen] = useState(false);
@@ -88,6 +107,31 @@ const ReportingEmailTracker = () => {
     setFilteringDrawerOpen(!filteringDrawerOpen);
   };
 
+  const statistic = useMemo(() => {
+    const { totalEmailsSent, totalEmailsDelivered, totalEmailsOpened } = emailtrackerData;
+
+    return [
+      {
+        label: 'Total emails sent:',
+        value: totalEmailsSent,
+      },
+      {
+        label: 'Total emails delivered:',
+        value:
+          totalEmailsSent === totalEmailsDelivered
+            ? `${totalEmailsDelivered} (100%)`
+            : `${totalEmailsDelivered} (${(totalEmailsDelivered / totalEmailsSent) * 100}%)`,
+      },
+      {
+        label: 'Total emails opened:',
+        value:
+          totalEmailsSent === totalEmailsOpened
+            ? `${totalEmailsOpened} (100%)`
+            : `${totalEmailsOpened} (${(totalEmailsOpened / totalEmailsSent) * 100}%)`,
+      },
+    ];
+  }, [emailtrackerData]);
+
   // to do
   // actions
   // sorting
@@ -96,13 +140,16 @@ const ReportingEmailTracker = () => {
 
   return (
     <Wrapper>
-      <StatisticBar data={data} />
+      <StatisticBar data={statistic} />
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{rows.length}</strong>
-            {' '}
-            Entries
+            <strong>{`${emailtrackerData.totalCount} `}</strong>
+            {`${
+              emailtrackerData.totalCount === 0 || emailtrackerData.totalCount > 1
+                ? 'Entries'
+                : 'Entry'
+            }`}
           </p>
           <SearchBarWrapper className="search-wrapper">
             <SecondaryButton
@@ -127,8 +174,8 @@ const ReportingEmailTracker = () => {
               />
               <TableBody>
                 {table.visibleRows.map((row) => (
-                  <Row key={row.id}>
-                    <TableCell className="message-id" onClick={() => alert('Message detail popup')}>
+                  <Row key={row.num}>
+                    <TableCell className="message-id" onClick={() => selectEmailDetail(row)}>
                       <a>{row.id}</a>
                     </TableCell>
                     <TableCell
@@ -143,11 +190,11 @@ const ReportingEmailTracker = () => {
                     <TableCell className="message-title">
                       <p>{row.messageTitle}</p>
                     </TableCell>
-                    <TableCell className="message-date-sent">
-                      <p>{row.date}</p>
-                    </TableCell>
                     <TableCell className="message-sent-by">
                       <p>{row.sentBy}</p>
+                    </TableCell>
+                    <TableCell className="message-date-sent">
+                      <p>{dayjs(row.dateSent).format('DD/MM/YYYY HH:MM')}</p>
                     </TableCell>
                     <TableCell className="message-delivered" title="add status">
                       {getStatusIcon(row, 'delivered')}
@@ -161,18 +208,18 @@ const ReportingEmailTracker = () => {
             </Table>
           </TableContainer>
           <TablePagination
-            handleChangePage={handleChangePage}
-            handleChangeRowsPerPage={handleChangeRowsPerPage}
+            handleChangePage={changePage}
+            handleChangeRowsPerPage={changeRowsPerPage}
             page={page}
             pagesCount={pagesCount}
             rowsPerPage={rowsPerPage}
             options={[5, 10, 25]}
           />
         </TableWrapper>
-        {open
+        {openEmailDetails
           ? createPortal(
-            <Overlay onClick={handleClose} className="overlay">
-              <ReportingEmailDetails />
+            <Overlay onClick={handleCloseEmailDetails} className="overlay">
+              <ReportingEmailDetails data={emailDetails} />
             </Overlay>,
             document.body,
           )

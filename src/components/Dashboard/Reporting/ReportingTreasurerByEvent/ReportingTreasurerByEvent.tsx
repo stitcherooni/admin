@@ -88,12 +88,6 @@ const ReportingTreasurerByEvent = () => {
     }
   };
 
-  const namesToDelete = useMemo(() => {
-    const names: string[] = [];
-    selected.forEach((id) => names.push(table.rowsListById[id].eventName));
-    return names.join(', ');
-  }, [selected, table.rowsListById]);
-
   const [filters, setSelectedFilters] = useState<ReportingFilters>({
     event: {
       value: '',

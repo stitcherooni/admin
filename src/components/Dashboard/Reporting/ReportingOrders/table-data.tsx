@@ -9,6 +9,7 @@ import ButtonIconPdf from '../../../../assets/icons/button-icon-pdf';
 import TuneOutlined from '@mui/icons-material/TuneOutlined';
 import ContentCopyOutlined from '@mui/icons-material/ContentCopyOutlined';
 import ShevronRight from '../../../../assets/icons/shevron-right';
+import DeleteIcon from '../../../../assets/icons/delete-icon';
 
 export const headCells = [
   {
@@ -138,7 +139,7 @@ export const rows = [
 export const actionsOptions = [
   {
     value: 'order-details',
-    label: 'Order Details',
+    label: 'View Order',
     icon: <ListEditIcon color={theme.colors.main.black} />,
   },
   {
@@ -147,13 +148,23 @@ export const actionsOptions = [
     icon: <MessageIcon color={theme.colors.main.black} />,
   },
   {
+    value: 'resend-confirmation',
+    label: 'Resend confirmation email',
+    icon: <MessageIcon color={theme.colors.main.black} />,
+  },
+  {
+    value: 'delete-order',
+    label: 'Delete Order',
+    icon: <DeleteIcon color={theme.colors.main.black} />,
+  },
+  {
     value: 'refund-order',
     label: 'Refund Order',
     icon: <ArrowLeftDoubleShake color={theme.colors.main.black} />,
   },
   {
     value: 'partial-refund',
-    label: 'Partial Refund',
+    label: 'Partial Refund (Beta)',
     icon: <ArrowLeftCurvedIcon color={theme.colors.main.black} />,
   },
   {

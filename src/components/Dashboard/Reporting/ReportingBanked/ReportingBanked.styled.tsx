@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { Cell } from '../../../shared/Table/Table.styled';
 import TableHeadSorting from '../../../shared/Table/TableHeadSorting/TableHeadSorting';
+import Alert from '../../../shared/Alert/Alert';
 
 export const Wrapper = styled.div`
   & .statistic {
@@ -145,4 +146,8 @@ export const TableCell = styled(Cell)`
       min-width: 155px;
     }
   }
+`;
+
+export const StyledAlert = styled(Alert)`
+  margin-bottom: 24px;
 `;
