@@ -1,10 +1,10 @@
 import React, { ChangeEvent, useMemo } from 'react';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { TableCell, Head } from './ReportingProductTableHorizontal.styled';
 import { Row, TableWrapper } from '../../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../../shared/Table/utils';
@@ -69,7 +69,7 @@ const ReportingProductTableHorizontal = () => {
             cells={mergeColumns(
               headCells,
               convertQuestionsToColumns(productQuestionsData.questions),
-            )}
+            ) as any}
             className="table-head"
             checkbox={false}
           />
@@ -88,7 +88,7 @@ const ReportingProductTableHorizontal = () => {
                   <p>{row.className}</p>
                 </TableCell>
                 <TableCell className="booked-for">
-                  <Link to={`/dashboard/customers?customerId=${row.customerId}`}>
+                  <Link to={`/dashboard/customers?customerId=${(row as any).customerId}`}>
                     {row.bookedFor}
                   </Link>
                 </TableCell>
@@ -102,10 +102,10 @@ const ReportingProductTableHorizontal = () => {
                   <p>{row.product}</p>
                 </TableCell>
                 <TableCell className="price">
-                  <p>{`${row.currency}${row.price}`}</p>
+                  <p>{`${(row as any).currency}${row.price}`}</p>
                 </TableCell>
                 <TableCell className="order-value">
-                  <p>{`${row.currency}${row.order}`}</p>
+                  <p>{`${(row as any).currency}${row.order}`}</p>
                 </TableCell>
                 {row.answers.length ? createAnswersColumns([...row.answers]) : null}
                 <TableCell className="terms">

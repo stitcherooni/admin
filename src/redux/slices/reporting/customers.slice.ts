@@ -1,9 +1,9 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { CustomersProps } from '../../../types/reporting/customers';
+import { CustomersStatProps } from '../../../types/reporting/customers';
 import { Price } from '../../../types/reporting';
 import { getCustomersStat } from '../../actions/reporting.actions';
 
-interface ReportingInitialState extends CustomersProps {
+interface ReportingInitialState extends CustomersStatProps {
   status: string;
 }
 
@@ -28,17 +28,20 @@ const customersSlice = createSlice({
         ...state,
         status: 'loading',
       }))
-      .addCase(getCustomersStat.fulfilled, (state, action: PayloadAction<CustomersProps>) => ({
-        ...state,
-        status: 'succeeded',
-        data: action.payload.data,
-        totalCount: action.payload.totalCount,
-        totalPages: action.payload.totalPages,
-        currentPage: action.payload.currentPage,
-        pageSize: action.payload.pageSize,
-        totalOrdersNumber: action.payload.totalOrdersNumber,
-        totalOrderValue: action.payload.totalOrderValue,
-      }))
+      .addCase(
+        getCustomersStat.fulfilled,
+        (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
+          ...state,
+          status: 'succeeded',
+          data: action.payload.data,
+          totalCount: action.payload.totalCount,
+          totalPages: action.payload.totalPages,
+          currentPage: action.payload.currentPage,
+          pageSize: action.payload.pageSize,
+          totalOrdersNumber: action.payload.totalOrdersNumber,
+          totalOrderValue: action.payload.totalOrderValue,
+        })
+      )
       .addCase(getCustomersStat.rejected, (state, action) => ({
         ...state,
         status: 'error',

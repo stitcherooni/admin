@@ -1,9 +1,9 @@
 import React, { ChangeEvent } from 'react';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import {
   StyledAlert,
   TableCaption,
@@ -17,14 +17,14 @@ import { useSortingTable } from '../../../shared/Table/utils';
 import { headCells, rows } from './table-data'; 
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { Invoice } from '../../../../types/reporting/invoices';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import { getInvoicesStat } from '../../../../redux/actions/reporting.actions';
+import { InvoiceStatItem } from '../../../../types/reporting/invoices';
 
 const ReportingInvoices = () => {
   const dispatch = useDispatch<AppDispatch>();
   const invoicesData = useSelector((state: RootState) => state.reporting.invoices);
-  const table = useSortingTable<Invoice>(invoicesData.data, {
+  const table = useSortingTable<InvoiceStatItem>(invoicesData.data, {
     totalCount: invoicesData.totalCount,
     totalPages: invoicesData.totalPages,
     pageSize: invoicesData.pageSize,
@@ -87,7 +87,7 @@ const ReportingInvoices = () => {
                 {table.visibleRows.map((row) => (
                   <Row key={row.num}>
                     <TableCell className="invoice-no">
-                      <p>{row.invoiceNo}</p>
+                      <p>{(row as any).invoiceNo}</p>
                     </TableCell>
                     <TableCell className="issue-date">
                       <p>{dayjs(row.issureDate).format('DD/MM/YYYY HH:MM')}</p>

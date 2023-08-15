@@ -1,5 +1,5 @@
-import Menu from '@mui/material/Menu/Menu';
-import MenuItem from '@mui/material/MenuItem/MenuItem';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import styled from 'styled-components';
 import { BaseButton } from '../Buttons/Buttons.styled';
 

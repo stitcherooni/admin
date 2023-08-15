@@ -1,12 +1,12 @@
 import React, {
   ChangeEvent, SyntheticEvent, useMemo, useState,
 } from 'react';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import dayjs from 'dayjs';
 import {
   TableCell,
@@ -35,12 +35,14 @@ import FilteringReportingEmailsModal from './FIlteringReportingEmailsModal/FIlte
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import StatisticBar from '../StatisticBar/StatisticBar';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { EmailTrackerItem } from '../../../../types/reporting/emailTracker';
 import { getEmailTrackerStat } from '../../../../redux/actions/reporting.actions';
 import { handleCloseModal } from '../ReportingBooking/utils';
+import { Order } from '../../../../types/reporting/orders';
+import { EmailTrackerStatItem } from '../../../../types/reporting/emailTracker';
 
-const getStatusIcon = (row, field) => {
+const getStatusIcon = (row: any, field: string) => {
   switch (true) {
+    // eslint-disable-next-line no-prototype-builtins
     case !row.hasOwnProperty(field):
       return <WarningIcon />;
     case !row[field]:
@@ -55,7 +57,7 @@ const getStatusIcon = (row, field) => {
 const ReportingEmailTracker = () => {
   const dispatch = useDispatch<AppDispatch>();
   const emailtrackerData = useSelector((state: RootState) => state.reporting.emailTracker);
-  const table = useSortingTable<EmailTrackerItem>(emailtrackerData.data, {
+  const table = useSortingTable<EmailTrackerStatItem>(emailtrackerData.data, {
     totalCount: emailtrackerData.totalCount,
     totalPages: emailtrackerData.totalPages,
     pageSize: emailtrackerData.pageSize,
@@ -85,7 +87,7 @@ const ReportingEmailTracker = () => {
   };
 
   const [openEmailDetails, setOpenEmailDetails] = useState(false);
-  const [emailDetails, setEmailDetails] = useState<EmailTrackerItem | null>(null);
+  const [emailDetails, setEmailDetails] = useState<EmailTrackerStatItem | null>(null);
 
   const toggleOpenEmailDetails = () => setOpenEmailDetails(!openEmailDetails);
 
@@ -94,7 +96,7 @@ const ReportingEmailTracker = () => {
     setEmailDetails(null);
   };
 
-  const selectEmailDetail = (detail: EmailTrackerItem) => {
+  const selectEmailDetail = (detail: EmailTrackerStatItem) => {
     setEmailDetails(detail);
     toggleOpenEmailDetails();
   };
@@ -219,7 +221,7 @@ const ReportingEmailTracker = () => {
         {openEmailDetails
           ? createPortal(
             <Overlay onClick={handleCloseEmailDetails} className="overlay">
-              <ReportingEmailDetails data={emailDetails} />
+              <ReportingEmailDetails data={emailDetails as any} />
             </Overlay>,
             document.body,
           )

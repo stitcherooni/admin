@@ -24,11 +24,11 @@ interface OrderDetailsProps {
 
 const OrderDetails = (props: OrderDetailsProps) => {
   const { data, needsActions, type } = props;
-  const resendEmail = (e: React.SyntheticEvent, email) => {
+  const resendEmail = (e: React.SyntheticEvent, email: string) => {
     e.preventDefault();
   };
 
-  const removeOrder = (e: React.SyntheticEvent, orderId) => {};
+  const removeOrder = (e: React.SyntheticEvent, orderId: number) => {};
 
   return (
     <Wrapper>
@@ -82,7 +82,7 @@ const OrderDetails = (props: OrderDetailsProps) => {
           </SecondaryButton>
           <SecondaryButton
             startIcon={<DeleteIcon color={theme.colors.main.green} />}
-            onClick={(e) => removeOrder(e, props.id)}
+            onClick={(e) => removeOrder(e, props.data.id)}
           >
             Delete Order
           </SecondaryButton>

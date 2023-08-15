@@ -1,9 +1,9 @@
 import React, { ChangeEvent } from 'react';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { useSortingTable } from '../../../../shared/Table/utils';
 import { Row, TableWrapper } from '../../../../shared/Table/Table.styled';
 import { TableCell, Head } from './ReportingTableTotalSales.styled';
@@ -22,6 +22,7 @@ const ReportingTableTotalSales = () => {
     totalPages: salesData.data?.totalSales?.totalPages,
     pageSize: salesData.data?.totalSales?.pageSize,
     currentPage: salesData.data?.totalSales?.currentPage,
+    columns: headCells,
   });
   const {
     page, pagesCount, rowsPerPage,

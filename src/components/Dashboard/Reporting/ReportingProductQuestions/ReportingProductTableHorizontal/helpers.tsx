@@ -18,7 +18,7 @@ export const mergeColumns = (target: unknown[], newColumns: unknown[]) => [
 export const createAnswersColumns = (answers: any[]) => (
   <>
     {answers
-      .sort((a, b) => a.questionId < b.questiondId)
+      .sort((a, b) => a.questionId - b.questiondId)
       .map((item) => (
         <TableCell className="answer" key={item.questionId}>
           {item.answer}

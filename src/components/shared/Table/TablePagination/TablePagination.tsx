@@ -1,5 +1,5 @@
 import React, { ChangeEvent, ReactNode } from 'react';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import {
   ChangePageButton, DropdownWrapper, PaginationWrapper,
   StyledSelect, Wrapper, StyledPagination, Option,

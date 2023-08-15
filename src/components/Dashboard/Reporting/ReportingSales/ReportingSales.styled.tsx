@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import Accordion from '@mui/material/Accordion/Accordion';
+import Accordion from '@mui/material/Accordion';
 import Alert from '../../../shared/Alert/Alert';
 
 export const Wrapper = styled.div`

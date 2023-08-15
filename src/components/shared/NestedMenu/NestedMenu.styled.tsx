@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import Menu from '@mui/material/Menu/Menu';
+import Menu from '@mui/material/Menu';
 import { BaseButton } from '../Buttons/Buttons.styled';
 
 export const List = styled.ul`

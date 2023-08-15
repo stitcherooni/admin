@@ -1,11 +1,11 @@
 import React, {
   ChangeEvent, SyntheticEvent, useMemo, useState,
 } from 'react';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import {
   Col,
   Filters,
@@ -31,11 +31,11 @@ import TablePagination from '../../../shared/Table/TablePagination/TablePaginati
 import Select from '../../../shared/Select/Select';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { BookingEvents, ChildBooking } from '../../../../types/reporting/bookings';
 import { createEventsOptions, handleCloseModal } from '../ReportingBooking/utils';
 import { getChildBookingStat, sortChildBookingStat } from '../../../../redux/actions/reporting.actions';
 import { createSortByOptions } from './utils';
 import QflowModal from '../QflowModal/QflowModal';
+import { BookingStatEvents, ChildBookingStatItem } from '../../../../types/reporting/bookings';
 
 interface Filter {
   value: number | string;
@@ -54,7 +54,7 @@ interface ReportingFilters {
 const ReportingChildBooking = () => {
   const dispatch = useDispatch<AppDispatch>();
   const childBookingData = useSelector((state: RootState) => state.reporting.childBookings);
-  const table = useSortingTable<ChildBooking>(childBookingData.data, {
+  const table = useSortingTable<ChildBookingStatItem>(childBookingData.data, {
     totalCount: childBookingData.totalCount,
     totalPages: childBookingData.totalPages,
     pageSize: childBookingData.pageSize,
@@ -85,7 +85,7 @@ const ReportingChildBooking = () => {
     },
     groupBy: '',
   });
-  const handleChooseEvent = (e) => {
+  const handleChooseEvent = (e: any) => {
     const { value, label, rootid } = e.currentTarget.dataset;
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
@@ -103,7 +103,7 @@ const ReportingChildBooking = () => {
     }));
   };
 
-  const handleSelectFilters = (e) => {
+  const handleSelectFilters = (e: any) => {
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
       groupBy: e.target.value,
@@ -116,8 +116,8 @@ const ReportingChildBooking = () => {
     }));
   };
 
-  const handleEventChange = (e) => handleChooseEvent(e);
-  const handleGroupByChange = (e) => handleSelectFilters(e);
+  const handleEventChange = (e: any) => handleChooseEvent(e);
+  const handleGroupByChange = (e: any) => handleSelectFilters(e);
 
   const changePage = (e: ChangeEvent, newPage?: number) => {
     e.preventDefault();
@@ -153,12 +153,12 @@ const ReportingChildBooking = () => {
   };
 
   const eventOptions = useMemo(
-    () => createEventsOptions(childBookingData?.filters?.events ?? ([] as BookingEvents[])),
+    () => createEventsOptions(childBookingData?.filters?.events ?? ([] as BookingStatEvents[])),
     [childBookingData?.filters?.events],
   );
 
   const groupByOptions = useMemo(
-    () => createSortByOptions(childBookingData?.filters?.groupBy ?? ([] as BookingGroupByFilter)),
+    () => createSortByOptions(childBookingData?.filters?.groupBy ?? ([] as any)),
     [childBookingData?.filters?.groupBy],
   );
 
@@ -186,7 +186,14 @@ const ReportingChildBooking = () => {
       </StyledAlert>
       <Filters>
         <div>
-          <Label text="Ticket Selection" content={{}} inputId="ticket" />
+          <Label
+            text="Ticket Selection"
+            inputId="ticket"
+            content={{
+              title: '',
+              text: '',
+            }}
+          />
           <FiltersWrapper>
             <Col>
               <p className="filter-title">Event</p>
@@ -273,7 +280,7 @@ const ReportingChildBooking = () => {
           />
         </TableWrapper>
       </TableContent>
-      {openDeleteModal
+      {/* {openDeleteModal
         ? createPortal(
           <Overlay onClick={handleCloseDeleteModal} className="overlay">
             <DeleteConfirmationModal
@@ -284,7 +291,7 @@ const ReportingChildBooking = () => {
           </Overlay>,
           document.body,
         )
-        : null}
+        : null} */}
       {openQflowModal
         ? createPortal(
           <Overlay onClick={handleCloseQflowModal} className="overlay">

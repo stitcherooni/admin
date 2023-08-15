@@ -11,14 +11,14 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import StayCurrentPortraitOutlinedIcon from '@mui/icons-material/StayCurrentPortraitOutlined';
 import dayjs from 'dayjs';
 import { Wrapper, Row, ArrowIcon, CheckedIcon, EmailIcon, StepTitle } from './ReportingEmailStepper.styled';
-import { EmailTrackerItem } from '../../../../../../types/reporting/emailTracker';
+import { EmailTrackerStatItem } from '../../../../../../types/reporting/emailTracker';
 
 const ArrowIconComponent = () => <ArrowIcon />;
 const CheckedIconComponent = () => <CheckedIcon />;
 const EmailIconComponent = () => <EmailIcon />;
 
 interface ReportingEmailStepperProps {
-  data: EmailTrackerItem;
+  data: EmailTrackerStatItem;
 }
 
 const ReportingEmailStepper = (props: ReportingEmailStepperProps) => (

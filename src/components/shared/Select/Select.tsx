@@ -1,5 +1,5 @@
 import React from 'react';
-import { SelectProps } from '@mui/material/Select/Select';
+import { SelectProps } from '@mui/material/Select';
 import { StyledSelect, Option } from './Select.styled';
 import ArrowDownDropdown from '../../../assets/icons/arrow-down-dropdown';
 import { theme as Theme } from '../../../styles/defaultTheme';

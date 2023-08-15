@@ -2,9 +2,9 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import {
   getInvoicesStat,
 } from '../../actions/reporting.actions';
-import { InvoicesProps } from '../../../types/reporting/invoices';
+import { InvoicesStatProps } from '../../../types/reporting/invoices';
 
-interface ReportingInitialState extends InvoicesProps {
+interface ReportingInitialState extends InvoicesStatProps {
   status: string;
 }
 
@@ -27,7 +27,7 @@ const invoicesSlice = createSlice({
         ...state,
         status: 'loading',
       }))
-      .addCase(getInvoicesStat.fulfilled, (state, action: PayloadAction<InvoicesProps>) => ({
+      .addCase(getInvoicesStat.fulfilled, (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
         ...state,
         status: 'succeeded',
         data: action.payload.data,

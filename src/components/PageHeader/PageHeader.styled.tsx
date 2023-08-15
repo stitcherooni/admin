@@ -1,4 +1,4 @@
-import Breadcrumbs from '@mui/material/Breadcrumbs/Breadcrumbs';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
 import styled from 'styled-components';
 
 export const Wrapper = styled.div`

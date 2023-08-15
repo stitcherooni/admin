@@ -1,4 +1,4 @@
-import Drawer from '@mui/material/Drawer/Drawer';
+import Drawer from '@mui/material/Drawer';
 import styled from 'styled-components';
 
 export const Wrapper = styled.div`

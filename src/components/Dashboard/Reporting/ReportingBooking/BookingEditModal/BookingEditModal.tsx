@@ -26,20 +26,48 @@ const BookingEditModal = (props: BookingEditModalProps) => (
     ) : null}
     <Form>
       <div className="form-row">
-        <Label text="Product Name" />
+        <Label
+          text="Product Name"
+          content={{
+            title: '',
+            text: '',
+          }}
+          inputId=""
+        />
         <Select options={[]} />
       </div>
       <div className="form-row">
-        <Label text="Booking Name" />
+        <Label
+          text="Booking Name"
+          content={{
+            title: '',
+            text: '',
+          }}
+          inputId=""
+        />
         <Input />
       </div>
       <div className="form-row">
-        <Label text="{Question}" />
+        <Label
+          text="{Question}"
+          content={{
+            title: '',
+            text: '',
+          }}
+          inputId=""
+        />
         <p className="form-message">Note: this answer is encrypted in the database</p>
         <Select options={[]} />
       </div>
       <div className="form-row">
-        <Label text="Terms" />
+        <Label
+          text="Terms"
+          content={{
+            title: '',
+            text: '',
+          }}
+          inputId=""
+        />
         <p className="form-message">Note: this answer is encrypted in the database</p>
         <StyledCheckbox />
       </div>

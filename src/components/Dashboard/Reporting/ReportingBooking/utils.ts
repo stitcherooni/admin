@@ -1,13 +1,17 @@
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent } from 'react';
 import {
-  BookingEvents, BookingGroupByFilter, BookingProductFilter, EventFilter,
+  BookingEventStatFilter,
+  BookingStatEvents,
+  BookingStatGroupByFilter,
+  BookingStatProductFilter,
 } from '../../../../types/reporting/bookings';
 
-const convertEventToOptions = (data: EventFilter[]) => data.map((item) => ({ value: item.eventId, label: item.eventName }));
+const convertEventToOptions = (data: BookingEventStatFilter[]) =>
+  data.map((item) => ({ value: item.eventId, label: item.eventName }));
 
-export const createEventsOptions = (data: BookingEvents[]) => {
+export const createEventsOptions = (data: BookingStatEvents[]) => {
   if (!data.length) return [];
-  const arr = [];
+  const arr: any = [];
 
   data.forEach((item) => {
     Object.entries(item.year).forEach((event) => {
@@ -15,7 +19,7 @@ export const createEventsOptions = (data: BookingEvents[]) => {
       arr.push({
         value: label,
         label,
-        subMenu: convertEventToOptions(options),
+        subMenu: convertEventToOptions(options as any),
       });
     });
   });
@@ -23,12 +27,12 @@ export const createEventsOptions = (data: BookingEvents[]) => {
   return arr;
 };
 
-export const createProductOptions = (data: BookingProductFilter[]) => {
+export const createProductOptions = (data: BookingStatProductFilter[]) => {
   if (!data.length) return [];
   return data.map((item) => ({ value: item.productId, label: item.productName }));
 };
 
-export const createSortByOptions = (data: BookingGroupByFilter[]) => {
+export const createSortByOptions = (data: BookingStatGroupByFilter[]) => {
   if (!data.length) return [];
   return data.map((item) => ({ value: item.id, label: item.name }));
 };

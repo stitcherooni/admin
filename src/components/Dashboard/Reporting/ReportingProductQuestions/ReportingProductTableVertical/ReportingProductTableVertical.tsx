@@ -1,10 +1,10 @@
 import React, { ChangeEvent } from 'react';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { TableCell, Head } from './ReportingProductTableVerticalstyled';
 import { Row, TableWrapper } from '../../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../../shared/Table/utils';
@@ -77,7 +77,7 @@ const ReportingProductTableVertical = () => {
                   <p>{row.className}</p>
                 </TableCell>
                 <TableCell className="booked-for">
-                  <Link to={`/dashboard/customers?customerId=${row.customerId}`}>
+                  <Link to={`/dashboard/customers?customerId=${(row as any).customerId}`}>
                     {row.bookedFor}
                   </Link>
                 </TableCell>
@@ -94,13 +94,13 @@ const ReportingProductTableVertical = () => {
                   <p>{row.price}</p>
                 </TableCell>
                 <TableCell className="order-value">
-                  <p>{`${row.currency}${row.order}`}</p>
+                  <p>{`${(row as any).currency}${row.order}`}</p>
                 </TableCell>
                 <TableCell className="question">
                   <p>{row.question}</p>
                 </TableCell>
                 <TableCell className="answer">
-                  <p>{row.answer}</p>
+                  <p>{(row as any).answer}</p>
                 </TableCell>
               </Row>
             ))}

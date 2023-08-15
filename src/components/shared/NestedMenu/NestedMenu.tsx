@@ -18,7 +18,7 @@ interface MenuItem extends MenuItemProps {
 
 interface NestedMenuProps {
   options: MenuItem[];
-  handleChoose: (e) => void;
+  handleChoose: (e: any) => void;
   rootId: number | null | string;
   buttonLabel: number | null | string;
   selectedId: number | null | string;
@@ -35,7 +35,7 @@ const NestedMenu = (props: NestedMenuProps) => {
     setAnchorEl(null);
   };
 
-  const selectItem = (e) => {
+  const selectItem = (e: any) => {
     props.handleChoose(e);
     setAnchorEl(null);
   };

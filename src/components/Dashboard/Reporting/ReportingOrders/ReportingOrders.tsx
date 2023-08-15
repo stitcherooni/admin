@@ -1,12 +1,12 @@
 import React, {
   ChangeEvent, SyntheticEvent, useMemo, useState,
 } from 'react';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import dayjs from 'dayjs';
 import {
   TableCell, TableContent, Head, Wrapper, OrderStatusBadge,
@@ -54,7 +54,7 @@ const data = [
   },
 ];
 
-const createTableActions = (order: Order, params) => {
+const createTableActions = (order: Order, params: any) => {
   const { selectOrderDetails } = params;
 
   return actionsOptions.map((item) => {
@@ -195,24 +195,25 @@ const ReportingOrders = () => {
                 rowCount={table.visibleRows.length}
                 cells={headCells}
                 className="table-head"
+                checkbox={false}
               />
               <TableBody>
                 {table.visibleRows.map((row) => {
-                  const isItemSelected = checkIsSelected(row.id);
-                  const labelId = `enhanced-table-checkbox-${row.num}`;
+                  // const isItemSelected = checkIsSelected(row.id);
+                  // const labelId = `enhanced-table-checkbox-${row.num}`;
 
                   return (
                     <Row
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
+                      // hover
+                      // onClick={(event) => handleClick(event, row.id)}
+                      // role="checkbox"
+                      // aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.num}
-                      selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
+                      // selected={isItemSelected}
+                      // sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell className="checkbox">
+                      {/* <TableCell className="checkbox">
                         <StyledCheckbox
                           checked={isItemSelected}
                           inputProps={{
@@ -220,7 +221,7 @@ const ReportingOrders = () => {
                           }}
                           size="small"
                         />
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className="row-id">
                         <p>{row.num}</p>
                       </TableCell>
@@ -249,10 +250,10 @@ const ReportingOrders = () => {
                         <p>{`${getCurrencyByCode(row.value.currency)}${row.value.amount}`}</p>
                       </TableCell>
                       <TableCell className="platform-fee">
-                        <p>{`${row.currency}${row.platformFee}`}</p>
+                        <p>{`${(row as any).currency}${row.platformFee}`}</p>
                       </TableCell>
                       <TableCell className="refunded">
-                        <p>{`${row.currency}${row.refunded}`}</p>
+                        <p>{`${(row as any).currency}${row.refunded}`}</p>
                       </TableCell>
                       <TableCell className="actions">
                         <ActionsMenu options={createTableActions(row, { selectOrderDetails })}
@@ -274,7 +275,7 @@ const ReportingOrders = () => {
           />
         </TableWrapper>
       </TableContent>
-      {filterModalOpen
+      {/* {filterModalOpen
         ? createPortal(
           <Overlay onClick={handleCloseFilterModal} className="overlay">
             <DeleteConfirmationModal
@@ -285,7 +286,7 @@ const ReportingOrders = () => {
           </Overlay>,
           document.body,
         )
-        : null}
+        : null} */}
       {!orderDetails ? null : (
         <StyledDrawer anchor="right" open={helperDrawerOpen} onClose={handleHelperDrawer}>
           <DrawerOverlay handleClick={handleHelperDrawer} handleKeydown={handleHelperDrawer}>

@@ -1,6 +1,8 @@
 import React from 'react';
-import InputAdornment from '@mui/material/InputAdornment/InputAdornment';
-import { Wrapper, Form, Divider, Row } from './FilteringReportingTreasurerDateModal.styled';
+import InputAdornment from '@mui/material/InputAdornment';
+import {
+  Wrapper, Form, Divider, Row,
+} from './FilteringReportingTreasurerDateModal.styled';
 import { Input } from '../../../../shared/Input/Input.styled';
 import ZoomIconSmall from '../../../../../assets/icons/zoom-icon-small';
 import { GreenButton, SecondaryButton } from '../../../../shared/Buttons/Buttons.styled';
@@ -32,15 +34,36 @@ const FilteringReportingTreasurerDateModal = () => (
     <Form className="filtering">
       <h4>Advanced Filtering</h4>
       <Row>
-        <Label text="Order Start Date" inputId="start-date" content={{} as any} />
+        <Label
+          text="Order Start Date"
+          inputId="start-date"
+          content={{
+            title: '',
+            text: '',
+          }}
+        />
         <DatePicker />
       </Row>
       <Row>
-        <Label text="Order End Date" inputId="end-date" content={{} as any} />
+        <Label
+          text="Order End Date"
+          inputId="end-date"
+          content={{
+            title: '',
+            text: '',
+          }}
+        />
         <DatePicker />
       </Row>
       <Row className="last">
-        <Label text="Payment Method" inputId="payment-method" content={{} as any} />
+        <Label
+          text="Payment Method"
+          inputId="payment-method"
+          content={{
+            title: '',
+            text: '',
+          }}
+        />
         <Select options={[]} id="payment-method" />
       </Row>
       <div className="button-wrapper">

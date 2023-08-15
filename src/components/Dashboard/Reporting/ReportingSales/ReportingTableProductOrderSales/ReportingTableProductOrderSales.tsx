@@ -1,9 +1,9 @@
 import React, { ChangeEvent } from 'react';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { useDispatch } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { useSortingTable } from '../../../../shared/Table/utils';
 import { Row, TableWrapper } from '../../../../shared/Table/Table.styled';
 import { TableCell, Head } from './ReportingTableProductOrderSales.styled';
@@ -52,7 +52,7 @@ const ReportingTableProductOrderSales = (props: ReportingTableProductOrderSalesP
           <Head cells={headCells} className="table-head" />
           <TableBody>
             {table.visibleRows.map((row) => (
-              <Row key={row.num}>
+              <Row key={(row as any).num}>
                 <TableCell className="percentage">
                   <p>{`${row.percentage}%`}</p>
                 </TableCell>

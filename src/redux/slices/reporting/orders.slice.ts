@@ -2,10 +2,10 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import {
   getOrdersStat,
 } from '../../actions/reporting.actions';
-import { OrdersProps } from '../../../types/reporting/orders';
+import { OrdersStatProps } from '../../../types/reporting/orders';
 import { Price } from '../../../types/reporting';
 
-interface ReportingInitialState extends OrdersProps {
+interface ReportingInitialState extends OrdersStatProps {
   status: string;
 }
 
@@ -31,7 +31,7 @@ const ordersSlice = createSlice({
         ...state,
         status: 'loading',
       }))
-      .addCase(getOrdersStat.fulfilled, (state, action: PayloadAction<OrdersProps>) => ({
+      .addCase(getOrdersStat.fulfilled, (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
         ...state,
         status: 'succeeded',
         data: action.payload.data,

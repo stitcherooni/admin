@@ -1,13 +1,10 @@
 /* eslint-disable arrow-body-style */
 import { SyntheticEvent } from 'react';
 import {
-  BookingGroupByFilter,
-  BookingProductFilter,
-} from '../../../../types/reporting/bookings';
-import {
   ProductQuestionsEventFilter,
   ProductQuestionsEvents,
 } from '../../../../types/reporting/productQuestions';
+import { BookingStatGroupByFilter, BookingStatProductFilter } from '../../../../types/reporting/bookings';
 
 interface OptionType {
   value: string | number;
@@ -42,12 +39,12 @@ export const createEventsOptions = (data: ProductQuestionsEvents[]) => {
   return arr;
 };
 
-export const createProductOptions = (data: BookingProductFilter[]) => {
+export const createProductOptions = (data: BookingStatProductFilter[]) => {
   if (!data.length) return [];
   return data.map((item) => ({ value: item.productId, label: item.productName }));
 };
 
-export const createSortByOptions = (data: BookingGroupByFilter[]) => {
+export const createSortByOptions = (data: BookingStatGroupByFilter[]) => {
   if (!data.length) return [];
   return data.map((item) => ({ value: item.id, label: item.name }));
 };

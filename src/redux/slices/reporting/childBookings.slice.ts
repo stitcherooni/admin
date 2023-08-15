@@ -4,9 +4,9 @@ import {
   getChildBookingStat,
   sortChildBookingStat,
 } from '../../actions/reporting.actions';
-import { ChildBookingFilters, ChildOnlyBookingsProps } from '../../../types/reporting/bookings';
+import { ChildBookingFilters, ChildOnlyBookingsStatProps } from '../../../types/reporting/bookings';
 
-interface ReportingInitialState extends ChildOnlyBookingsProps {
+interface ReportingInitialState extends ChildOnlyBookingsStatProps {
   status: string;
 }
 
@@ -32,7 +32,7 @@ const childBookingsSlice = createSlice({
       }))
       .addCase(
         getChildBookingStat.fulfilled,
-        (state, action: PayloadAction<ChildOnlyBookingsProps>) => ({
+        (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
           ...state,
           status: 'succeeded',
           data: action.payload.data,
@@ -53,7 +53,7 @@ const childBookingsSlice = createSlice({
       }))
       .addCase(
         sortChildBookingStat.fulfilled,
-        (state, action: PayloadAction<ChildOnlyBookingsProps>) => ({
+        (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
           ...state,
           status: 'succeeded',
           data: action.payload.data,

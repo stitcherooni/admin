@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import Table from '@mui/material/Table/Table';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import TableBody from '@mui/material/TableBody/TableBody';
+import Table from '@mui/material/Table';
+import TableContainer from '@mui/material/TableContainer';
+import TableBody from '@mui/material/TableBody';
 import { TableCell, Head } from '../OrderDetails.styled';
 import { OrderStatusBadge, TableContent } from '../../ReportingOrders.styled';
 import { TableWrapper, Row as TableRow } from '../../../../../shared/Table/Table.styled';

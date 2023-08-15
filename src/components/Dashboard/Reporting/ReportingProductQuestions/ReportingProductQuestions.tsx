@@ -62,7 +62,7 @@ const ReportingProductQuestions = () => {
     groupBy: '',
   });
 
-  const handleChooseEvent = (e) => {
+  const handleChooseEvent = (e: any) => {
     const { value, label, rootid } = e.currentTarget.dataset;
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
@@ -81,7 +81,7 @@ const ReportingProductQuestions = () => {
     }));
   };
 
-  const handleSelectFilters = (e, type: string) => {
+  const handleSelectFilters = (e: any, type: string) => {
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
       [type]: e.target.value,
@@ -96,12 +96,12 @@ const ReportingProductQuestions = () => {
     }));
   };
 
-  const handleEventChange = (e) => handleChooseEvent(e);
-  const handleProductChange = (e) => handleSelectFilters(e, 'product');
-  const handleGroupByChange = (e) => handleSelectFilters(e, 'groupBy');
+  const handleEventChange = (e: any) => handleChooseEvent(e);
+  const handleProductChange = (e: any) => handleSelectFilters(e, 'product');
+  const handleGroupByChange = (e: any) => handleSelectFilters(e, 'groupBy');
 
   const eventOptions = useMemo(
-    () => createEventsOptions(productQuestionsData?.filters?.events ?? ([] as [])),
+    () => createEventsOptions(productQuestionsData?.filters?.events ?? ([] as any)),
     [productQuestionsData?.filters?.events],
   );
 
@@ -112,12 +112,12 @@ const ReportingProductQuestions = () => {
     [productQuestionsData?.filters?.products],
   );
 
-  const groupByOptions = useMemo(
-    () => createSortByOptions(
-      productQuestionsData?.filters?.groupBy ?? ([] as ProductQuestionsFormat[]),
-    ),
-    [productQuestionsData?.filters?.groupBy],
-  );
+  // const groupByOptions = useMemo(
+  //   () => createSortByOptions(
+  //     productQuestionsData?.filters?.groupBy ?? ([] as ProductQuestionsFormat[]),
+  //   ),
+  //   [productQuestionsData?.filters?.groupBy],
+  // );
 
   // to do
   // sorting
@@ -134,7 +134,14 @@ const ReportingProductQuestions = () => {
     <Wrapper>
       <Filters>
         <div>
-          <Label text="Product Questions Selection" content={{}} inputId="ticket" />
+          <Label
+            text="Product Questions Selection"
+            inputId="ticket"
+            content={{
+              title: '',
+              text: '',
+            }}
+          />
           <FiltersWrapper>
             <Col>
               <p className="filter-title">Event</p>

@@ -27,7 +27,7 @@ export interface BookingStatFilters {
 export interface BookingStatEvents {
   year: BookingEventStatFilter[];
 }
-interface BookingEventStatFilter {
+export interface BookingEventStatFilter {
   eventId: number;
   eventName: string;
 }

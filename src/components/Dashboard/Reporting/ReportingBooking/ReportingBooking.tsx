@@ -1,9 +1,11 @@
-import React, { ChangeEvent, SyntheticEvent, useMemo, useState } from 'react';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import React, {
+  ChangeEvent, SyntheticEvent, useMemo, useState,
+} from 'react';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import dayjs from 'dayjs';
 import {
   Col,
@@ -44,7 +46,8 @@ import {
 } from './utils';
 import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
-import { BookingStatItem } from '../../../../types/reporting/bookings';
+import { BookingStatEvents, BookingStatGroupByFilter, BookingStatItem } from '../../../../types/reporting/bookings';
+import { Order } from '../../../../types/reporting/orders';
 
 interface Filter {
   value: number | string;
@@ -71,7 +74,9 @@ const ReportingBooking = () => {
     currentPage: bookingData.currentPage,
   });
   const { page, pagesCount, rowsPerPage } = table.pagination;
-  const { selected, handleSelectAllClick, checkIsSelected, handleClick } = table.selection;
+  const {
+    selected, handleSelectAllClick, checkIsSelected, handleClick,
+  } = table.selection;
   const { handleRequestSort } = table.sorting;
   const [openUpdateBooking, setOpenUpdateBooking] = useState(false);
   const toggleOpenUpdateBooking = () => setOpenUpdateBooking(!openUpdateBooking);
@@ -99,7 +104,7 @@ const ReportingBooking = () => {
 
   // for sorting we neednt all fields are required
 
-  const handleChooseEvent = (e) => {
+  const handleChooseEvent = (e: any) => {
     const { value, label, rootid } = e.currentTarget.dataset;
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
@@ -118,7 +123,7 @@ const ReportingBooking = () => {
     }));
   };
 
-  const handleSelectFilters = (e, type: string) => {
+  const handleSelectFilters = (e: any, type: string) => {
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
       [type]: e.target.value,
@@ -133,9 +138,9 @@ const ReportingBooking = () => {
     }));
   };
 
-  const handleEventChange = (e) => handleChooseEvent(e);
-  const handleProductChange = (e) => handleSelectFilters(e, 'product');
-  const handleGroupByChange = (e) => handleSelectFilters(e, 'groupBy');
+  const handleEventChange = (e: any) => handleChooseEvent(e);
+  const handleProductChange = (e: any) => handleSelectFilters(e, 'product');
+  const handleGroupByChange = (e: any) => handleSelectFilters(e, 'groupBy');
 
   const changePage = (e: ChangeEvent, newPage?: number) => {
     e.preventDefault();
@@ -143,7 +148,7 @@ const ReportingBooking = () => {
       getBookingStat({
         page: newPage,
         pageSize: rowsPerPage,
-      })
+      }),
     );
   };
 
@@ -152,23 +157,23 @@ const ReportingBooking = () => {
       getBookingStat({
         page: 1,
         pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-      })
+      }),
     );
   };
 
   const eventOptions = useMemo(
-    () => createEventsOptions(bookingData?.filters?.events ?? ([] as BookingEvents[])),
-    [bookingData?.filters?.events]
+    () => createEventsOptions(bookingData?.filters?.events ?? ([] as BookingStatEvents[])),
+    [bookingData?.filters?.events],
   );
 
   const productsOptions = useMemo(
     () => createProductOptions(bookingData?.filters?.products ?? []),
-    [bookingData?.filters?.products]
+    [bookingData?.filters?.products],
   );
 
   const groupByOptions = useMemo(
-    () => createSortByOptions(bookingData?.filters?.groupBy ?? ([] as BookingGroupByFilter)),
-    [bookingData?.filters  ?.groupBy]
+    () => createSortByOptions(bookingData?.filters?.groupBy ?? ([] as any)),
+    [bookingData?.filters?.groupBy],
   );
 
   const [orderDetails, setOrderDetails] = useState<Order | null>(null);
@@ -205,10 +210,15 @@ const ReportingBooking = () => {
     <Wrapper>
       <StyledAlert type="success" className="booking-alert">
         <p>
-          Good news <strong>Test User</strong>, we’ve integrated with{' '}
+          Good news
+          {' '}
+          <strong>Test User</strong>
+          , we’ve integrated with
+          {' '}
           <a href="https://www.getqflow.com/features" target="_blank" rel="noreferrer">
             Qflow
-          </a>{' '}
+          </a>
+          {' '}
           which is a simple and intuitive ticket scanning and guest list app that you can use to
           scan your guests in to your events.
           <br />
@@ -219,7 +229,14 @@ const ReportingBooking = () => {
       </StyledAlert>
       <Filters>
         <div>
-          <Label text="Ticket Selection" content={{}} inputId="ticket" />
+          <Label
+            text="Ticket Selection"
+            content={{
+              title: '',
+              text: '',
+            }}
+            inputId="ticket"
+          />
           <FiltersWrapper>
             <Col>
               <p className="filter-title">Event</p>
@@ -274,24 +291,23 @@ const ReportingBooking = () => {
                 rowCount={bookingData.data.length}
                 cells={headCells}
                 className="table-head"
+                checkbox={false}
               />
               <TableBody>
-                {table.visibleRows.map((row, index) => {
-                  const isItemSelected = checkIsSelected(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                {table.visibleRows.map((row, index) =>
+                // const isItemSelected = checkIsSelected(row.id);
+                // const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
+                  (
                     <Row
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
+                      // hover
+                      // onClick={(event) => handleClick(event, row.id)}
+                      // role="checkbox"
+                      // aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.num}
-                      selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell className="checkbox">
+                      {/* <TableCell className="checkbox">
                         <StyledCheckbox
                           checked={isItemSelected}
                           inputProps={{
@@ -299,61 +315,60 @@ const ReportingBooking = () => {
                           }}
                           size="small"
                         />
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className="row-id">
                         <p>{row.num}</p>
                       </TableCell>
                       <TableCell className="first-name">
-                        <p>{row.firstName}</p>
+                        <p>{(row as any).firstName}</p>
                       </TableCell>
                       <TableCell className="last-name">
-                        <p>{row.lastName}</p>
+                        <p>{(row as any).lastName}</p>
                       </TableCell>
                       <TableCell className="booking-name">
                         <p>{row.bookingName}</p>
                       </TableCell>
                       <TableCell className="class">
-                        <p>{row.class}</p>
+                        <p>{(row as any).class}</p>
                       </TableCell>
                       <TableCell className="booking-info">
-                        <p>{row.bookingInfo}</p>
+                        <p>{(row as any).bookingInfo}</p>
                       </TableCell>
                       <TableCell className="sku">
-                        <p>{row.sku}</p>
+                        <p>{(row as any).sku}</p>
                       </TableCell>
                       <TableCell className="product">
                         <p>{row.product}</p>
                       </TableCell>
                       <TableCell className="price">
-                        <p>{`${row.currency}${row.price}`}</p>
+                        <p>{`${(row as any).currency}${(row as any).price}`}</p>
                       </TableCell>
                       <TableCell className="quantity">
-                        <p>{row.quantity}</p>
+                        <p>{(row as any).quantity}</p>
                       </TableCell>
                       <TableCell className="order-id">
-                        <p>{row.orderId}</p>
+                        <p>{(row as any).orderId}</p>
                       </TableCell>
                       <TableCell className="order-date">
                         <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
                       </TableCell>
                       <TableCell className="booked-by">
-                        <p>{row.bookedBy}</p>
+                        <p>{(row as any).bookedBy}</p>
                       </TableCell>
                       <TableCell className="phone">
-                        <p>{row.phone}</p>
+                        <p>{(row as any).phone}</p>
                       </TableCell>
                       <TableCell className="email">
-                        <p>{row.email}</p>
+                        <p>{(row as any).email}</p>
                       </TableCell>
                       <TableCell className="payment-method">
-                        <p>{row.paymentMethod}</p>
+                        <p>{(row as any).paymentMethod}</p>
                       </TableCell>
                       <TableCell className="actions">
                         <ActionsMenu options={tableActionsOptions} />
                       </TableCell>
                     </Row>
-                  );
-                })}
+                  ))}
               </TableBody>
             </Table>
           </StyledTableWrapper>
@@ -369,21 +384,21 @@ const ReportingBooking = () => {
       </TableContent>
       {openUpdateBooking
         ? createPortal(
-            <Overlay onClick={handleCloseUpdateBooking} className="overlay">
-              <BookingEditModal />
-            </Overlay>,
-            document.body
-          )
+          <Overlay onClick={handleCloseUpdateBooking} className="overlay">
+            <BookingEditModal />
+          </Overlay>,
+          document.body,
+        )
         : null}
       {openQflowModal
         ? createPortal(
-            <Overlay onClick={handleCloseQflowModal} className="overlay">
-              <QflowModal handleClose={toggleOpenQflowModal} />
-            </Overlay>,
-            document.body
-          )
+          <Overlay onClick={handleCloseQflowModal} className="overlay">
+            <QflowModal handleClose={toggleOpenQflowModal} />
+          </Overlay>,
+          document.body,
+        )
         : null}
-      {!orderDetails ? null : (
+      {/* {!orderDetails ? null : (
         <StyledDrawer
           anchor="right"
           open={orderDetailOpen}
@@ -396,7 +411,7 @@ const ReportingBooking = () => {
             <OrderDetails data={orderDetails} needsActions={false} />
           </DrawerOverlay>
         </StyledDrawer>
-      )}
+      )} */}
     </Wrapper>
   );
 };

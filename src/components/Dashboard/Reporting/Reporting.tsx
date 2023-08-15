@@ -1,18 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material/Select';
 import { Col, ChooseReportWrapper, Wrapper } from './Reporting.styled';
 import { ReportTypes, tabsList } from './tabs';
 import { getReportComponent } from './utils';
 import Label from '../../shared/Label/Label';
 import Select from '../../shared/Select/Select';
 import { AppDispatch } from '../../../redux/store';
-import { getBankedStat, getBookingFilters, getBookingStat, getChildBookingFilters, getChildBookingStat, getCustomersStat, getEmailTrackerStat, getInvoicesStat, getOrdersStat, getProductQuestionsFilters, getProductQuestionsStat, getSalesFilters, getSalesStat, getTicketsFilters, getTicketsStat, getTreasurerByDateStat, getTreasurerByEventFilters, getTreasurerByEventStat, getVolunteersFilters, getVolunteersStat } from '../../../redux/actions/reporting.actions';
+import {
+  getBankedStat,
+  getBookingFilters,
+  getBookingStat,
+  getChildBookingFilters,
+  getChildBookingStat,
+  getCustomersStat,
+  getEmailTrackerStat,
+  getInvoicesStat,
+  getOrdersStat,
+  getProductQuestionsFilters,
+  getProductQuestionsStat,
+  getSalesFilters,
+  getSalesStat,
+  getTicketsFilters,
+  getTicketsStat,
+  getTreasurerByDateStat,
+  getTreasurerByEventFilters,
+  getTreasurerByEventStat,
+  getVolunteersFilters,
+  getVolunteersStat,
+} from '../../../redux/actions/reporting.actions';
 
 const Reporting = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [activeReportType, setActiveReportType] = useState(ReportTypes.EMAIL_TRACKER);
+  const [activeReportType, setActiveReportType] = useState(ReportTypes.BANKED);
 
-  const handleChangeReportType = (e) => setActiveReportType(e.target.value);
+  const handleChangeReportType = (e: SelectChangeEvent<any>) => setActiveReportType(e.target.value);
 
   useEffect(() => {
     if (activeReportType === ReportTypes.BANKED) {
@@ -40,7 +62,9 @@ const Reporting = () => {
     }
     if (activeReportType === ReportTypes.PRODUCT_QUESTIONS) {
       dispatch(getProductQuestionsFilters(1));
-      dispatch(getProductQuestionsStat({ type: 'product_questionvertical', page: 1, pageSize: 10 }));
+      dispatch(
+        getProductQuestionsStat({ type: 'product_questionvertical', page: 1, pageSize: 10 }),
+      );
     }
     if (activeReportType === ReportTypes.SALES) {
       dispatch(getSalesFilters(1));
@@ -66,10 +90,22 @@ const Reporting = () => {
   return (
     <Wrapper>
       <ChooseReportWrapper>
-        <Label text="Report Selection" content={{}} inputId="choose-report" />
+        <Label
+          text="Report Selection"
+          inputId="choose-report"
+          content={{
+            title: '',
+            text: '',
+          }}
+        />
         <Col>
           <p>Choose your report</p>
-          <Select name="show" options={tabsList} value={activeReportType} onChange={handleChangeReportType} />
+          <Select
+            name="show"
+            options={tabsList}
+            value={activeReportType}
+            onChange={handleChangeReportType}
+          />
         </Col>
       </ChooseReportWrapper>
       {getReportComponent(activeReportType)}

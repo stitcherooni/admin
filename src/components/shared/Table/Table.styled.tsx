@@ -1,12 +1,12 @@
 import styled from 'styled-components';
-import TableRow from '@mui/material/TableRow/TableRow';
-import Checkbox from '@mui/material/Checkbox/Checkbox';
-import IconButton from '@mui/material/IconButton/IconButton';
-import Pagination from '@mui/material/Pagination/Pagination';
-import Button from '@mui/material/Button/Button';
-import Select from '@mui/material/Select/Select';
-import MenuItem from '@mui/material/MenuItem/MenuItem';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
+import TableRow from '@mui/material/TableRow';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import Pagination from '@mui/material/Pagination';
+import Button from '@mui/material/Button';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import TableContainer from '@mui/material/TableContainer';
 import { Input } from '../Input/Input.styled';
 
 export const Wrapper = styled.div`
@@ -85,6 +85,7 @@ export const Cell = styled.td`
   border-left: 1px solid rgba(122, 81, 145, 0.4);
   border-bottom: 1px solid rgba(122, 81, 145, 0.4);
   word-break: break-all;
+  min-height: 38px;
 
   & {
     white-space: pre-wrap;
@@ -114,6 +115,25 @@ export const Row = styled(TableRow)`
   &.MuiTableRow-root {
     display: flex;
     width: 100%;
+  }
+
+  & td:first-of-type {
+    border-left: 1px solid rgba(122, 81, 145, 0.4);
+  }
+
+  & td:last-of-type {
+    border-right: 1px solid rgba(122, 81, 145, 0.4);
+  }
+
+  &.last {
+    & td:first-of-type {
+      border-bottom-left-radius: 8px;
+    }
+
+    & td:last-of-type {
+      border-right: 1px solid rgba(122, 81, 145, 0.4);
+      border-bottom-right-radius: 8px;
+    }
   }
 `;
 

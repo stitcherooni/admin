@@ -13,11 +13,6 @@ const initialState: ReportingInitialState = {
   totalPages: 1,
   currentPage: 1,
   pageSize: 10,
-  filters: {} as VolunteersFIlters,
-  totalSales: 0,
-  profit: 0,
-  processingFeeNotPaid: 0,
-  platformFeesNotPaid: 0,
 };
 
 const volunteersSlice = createSlice({
@@ -32,7 +27,7 @@ const volunteersSlice = createSlice({
       }))
       .addCase(
         getVolunteersStat.fulfilled,
-        (state, action: PayloadAction<ReportingInitialState>) => ({
+        (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
           ...state,
           status: 'succeeded',
           data: action.payload.data,
@@ -70,7 +65,7 @@ const volunteersSlice = createSlice({
       }))
       .addCase(
         sortVolunteersStat.fulfilled,
-        (state, action: PayloadAction<ReportingInitialState>) => ({
+        (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
           ...state,
           status: 'succeeded',
           data: action.payload.data,

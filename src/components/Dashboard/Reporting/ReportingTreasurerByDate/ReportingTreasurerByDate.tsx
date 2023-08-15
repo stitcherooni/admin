@@ -1,6 +1,6 @@
 import React, { SyntheticEvent, useMemo, useState } from 'react';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import {
   SearchBarWrapper,
@@ -96,24 +96,25 @@ const ReportingTreasurerByDate = () => {
                 rowCount={rows.length}
                 cells={headCells}
                 className="table-head"
+                checkbox={false}
               />
               <TableBody>
                 {table.visibleRows.map((row, index) => {
-                  const isItemSelected = checkIsSelected(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                  // const isItemSelected = checkIsSelected(row.id);
+                  // const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <Row
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
+                      // hover
+                      // onClick={(event) => handleClick(event, row.id)}
+                      // role="checkbox"
+                      // aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
-                      selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
+                      // selected={isItemSelected}
+                      // sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell className="checkbox">
+                      {/* <TableCell className="checkbox">
                         <StyledCheckbox
                           checked={isItemSelected}
                           inputProps={{
@@ -121,7 +122,7 @@ const ReportingTreasurerByDate = () => {
                           }}
                           size="small"
                         />
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className="row-id">
                         <p>{row['row-id']}</p>
                       </TableCell>
@@ -162,7 +163,7 @@ const ReportingTreasurerByDate = () => {
                         <p>{`${row.currency}${row.refunded}`}</p>
                       </TableCell>
                       <TableCell className="cost">
-                        <p>{`${row.currency}${row.price}`}</p>
+                        <p>{`${row.currency}${(row as any).price}`}</p>
                       </TableCell>
                     </Row>
                   );
@@ -209,7 +210,7 @@ const ReportingTreasurerByDate = () => {
           />
         </TableWrapper>
       </TableContent>
-      {open
+      {/* {open
         ? createPortal(
           <Overlay onClick={handleClose} className="overlay">
             <DeleteConfirmationModal
@@ -220,7 +221,7 @@ const ReportingTreasurerByDate = () => {
           </Overlay>,
           document.body,
         )
-        : null}
+        : null} */}
       <StyledDrawer anchor="right" open={filteringDrawerOpen} onClose={handleFilteringDrawer}>
         <DrawerOverlay handleClick={handleFilteringDrawer} handleKeydown={handleFilteringDrawer}>
           <FilteringReportingTreasurerDateModal />

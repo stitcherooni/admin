@@ -1,5 +1,5 @@
-import Button from '@mui/material/Button/Button';
-import IconButton from '@mui/material/IconButton/IconButton';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import styled from 'styled-components';
 
 export const Wrapper = styled.div`

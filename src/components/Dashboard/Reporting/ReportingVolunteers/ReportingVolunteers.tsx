@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import {
   Col,
   Filters,
@@ -61,7 +61,7 @@ const ReportingVolunteers = () => {
     groupBy: '',
   });
 
-  const handleChooseEvent = (e) => {
+  const handleChooseEvent = (e: any) => {
     const { value, label, rootid } = e.currentTarget.dataset;
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
@@ -73,21 +73,28 @@ const ReportingVolunteers = () => {
     }));
   };
 
-  const handleSelectFilters = (e) => {
+  const handleSelectFilters = (e: any) => {
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
       groupBy: e.target.value,
     }));
   };
 
-  const handleEventChange = (e) => handleChooseEvent(e);
-  const handleGroupByChange = (e) => handleSelectFilters(e);
+  const handleEventChange = (e: any) => handleChooseEvent(e);
+  const handleGroupByChange = (e: any) => handleSelectFilters(e);
 
   return (
     <Wrapper>
       <Filters>
         <div>
-          <Label text="Volunteer Selection" content={{}} inputId="ticket" />
+          <Label
+            text="Volunteer Selection"
+            content={{
+              title: '',
+              text: '',
+            }}
+            inputId="ticket"
+          />
           <FiltersWrapper>
             <Col>
               <p className="filter-title">Event</p>
@@ -138,24 +145,23 @@ const ReportingVolunteers = () => {
                 rowCount={rows.length}
                 cells={headCells}
                 className="table-head"
+                checkbox={false}
               />
               <TableBody>
-                {table.visibleRows.map((row, index) => {
-                  const isItemSelected = checkIsSelected(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                {table.visibleRows.map((row, index) =>
+                // const isItemSelected = checkIsSelected(row.id);
+                // const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
+                  (
                     <Row
-                      hover
+                      // hover
                       // onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
+                      // role="checkbox"
+                      // aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
-                      selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell className="checkbox">
+                      {/* <TableCell className="checkbox">
                         <StyledCheckbox
                           checked={isItemSelected}
                           inputProps={{
@@ -163,7 +169,7 @@ const ReportingVolunteers = () => {
                           }}
                           size="small"
                         />
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className="event-name">
                         <p>{row.eventName}</p>
                       </TableCell>
@@ -189,8 +195,7 @@ const ReportingVolunteers = () => {
                         <ActionsMenu options={actionsOptions} />
                       </TableCell>
                     </Row>
-                  );
-                })}
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>

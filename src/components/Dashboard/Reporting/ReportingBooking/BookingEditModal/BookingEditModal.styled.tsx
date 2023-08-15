@@ -1,4 +1,4 @@
-import Checkbox from '@mui/material/Checkbox/Checkbox';
+import Checkbox from '@mui/material/Checkbox';
 import styled from 'styled-components';
 import Alert from '../../../../shared/Alert/Alert';
 

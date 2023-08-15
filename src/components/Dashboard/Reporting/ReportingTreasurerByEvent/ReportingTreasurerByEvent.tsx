@@ -1,6 +1,6 @@
 import React, { SyntheticEvent, useMemo, useState } from 'react';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import {
   Col,
@@ -21,7 +21,9 @@ import {
   TableWrapper,
 } from '../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
-import { eventOptions, groupByOptions, headCells, menuActionsOptions, rows } from './table-data';
+import {
+  eventOptions, groupByOptions, headCells, menuActionsOptions, rows,
+} from './table-data';
 import { Overlay } from '../Reporting.styled';
 import HelpModal from './ReportingTreasurerByEventsModals/HelpModal/HelpModal';
 import Label from '../../../shared/Label/Label';
@@ -96,7 +98,7 @@ const ReportingTreasurerByEvent = () => {
     },
     groupBy: '',
   });
-  const handleChooseEvent = (e) => {
+  const handleChooseEvent = (e: any) => {
     const { value, label, rootid } = e.currentTarget.dataset;
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
@@ -108,15 +110,15 @@ const ReportingTreasurerByEvent = () => {
     }));
   };
 
-  const handleSelectFilters = (e) => {
+  const handleSelectFilters = (e: any) => {
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
       groupBy: e.target.value,
     }));
   };
 
-  const handleEventChange = (e) => handleChooseEvent(e);
-  const handleGroupByChange = (e) => handleSelectFilters(e);
+  const handleEventChange = (e: any) => handleChooseEvent(e);
+  const handleGroupByChange = (e: any) => handleSelectFilters(e);
 
   // to do
   // show test orders
@@ -126,7 +128,14 @@ const ReportingTreasurerByEvent = () => {
     <Wrapper>
       <StatisticBar data={data} />
       <Filters>
-        <Label content={{} as any} text="Treasurer Selection" inputId="show" />
+        <Label
+          content={{
+            title: '',
+            text: '',
+          }}
+          text="Treasurer Selection"
+          inputId="show"
+        />
         <TableFilters>
           <FiltersWrapper>
             <Col>
@@ -172,24 +181,23 @@ const ReportingTreasurerByEvent = () => {
                 rowCount={rows.length}
                 cells={headCells}
                 className="table-head"
+                checkbox={false}
               />
               <TableBody>
-                {table.visibleRows.map((row, index) => {
-                  const isItemSelected = checkIsSelected(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                {table.visibleRows.map((row, index) =>
+                // const isItemSelected = checkIsSelected(row.id);
+                // const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
+                  (
                     <Row
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
+                      // hover
+                      // onClick={(event) => handleClick(event, row.id)}
+                      // role="checkbox"
+                      // aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
-                      selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell className="checkbox">
+                      {/* <TableCell className="checkbox">
                         <StyledCheckbox
                           checked={isItemSelected}
                           inputProps={{
@@ -197,7 +205,7 @@ const ReportingTreasurerByEvent = () => {
                           }}
                           size="small"
                         />
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className="row-id">
                         <p>{row['row-id']}</p>
                       </TableCell>
@@ -250,8 +258,7 @@ const ReportingTreasurerByEvent = () => {
                         <p>{`${row.currency}${row.platformFeePaid}`}</p>
                       </TableCell>
                     </Row>
-                  );
-                })}
+                  ))}
                 <Row
                   sx={{ cursor: 'pointer' }}
                 >

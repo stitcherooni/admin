@@ -1,12 +1,12 @@
 import React, {
   ChangeEvent, SyntheticEvent, useMemo, useState,
 } from 'react';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import {
   Col,
   Filters,
@@ -78,7 +78,7 @@ const ReportingTickets = () => {
     groupBy: '',
   });
 
-  const handleChooseEvent = (e) => {
+  const handleChooseEvent = (e: any) => {
     const { value, label, rootid } = e.currentTarget.dataset;
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
@@ -96,7 +96,7 @@ const ReportingTickets = () => {
     }));
   };
 
-  const handleSelectFilters = (e) => {
+  const handleSelectFilters = (e: any) => {
     setSelectedFilters((currentFilters) => ({
       ...currentFilters,
       groupBy: e.target.value,
@@ -109,8 +109,8 @@ const ReportingTickets = () => {
     }));
   };
 
-  const handleEventChange = (e) => handleChooseEvent(e);
-  const handleGroupByChange = (e) => handleSelectFilters(e);
+  const handleEventChange = (e: any) => handleChooseEvent(e);
+  const handleGroupByChange = (e: any) => handleSelectFilters(e);
 
   const [open, setOpen] = useState(false);
 
@@ -168,7 +168,14 @@ const ReportingTickets = () => {
     <Wrapper>
       <Filters>
         <div>
-          <Label text="Ticket Selection" content={{}} inputId="ticket" />
+          <Label
+            text="Ticket Selection"
+            content={{
+              title: '',
+              text: '',
+            }}
+            inputId="ticket"
+          />
           <FiltersWrapper>
             <Col>
               <p className="filter-title">Event</p>
@@ -214,24 +221,23 @@ const ReportingTickets = () => {
                 rowCount={rows.length}
                 cells={headCells}
                 className="table-head"
+                checkbox={false}
               />
               <TableBody>
-                {table.visibleRows.map((row, index) => {
-                  const isItemSelected = checkIsSelected(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                {table.visibleRows.map((row, index) =>
+                // const isItemSelected = checkIsSelected(row.id);
+                // const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
+                  (
                     <Row
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
+                      // hover
+                      // onClick={(event) => handleClick(event, row.id)}
+                      // role="checkbox"
+                      // aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.num}
-                      selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell className="checkbox">
+                      {/* <TableCell className="checkbox">
                         <StyledCheckbox
                           checked={isItemSelected}
                           inputProps={{
@@ -239,40 +245,39 @@ const ReportingTickets = () => {
                           }}
                           size="small"
                         />
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className="row-id">
                         <p>{row.num}</p>
                       </TableCell>
                       <TableCell className="first-name">
-                        <p>{row.firstName}</p>
+                        <p>{(row as any).firstName}</p>
                       </TableCell>
                       <TableCell className="last-name">
-                        <p>{row.lastName}</p>
+                        <p>{(row as any).lastName}</p>
                       </TableCell>
                       <TableCell className="product-name">
                         <p>{row.product}</p>
                       </TableCell>
                       <TableCell className="order-id">
-                        <p>{row.orderId}</p>
+                        <p>{(row as any).orderId}</p>
                       </TableCell>
                       <TableCell className="ticket-id">
                         <p>{row.ticketNumber}</p>
                       </TableCell>
                       <TableCell className="booking-info">
-                        <p>{row.bookingInfo}</p>
+                        <p>{(row as any).bookingInfo}</p>
                       </TableCell>
                       <TableCell className="winning-prize">
-                        <p>{row.winningPrize}</p>
+                        <p>{(row as any).winningPrize}</p>
                       </TableCell>
                       <TableCell className="scan-date">
-                        <p>{row.scanDate}</p>
+                        <p>{(row as any).scanDate}</p>
                       </TableCell>
                       <TableCell className="actions">
                         <ActionsMenu options={actionsOptions} />
                       </TableCell>
                     </Row>
-                  );
-                })}
+                  ))}
               </TableBody>
             </Table>
           </TableContainer>

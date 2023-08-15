@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import InputAdornment from '@mui/material/InputAdornment/InputAdornment';
+import InputAdornment from '@mui/material/InputAdornment';
 import {
   StyledHeader,
   HeaderWrapper,

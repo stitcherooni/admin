@@ -1,19 +1,14 @@
-import React, { useMemo, useState, ChangeEvent } from 'react';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import React, {
+  useMemo, useState, ChangeEvent, useRef,
+} from 'react';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
 import { useDispatch, useSelector } from 'react-redux';
-import dayjs from 'dayjs';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import {
-  TableCell, TableContent, Head, Wrapper, StyledAlert,
+  TableContent, Head, Wrapper, StyledAlert,
 } from './ReportingBanked.styled';
-import {
-  Row,
-  SearchBarWrapper,
-  TableCaption,
-  TableWrapper,
-} from '../../../shared/Table/Table.styled';
+import { SearchBarWrapper, TableCaption, TableWrapper } from '../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
 import { actionsOptions, headCells, rows } from './table-data';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
@@ -27,6 +22,8 @@ import { StyledDrawer } from '../Reporting.styled';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
 import { getBankedStat } from '../../../../redux/actions/reporting.actions';
+import ReportingBankedTableBody from './ReportingBankedTableBody';
+import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
 
 const ReportingBanked = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,26 +33,30 @@ const ReportingBanked = () => {
     totalPages: bankedData.totalPages,
     pageSize: bankedData.pageSize,
     currentPage: bankedData.currentPage,
+    columns: headCells,
   });
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const {
-    page, pagesCount, rowsPerPage,
-  } = table.pagination;
+  const { page, pagesCount, rowsPerPage } = table.pagination;
+  const { columnsOptions, visibleColumns, updateColumnsOptions } = table.customization;
 
   const changePage = (e: ChangeEvent, newPage?: number) => {
     e.preventDefault();
-    dispatch(getBankedStat({
-      page: newPage,
-      pageSize: rowsPerPage,
-    }));
+    dispatch(
+      getBankedStat({
+        page: newPage,
+        pageSize: rowsPerPage,
+      }),
+    );
   };
 
   const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(getBankedStat({
-      page: 1,
-      pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-    }));
+    dispatch(
+      getBankedStat({
+        page: 1,
+        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
+      }),
+    );
   };
 
   const {
@@ -94,20 +95,23 @@ const ReportingBanked = () => {
     setOrderDetails(order);
   };
 
-  const ids = useMemo(() => table.visibleRows.map((item) => item.order.transactionId), [table.visibleRows]);
-
   const [showTestTransactions, setShowTestTransactions] = useState(false);
-
-  // to do
-  // actions
-  // sorting
-  // table copy
-  // search
-  // add button 'show test transactions'
-
-  // needs transactionId and currency
-  // total values is it just for table?
-  // needs refunded for order history
+  const actionsMenuRef = useRef(null);
+  const [openCustomizeMenu, setOpenCustomizeMenu] = useState(false);
+  const closeCustomizeMenu = () => {
+    setOpenCustomizeMenu(false);
+  };
+  const actionsMenuOptions = useMemo(
+    () => actionsOptions.map((item) => {
+      switch (item.value) {
+        case 'customize-view':
+          return { ...item, handleClick: () => setOpenCustomizeMenu(true) };
+        default:
+          return item;
+      }
+    }),
+    [actionsOptions],
+  );
 
   return (
     <Wrapper>
@@ -127,8 +131,8 @@ const ReportingBanked = () => {
             <strong>{`${bankedData.totalCount} `}</strong>
             {`${bankedData.totalCount === 0 || bankedData.totalCount > 1 ? 'Entries' : 'Entry'}`}
           </p>
-          <SearchBarWrapper className="search-wrapper">
-            <ActionsMenu options={actionsOptions} />
+          <SearchBarWrapper className="search-wrapper" ref={actionsMenuRef}>
+            <ActionsMenu options={actionsMenuOptions} />
           </SearchBarWrapper>
         </TableCaption>
         <TableWrapper>
@@ -139,73 +143,16 @@ const ReportingBanked = () => {
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}
-                cells={headCells}
+                cells={visibleColumns ?? []}
                 className="table-head"
                 checkbox={false}
               />
-              <TableBody>
-                {table.visibleRows.map((row) => (
-                  <Row key={row.num}>
-                    <TableCell className="row-id">
-                      <p>{row.num}</p>
-                    </TableCell>
-                    <TableCell className="order-id" onClick={(e) => handleOrderDetailDrawer(e, row.order)}>
-                      <a>{row.orderId}</a>
-                    </TableCell>
-                    <TableCell className="transaction-id">
-                      <p>{row.order.transactionId}</p>
-                    </TableCell>
-                    <TableCell className="transaction-status">
-                      <p>{row.status}</p>
-                    </TableCell>
-                    <TableCell className="transaction-date">
-                      <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
-                    </TableCell>
-                    <TableCell className="transaction-value">
-                      <p>{`${getCurrencyByCode('GBP')}${row.value}`}</p>
-                    </TableCell>
-                    <TableCell className="banked-fee">
-                      <p>{`${getCurrencyByCode('GBP')}${row.bankedFee}`}</p>
-                    </TableCell>
-                    <TableCell className="platform-fee">
-                      <p>{`${getCurrencyByCode('GBP')}${row.platformFee}`}</p>
-                    </TableCell>
-                  </Row>
-                ))}
-                <Row sx={{ cursor: 'pointer' }}>
-                  <TableCell className="row-id" />
-                  <TableCell className="order-id hidden" />
-                  <TableCell className="transaction-id hidden" />
-                  <TableCell className="transaction-status hidden" />
-                  <TableCell className="transaction-date">
-                    <strong>Total</strong>
-                  </TableCell>
-                  <TableCell className="transaction-value">
-                    <strong>
-                      {`${getCurrencyByCode('GBP')}${
-                        bankedData.totalSalesAmount.amount
-                      }`}
-
-                    </strong>
-                  </TableCell>
-                  <TableCell className="banked-fee">
-                    <strong>
-                      {`${getCurrencyByCode('GBP')}${
-                        bankedData.totalBankedFee.amount
-                      }`}
-
-                    </strong>
-                  </TableCell>
-                  <TableCell className="platform-fee">
-                    <strong>
-                      {`${getCurrencyByCode('GBP')}${
-                        bankedData.totalPlatformFees.amount
-                      }`}
-
-                    </strong>
-                  </TableCell>
-                </Row>
-              </TableBody>
+              <ReportingBankedTableBody
+                rows={table.visibleRows}
+                handleOrderDetailDrawer={handleOrderDetailDrawer}
+                columnsOptions={columnsOptions}
+                currency={totalBankedFee.currency}
+              />
             </Table>
           </TableContainer>
           <TablePagination
@@ -218,7 +165,11 @@ const ReportingBanked = () => {
           />
         </TableWrapper>
         {!orderDetails ? null : (
-          <StyledDrawer anchor="right" open={orderDetailOpen} onClose={(e) => handleOrderDetailDrawer(e, null)}>
+          <StyledDrawer
+            anchor="right"
+            open={orderDetailOpen}
+            onClose={(e) => handleOrderDetailDrawer(e as any, null)}
+          >
             <DrawerOverlay
               handleClick={handleOrderDetailDrawer}
               handleKeydown={handleOrderDetailDrawer}
@@ -227,6 +178,15 @@ const ReportingBanked = () => {
             </DrawerOverlay>
           </StyledDrawer>
         )}
+        {actionsMenuRef.current && openCustomizeMenu ? (
+          <CustomizeTableColumnsPopup
+            anchorEl={actionsMenuRef.current}
+            open={openCustomizeMenu}
+            onClose={closeCustomizeMenu}
+            options={columnsOptions}
+            updatePopup={updateColumnsOptions}
+          />
+        ) : null}
       </TableContent>
     </Wrapper>
   );

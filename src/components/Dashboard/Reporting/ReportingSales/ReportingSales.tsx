@@ -63,7 +63,7 @@ const ReportingSales = () => {
   };
   const salesData = useSelector((state: RootState) => state.reporting.sales);
   const [selectedEvent, setSelectEvent] = useState<SelectedEventProps | null>(null);
-  const handleSelectEvent = (e) => {
+  const handleSelectEvent = (e: any) => {
     const { rootid, value, label } = e.currentTarget.dataset;
     setSelectEvent({
       year: rootid,
@@ -114,7 +114,14 @@ const ReportingSales = () => {
     <Wrapper>
       <StatisticBar data={statistic} />
       <Filters>
-        <Label content={{} as any} text="Sales Selection" inputId="show" />
+        <Label
+          content={{
+            title: '',
+            text: '',
+          }}
+          text="Sales Selection"
+          inputId="show"
+        />
         <TableFilters>
           <FiltersWrapper>
             <Col>

@@ -1,5 +1,5 @@
 import React from 'react';
-import InputAdornment from '@mui/material/InputAdornment/InputAdornment';
+import InputAdornment from '@mui/material/InputAdornment';
 import { Wrapper, Form, Divider, Row } from './FilteringReportingOrdersModal.styled';
 import { Input } from '../../../../shared/Input/Input.styled';
 import ZoomIconSmall from '../../../../../assets/icons/zoom-icon-small';

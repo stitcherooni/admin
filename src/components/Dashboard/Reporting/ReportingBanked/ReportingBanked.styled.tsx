@@ -25,7 +25,7 @@ export const Head = styled(TableHeadSorting)`
     }
 
     & .transaction-id {
-      width: 320px;
+      width: 310px;
     }
 
     & .transaction-status,
@@ -34,21 +34,12 @@ export const Head = styled(TableHeadSorting)`
     }
 
     & .transaction-date {
-      width: 132px;
+      width: 142px;
     }
 
     & .banked-fee,
     & .platform-fee {
       width: 155px;
-    }
-
-    & .row-id {
-      border-top-left-radius: 8px;
-    }
-
-    & .platform-fee {
-      border-right: 1px solid rgba(122, 81, 145, 0.4);
-      border-top-right-radius: 8px;
     }
   }
 
@@ -92,7 +83,7 @@ export const TableCell = styled(Cell)`
   }
 
   &.transaction-id {
-    width: 320px;
+    width: 310px;
   }
 
   &.transaction-status,
@@ -101,16 +92,12 @@ export const TableCell = styled(Cell)`
   }
 
   &.transaction-date {
-    width: 132px;
+    width: 142px;
   }
 
   &.banked-fee,
   &.platform-fee {
     width: 155px;
-  }
-
-  &.platform-fee {
-    border-right: 1px solid rgba(122, 81, 145, 0.4);
   }
 
   &.hidden {

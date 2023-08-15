@@ -1,8 +1,8 @@
-import Button from '@mui/material/Button/Button';
-import Pagination from '@mui/material/Pagination/Pagination';
+import Button from '@mui/material/Button';
+import Pagination from '@mui/material/Pagination';
 import styled from 'styled-components';
-import MenuItem from '@mui/material/MenuItem/MenuItem';
-import Select from '@mui/material/Select/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 export const PaginationWrapper = styled.div`
   display: flex;

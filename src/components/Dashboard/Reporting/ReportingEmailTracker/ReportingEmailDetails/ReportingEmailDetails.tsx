@@ -1,10 +1,10 @@
 import React from 'react';
 import { Wrapper, Row } from './ReportingEmailDetails.styled';
 import ReportingEmailStepper from './ReportingEmailStepper/ReportingEmailStepper';
-import { EmailTrackerItem } from '../../../../../types/reporting/emailTracker';
+import { EmailTrackerStatItem } from '../../../../../types/reporting/emailTracker';
 
 interface ReportingEmailDetailProps {
-  data: EmailTrackerItem;
+  data: EmailTrackerStatItem;
 }
 
 // needs sender email
@@ -17,7 +17,7 @@ const ReportingEmailDetails = (props: ReportingEmailDetailProps) => (
     </Row>
     <Row>
       <strong>From:</strong>
-      <p>{`${props.data.sentBy} (${props.data.senderEmail})`}</p>
+      <p>{`${props.data.sentBy} (${(props.data as any).senderEmail})`}</p>
     </Row>
     <Row>
       <strong>Title:</strong>

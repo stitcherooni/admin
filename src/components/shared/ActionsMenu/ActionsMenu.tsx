@@ -29,7 +29,7 @@ const ActionsMenu = (props: ActionsMenuProps) => {
     setAnchorEl(null);
   };
 
-  const handleChoose = (cb) => {
+  const handleChoose = (cb?: () => void) => {
     if (cb) cb();
     setAnchorEl(null);
   };

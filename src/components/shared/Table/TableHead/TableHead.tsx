@@ -1,7 +1,7 @@
 import React from 'react';
 import { Cell, Row, StyledHead } from './TableHead.styled';
 
-interface CellProps {
+export interface CellProps {
   id: string;
   label: string;
   className: string;

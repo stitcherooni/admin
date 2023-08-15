@@ -1,5 +1,5 @@
-import MenuItem from '@mui/material/MenuItem/MenuItem';
-import Select from '@mui/material/Select/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import styled from 'styled-components';
 import ArrowUpIcon from '../../../assets/icons/arrow-up-dropdown.svg';
 

@@ -1,13 +1,13 @@
 import React, {
   ChangeEvent, SyntheticEvent, useMemo, useState,
 } from 'react';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import dayjs from 'dayjs';
 import {
   TableCell, TableContent, Head, Wrapper,
@@ -34,19 +34,20 @@ import ApproveCustomerModal from './ApproveCustomerModal/ApproveCustomerModal';
 import DeleteCustomerModal from './DeleteCustomerModal/DeleteCustomerModal';
 import StatisticBar from '../StatisticBar/StatisticBar';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { CustomerItem } from '../../../../types/reporting/customers';
 import { getCustomersStat } from '../../../../redux/actions/reporting.actions';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import { handleCloseModal } from '../ReportingBooking/utils';
+import { CustomerStatItem } from '../../../../types/reporting/customers';
 
 const ReportingCustomers = () => {
   const dispatch = useDispatch<AppDispatch>();
   const customersData = useSelector((state: RootState) => state.reporting.customers);
-  const table = useSortingTable<CustomerItem>(customersData.data, {
+  const table = useSortingTable<CustomerStatItem>(customersData.data, {
     totalCount: customersData.totalCount,
     totalPages: customersData.totalPages,
     pageSize: customersData.pageSize,
     currentPage: customersData.currentPage,
+    columns: headCells,
   });
   const {
     selected, handleSelectAllClick, checkIsSelected, handleClick,
@@ -157,21 +158,21 @@ const ReportingCustomers = () => {
               />
               <TableBody>
                 {table.visibleRows.map((row, index) => {
-                  const isItemSelected = checkIsSelected(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
+                  // const isItemSelected = checkIsSelected(row.id);
+                  // const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <Row
-                      hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
+                      // hover
+                      // onClick={(event) => handleClick(event, row.id)}
+                      // role="checkbox"
+                      // aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
-                      selected={isItemSelected}
+                      // selected={isItemSelected}
                       sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell className="checkbox">
+                      {/* <TableCell className="checkbox">
                         <StyledCheckbox
                           checked={isItemSelected}
                           inputProps={{
@@ -179,7 +180,7 @@ const ReportingCustomers = () => {
                           }}
                           size="small"
                         />
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell className="row-id">
                         <p>{row.num}</p>
                       </TableCell>
@@ -196,7 +197,7 @@ const ReportingCustomers = () => {
                         <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
                       </TableCell>
                       <TableCell className="approved">
-                        <SecondaryButton>{row.approved ? 'Yes' : 'No'}</SecondaryButton>
+                        <SecondaryButton>{(row as any).approved ? 'Yes' : 'No'}</SecondaryButton>
                       </TableCell>
                       <TableCell className="orders">
                         <p>{row.orders}</p>
@@ -228,7 +229,7 @@ const ReportingCustomers = () => {
           <Overlay onClick={handleCloseDeletePopup} className="overlay">
             <DeleteConfirmationModal
               confirm={console.log}
-              cancel={handleCloseDeletePopup}
+              cancel={() => handleCloseDeletePopup}
               confirmButtonName="Yes - Delete"
               cancelButtonName="No - Cancel"
             >
@@ -238,7 +239,7 @@ const ReportingCustomers = () => {
           document.body,
         )
         : null}
-      {openApprovalModal
+      {/* {openApprovalModal
         ? createPortal(
           <Overlay onClick={handleCloseApprovalModal} className="overlay">
             <DeleteConfirmationModal
@@ -252,7 +253,7 @@ const ReportingCustomers = () => {
           </Overlay>,
           document.body,
         )
-        : null}
+        : null} */}
       <StyledDrawer anchor="right" open={filteringDrawerOpen} onClose={handleFilteringDrawer}>
         <DrawerOverlay handleClick={handleFilteringDrawer} handleKeydown={handleFilteringDrawer}>
           <FilteringReportingCustomersModal />

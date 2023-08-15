@@ -1,8 +1,8 @@
 import React, { SyntheticEvent, useState } from 'react';
-import InputAdornment from '@mui/material/InputAdornment/InputAdornment';
-import Table from '@mui/material/Table/Table';
-import TableBody from '@mui/material/TableBody/TableBody';
-import TableContainer from '@mui/material/TableContainer/TableContainer';
+import InputAdornment from '@mui/material/InputAdornment';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableContainer from '@mui/material/TableContainer';
 import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import {
@@ -64,15 +64,36 @@ const ReportingMiWizard = () => {
     <Wrapper>
       <FiltersWrapper>
         <Col>
-          <Label content={{} as any} text="Show me the ..." inputId="show" />
+          <Label
+            content={{
+              title: '',
+              text: '',
+            }}
+            text="Show me the ..."
+            inputId="show"
+          />
           <Select name="show" options={[]} />
         </Col>
         <Col>
-          <Label content={{} as any} text="By ..." inputId="by" />
+          <Label
+            content={{
+              title: '',
+              text: '',
+            }}
+            text="By ..."
+            inputId="by"
+          />
           <Select name="by" options={[]} />
         </Col>
         <Col>
-          <Label content={{} as any} text="In ..." inputId="in" />
+          <Label
+            content={{
+              title: '',
+              text: '',
+            }}
+            text="In ..."
+            inputId="in"
+          />
           <Select name="in" options={[]} />
         </Col>
         <Col className="run-report">

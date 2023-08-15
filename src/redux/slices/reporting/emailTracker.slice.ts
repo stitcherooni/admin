@@ -1,8 +1,8 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import { EmailTrackerProps } from '../../../types/reporting/emailTracker';
+import { EmailTrackerTrackerProps } from '../../../types/reporting/emailTracker';
 import { getEmailTrackerStat } from '../../actions/reporting.actions';
 
-interface ReportingInitialState extends EmailTrackerProps {
+interface ReportingInitialState extends EmailTrackerTrackerProps {
   status: string;
 }
 
@@ -30,7 +30,7 @@ const emailTrackerSlice = createSlice({
       }))
       .addCase(
         getEmailTrackerStat.fulfilled,
-        (state, action: PayloadAction<EmailTrackerProps>) => ({
+        (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
           ...state,
           status: 'succeeded',
           data: action.payload.data,

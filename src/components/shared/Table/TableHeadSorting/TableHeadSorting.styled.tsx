@@ -1,7 +1,7 @@
 import styled from 'styled-components';
-import TableRow from '@mui/material/TableRow/TableRow';
-import IconButton from '@mui/material/IconButton/IconButton';
-import TableHead from '@mui/material/TableHead/TableHead';
+import TableRow from '@mui/material/TableRow';
+import IconButton from '@mui/material/IconButton';
+import TableHead from '@mui/material/TableHead';
 
 export const StyledHead = styled(TableHead)``;
 
@@ -37,6 +37,15 @@ export const Row = styled(TableRow)`
   &.MuiTableRow-root {
     display: flex;
     width: 100%;
+  }
+
+  & td:first-of-type {
+    border-top-left-radius: 8px;
+  }
+
+  & td:last-of-type {
+    border-right: 1px solid rgba(122, 81, 145, 0.4);
+    border-top-right-radius: 8px;
   }
 `;
 

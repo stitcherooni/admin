@@ -1,4 +1,4 @@
-import { DatePicker } from '@mui/x-date-pickers/DatePicker/DatePicker';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import styled from 'styled-components';
 import { theme } from '../../../styles/defaultTheme';
 

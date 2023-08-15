@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import TableRow from '@mui/material/TableRow/TableRow';
-import TableHead from '@mui/material/TableHead/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TableHead from '@mui/material/TableHead';
 
 export const StyledHead = styled(TableHead)``;
 

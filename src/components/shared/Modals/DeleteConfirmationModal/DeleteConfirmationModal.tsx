@@ -1,10 +1,10 @@
-import React, { SyntheticEvent } from 'react';
+import React from 'react';
 import { OverlayWrapper } from './DeleteConfirmationModal.styled';
 import { GreenButton, SecondaryButton } from '../../Buttons/Buttons.styled';
 
 interface DeleteConfirmationModalProps {
   confirm: () => void;
-  cancel: (e: SyntheticEvent<HTMLDivElement>) => void;
+  cancel: () => void;
   children: React.ReactNode;
   cancelButtonName: string;
   confirmButtonName: string;

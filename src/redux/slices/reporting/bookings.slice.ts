@@ -4,7 +4,7 @@ import {
   getBookingStat,
   sortBookingStat,
 } from '../../actions/reporting.actions';
-import { BookingsStatProps } from '../../../types/reporting/bookings';
+import { BookingsStatProps, BookingStatFilters } from '../../../types/reporting/bookings';
 
 interface ReportingInitialState extends BookingsStatProps {
   status: string;
@@ -51,7 +51,7 @@ export const bookingsSlice = createSlice({
         ...state,
         status: 'loading',
       }))
-      .addCase(sortBookingStat.fulfilled, (state, action: PayloadAction<BookingsProps>) => ({
+      .addCase(sortBookingStat.fulfilled, (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
         ...state,
         status: 'succeeded',
         data: action.payload.data,
@@ -69,7 +69,7 @@ export const bookingsSlice = createSlice({
         ...state,
         status: 'loading',
       }))
-      .addCase(getBookingFilters.fulfilled, (state, action: PayloadAction<BookingFilters>) => ({
+      .addCase(getBookingFilters.fulfilled, (state, action: PayloadAction<BookingStatFilters>) => ({
         ...state,
         status: 'succeeded',
         filters: action.payload,

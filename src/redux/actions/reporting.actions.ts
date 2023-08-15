@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-const createQueryString = (obj) => {
+const createQueryString = (obj: any) => {
   let query = '?';
   Object.entries(obj).forEach((item) => {
     const [key, value] = item;
