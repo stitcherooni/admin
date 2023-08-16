@@ -31,8 +31,8 @@ RUN echo "SSLProxyCheckPeerExpire off" >> /usr/local/apache2/conf/httpd.conf
 RUN sed -i 's#DirectoryIndex index.html#DirectoryIndex index.html\n    ErrorDocument 404 /index.html#' /usr/local/apache2/conf/httpd.conf
 
 # Configure reverse proxy for /api
-RUN echo 'ProxyPass "/api" "https://ptaeventsgateway.azurewebsites.net/api/onboarding"' >> /usr/local/apache2/conf/httpd.conf
-RUN echo 'ProxyPassReverse "/api" "https://ptaeventsgateway.azurewebsites.net/api/onboarding"' >> /usr/local/apache2/conf/httpd.conf
+RUN echo 'ProxyPass "/api" "https://ptaeventsgateway.azurewebsites.net/api"' >> /usr/local/apache2/conf/httpd.conf
+RUN echo 'ProxyPassReverse "/api" "https://ptaeventsgateway.azurewebsites.net/api"' >> /usr/local/apache2/conf/httpd.conf
 
 # Set the ServerName directive to suppress the warning
 RUN echo "ServerName localhost" >> /usr/local/apache2/conf/httpd.conf

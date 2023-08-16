@@ -17,24 +17,21 @@ export const getBankedStat = createAsyncThunk('reporting/getBankedStat', async (
 });
 
 export const getBookingStat = createAsyncThunk('reporting/getBookingsStat', async (params: any = null) => {
-  // const url = `/api/Report/datareport?SchoolId=1&Type=bookings&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
-  const url = 'http://localhost:3000/bookings';
+  const url = `/api/Report/datareport?SchoolId=1&Type=bookings&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
   const response = await fetch(url);
   const data = await response.json();
   return data;
 });
 
 export const getBookingFilters = createAsyncThunk('reporting/getBookingsFilters', async (organizationId: number) => {
-  // const url = `/api/Report/bookingsfilters?OrganizationId=${organizationId}`;
-  const url = 'http://localhost:3000/bookingFilters';
+  const url = `/api/Report/bookingsfilters?OrganizationId=${organizationId}`;
   const response = await fetch(url);
   const data = await response.json();
   return data;
 });
 
 export const sortBookingStat = createAsyncThunk('reporting/sortBookingStat', async (params: any) => {
-  // const baseUrl = '/api/Report/sortbookings';
-  const baseUrl = 'http://localhost:3000/bookings';
+  const baseUrl = '/api/Report/sortbookings';
   const response = await fetch(baseUrl + createQueryString(params));
   const data = await response.json();
   return data;

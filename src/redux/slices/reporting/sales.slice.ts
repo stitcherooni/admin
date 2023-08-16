@@ -15,7 +15,7 @@ interface ReportingInitialState extends SalesProps {
 const initialState: ReportingInitialState = {
   status: 'loading',
   data: {} as SalesDataProps,
-  totalSales: 10,
+  totalSales: 0,
   totalSalesValue: 0,
   avgSalesValue: 0,
   platformBookingFees: 0,

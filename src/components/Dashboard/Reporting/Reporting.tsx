@@ -20,7 +20,6 @@ import {
   getProductQuestionsFilters,
   getProductQuestionsStat,
   getSalesFilters,
-  getSalesStat,
   getTicketsFilters,
   getTicketsStat,
   getTreasurerByDateStat,
@@ -68,7 +67,6 @@ const Reporting = () => {
     }
     if (activeReportType === ReportTypes.SALES) {
       dispatch(getSalesFilters(1));
-      dispatch(getSalesStat({ page: 1, pageSize: 10 }));
     }
     if (activeReportType === ReportTypes.TICKETS) {
       dispatch(getTicketsFilters(1));
