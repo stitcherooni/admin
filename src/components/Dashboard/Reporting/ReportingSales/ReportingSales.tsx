@@ -19,7 +19,7 @@ import { theme } from '../../../../styles/defaultTheme';
 import ReportingTableTotalSales from './ReportingTableTotalSales/ReportingTableTotalSales';
 import ReportingTableTotalDaySales from './ReportingTableTotalDaySales/ReportingTableTotalDaySales';
 import ReportingTableProductDaySales from './ReportingTableProductDaySales/ReportingTableProductDaySales';
-import ReportingTableProductSchoolSales from './ReportingTableProductSchoolSales /ReportingTableProductSchoolSales';
+import ReportingTableProductSchoolSales from './ReportingTableProductSchoolSales/ReportingTableProductSchoolSales';
 import ReportingTableProductOrderSales from './ReportingTableProductOrderSales/ReportingTableProductOrderSales';
 import Label from '../../../shared/Label/Label';
 import NestedMenu from '../../../shared/NestedMenu/NestedMenu';
