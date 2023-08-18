@@ -1,5 +1,5 @@
 import {
-  ChangeEvent, useState, MouseEvent, useMemo,
+  ChangeEvent, useState, useMemo,
 } from 'react';
 import _orderBy from 'lodash.orderby';
 import { CellProps } from './TableHead/TableHead';
@@ -23,14 +23,59 @@ const createCellsOptions = (cells: CellProps[]) => {
     });
   });
   return options;
-}
+};
 
-export const useSortingTable = <T>(rows: T[], other?: SortingTableProps) => {
-  const [selected, setSelected] = useState<readonly string[]>([]);
-  const [page, setPage] = useState(!other?.currentPage ? 1 : other?.currentPage);
-  const [rowsPerPage, setRowsPerPage] = useState(!other?.pageSize ? 10 : other?.pageSize);
-  const [sort, setSort] = useState<Array<string | Order>[]>([]);
-  const [columnsOptions, setColumnsOptions] = useState(createCellsOptions(other?.columns ?? []));
+const useTableSearching = <T extends { rows: any[], converted: any[] }>(data: T,
+  columns: string[]) => {
+  const [searchText, setSearchText] = useState('');
+  // eslint-disable-next-line max-len
+  const updateSearchText = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value.trim());
+  };
+  const prepare = (row: T, allData: string[] = []) => {
+    Object.entries(row).forEach((item) => {
+      const [key, value] = item;
+      if (columns.includes(key)) {
+        if (value && typeof value === 'object') prepare(value as unknown as T, allData);
+        else allData.push(`${value} `);
+      }
+    });
+    return allData;
+  };
+
+  const searchRows = useMemo(() => {
+    const rowMap = new Map();
+    data.converted.forEach((item, i) => {
+      const dataItem = prepare(item).toString();
+      rowMap.set(dataItem, data.rows[i]);
+    });
+    return rowMap;
+  }, [data]);
+
+  const foundData: T[] = useMemo(() => {
+    const result = [] as T[];
+    Array.from(searchRows).forEach((item) => {
+      const [key, value] = item;
+      if (searchText?.length) {
+        if (key.toLowerCase().indexOf(searchText.toLowerCase()) >= 0) {
+          result.push(value);
+        }
+      }
+    });
+    return result;
+  }, [searchRows, searchText]);
+
+  return {
+    updateSearchText,
+    foundData,
+    searchText,
+    isSearching: Boolean(searchText.length),
+    isFound: Boolean(foundData.length),
+  };
+};
+
+const useTableCustomization = (columns: CellProps[]) => {
+  const [columnsOptions, setColumnsOptions] = useState(createCellsOptions(columns));
   const updateColumnsOptions = (columnId: string) => {
     setColumnsOptions((colsOptions) => {
       const data = new Map(colsOptions);
@@ -43,11 +88,16 @@ export const useSortingTable = <T>(rows: T[], other?: SortingTableProps) => {
     });
   };
   const visibleColumns = useMemo(() => {
-    if (!other?.columns) return [];
-    return other?.columns.filter((item) => columnsOptions.get(item.id).checked);
-  }, [other?.columns, columnsOptions]);
+    if (!columns.length) return [];
+    return columns.filter((item) => columnsOptions.get(item.id).checked);
+  }, [columns, columnsOptions]);
 
-  const handleRequestSort = (property: string, order: 'asc' | 'desc') => {
+  return { columnsOptions, updateColumnsOptions, visibleColumns };
+};
+
+const useTableSorting = () => {
+  const [sort, setSort] = useState<Array<string | Order>[]>([]);
+  const handleRequestSort = (property: string, order: Order) => {
     setSort((sortState) => {
       let arr = [...sortState];
       const isFilterExists = arr.find((item) => item[0] === property);
@@ -61,6 +111,37 @@ export const useSortingTable = <T>(rows: T[], other?: SortingTableProps) => {
       return arr;
     });
   };
+  const convertedSort = useMemo(() => {
+    const fields: string[] = [];
+    const orders: Order[] = [];
+    sort.forEach((item) => {
+      const [field, order] = item;
+      fields.push(field);
+      orders.push(order as Order);
+    });
+
+    return { fields, orders };
+  }, [sort]);
+
+  return {
+    sort, setSort, convertedSort, handleRequestSort,
+  };
+};
+
+export const useSortingTable = <T extends {}>(rows: T[],
+  other?: SortingTableProps, convertCb?: (data: any[], currency?: string) => any[]) => {
+  const [selected, setSelected] = useState<readonly string[]>([]);
+  const {
+    foundData, searchText, isFound, isSearching, updateSearchText,
+  } = useTableSearching(
+    {
+      rows,
+      converted: convertCb ? convertCb(rows) : [],
+    },
+    other?.columns?.map((item) => item.id) ?? [],
+  );
+  const [page, setPage] = useState(!other?.currentPage ? 1 : other?.currentPage);
+  const [rowsPerPage, setRowsPerPage] = useState(!other?.pageSize ? 10 : other?.pageSize);
 
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -104,17 +185,7 @@ export const useSortingTable = <T>(rows: T[], other?: SortingTableProps) => {
     setPage(1);
   };
 
-  const convertedSort = useMemo(() => {
-    const fields: string[] = [];
-    const orders: Order[] = [];
-    sort.forEach((item) => {
-      const [field, order] = item;
-      fields.push(field);
-      orders.push(order as Order);
-    });
-
-    return { fields, orders };
-  }, [sort]);
+  const { convertedSort, handleRequestSort } = useTableSorting();
 
   const visibleRows = useMemo(
     () => (!other ? _orderBy(rows, convertedSort.fields, convertedSort.orders).slice(
@@ -124,7 +195,17 @@ export const useSortingTable = <T>(rows: T[], other?: SortingTableProps) => {
     [convertedSort, page, rowsPerPage, rows, other],
   );
 
-  const pagesCount = useMemo(() => Math.ceil(rows.length / rowsPerPage), [rows.length, rowsPerPage]);
+  const pagesCount = useMemo(() => {
+    if (searchText.length) {
+      return Math.ceil(foundData.length / rowsPerPage);
+    }
+    return other?.totalPages ? other?.totalPages : Math.ceil(rows.length / rowsPerPage);
+  }, [rows.length, rowsPerPage, foundData, searchText, other?.totalPages]);
+
+  const {
+    columnsOptions, updateColumnsOptions,
+    visibleColumns,
+  } = useTableCustomization(other?.columns ?? []);
 
   return {
     selection: {
@@ -142,14 +223,19 @@ export const useSortingTable = <T>(rows: T[], other?: SortingTableProps) => {
       handleChangePage,
       rowsPerPage: other?.pageSize ? other.pageSize : rowsPerPage,
       handleChangeRowsPerPage,
-      pagesCount: other?.totalPages ? other.totalPages : pagesCount,
+      pagesCount,
       pageSizes: [10, 25, 50, 100],
     },
-    visibleRows,
+    visibleRows: !searchText.length ? visibleRows : foundData as unknown as T[],
     customization: {
       columnsOptions,
       updateColumnsOptions,
       visibleColumns,
+    },
+    search: {
+      updateSearchText,
+      isFound,
+      isSearching,
     },
   };
 };

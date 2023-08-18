@@ -53,10 +53,10 @@ const ReportingTableTotalDaySales = () => {
         <Table sx={{ minWidth: 320 }} aria-labelledby="tableTitle" size="small">
           <Head cells={headCells} className="table-head" />
           <TableBody>
-            {table.visibleRows.map((row) => (
+            {table.visibleRows.map((row: any) => (
               <Row key={row.num}>
                 <TableCell className="date">
-                  <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
+                  <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
                 </TableCell>
                 <TableCell className="quantity">
                   <p>{row.quantity}</p>

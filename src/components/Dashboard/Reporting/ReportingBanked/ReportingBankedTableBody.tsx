@@ -12,20 +12,15 @@ interface ReportingBankedTableBodyProps {
   rows: BankedItem[];
   columnsOptions: Map<string, { name: string; checked: boolean }>;
   currency: string;
+  dataFound: boolean;
+  isSearching: boolean;
 }
 
 const ReportingBankedTableBody = (props: ReportingBankedTableBodyProps) => {
-  const totalValue = useMemo(() => {
-    return sumTotalAmount(props.rows.map((item) => item.value));
-  }, [props.rows]);
+  const totalValue = useMemo(() => sumTotalAmount(props.rows.map((item) => item.value)), [props.rows]);
+  const totalBankedFee = useMemo(() => sumTotalAmount(props.rows.map((item) => item.bankedFee)), [props.rows]);
+  const totalPlatformFee = useMemo(() => sumTotalAmount(props.rows.map((item) => item.platformFee)), [props.rows]);
 
-  const totalBankedFee = useMemo(() => {
-    return sumTotalAmount(props.rows.map((item) => item.bankedFee));
-  }, [props.rows]);
-
-  const totalPlatformFee = useMemo(() => {
-    return sumTotalAmount(props.rows.map((item) => item.platformFee));
-  }, [props.rows]);
   return (
     <TableBody>
       {props.rows.map((row) => (
@@ -55,7 +50,7 @@ const ReportingBankedTableBody = (props: ReportingBankedTableBodyProps) => {
           ) : null}
           {props.columnsOptions.get('date')?.checked ? (
             <TableCell className="transaction-date">
-              <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
+              <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
             </TableCell>
           ) : null}
           {props.columnsOptions.get('value')?.checked ? (
@@ -75,38 +70,47 @@ const ReportingBankedTableBody = (props: ReportingBankedTableBodyProps) => {
           ) : null}
         </Row>
       ))}
-      <Row className="last">
-        {props.columnsOptions.get('num')?.checked ? <TableCell className="row-id" /> : null}
-        {props.columnsOptions.get('orderId')?.checked ? (
-          <TableCell className="order-id hidden" />
-        ) : null}
-        {props.columnsOptions.get('transactionId')?.checked ? (
-          <TableCell className="transaction-id hidden" />
-        ) : null}
-        {props.columnsOptions.get('status')?.checked ? (
-          <TableCell className="transaction-status hidden" />
-        ) : null}
-        {props.columnsOptions.get('date')?.checked ? (
-          <TableCell className="transaction-date hidden">
-            <strong>Total</strong>
+      {props.rows.length ? (
+        <Row className="last">
+          {props.columnsOptions.get('num')?.checked ? <TableCell className="row-id" /> : null}
+          {props.columnsOptions.get('orderId')?.checked ? (
+            <TableCell className="order-id hidden" />
+          ) : null}
+          {props.columnsOptions.get('transactionId')?.checked ? (
+            <TableCell className="transaction-id hidden" />
+          ) : null}
+          {props.columnsOptions.get('status')?.checked ? (
+            <TableCell className="transaction-status hidden" />
+          ) : null}
+          {props.columnsOptions.get('date')?.checked ? (
+            <TableCell className="transaction-date hidden">
+              <strong>Total</strong>
+            </TableCell>
+          ) : null}
+          {props.columnsOptions.get('value')?.checked ? (
+            <TableCell className="transaction-value">
+              <strong>{`${getCurrencyByCode(props.currency)}${totalValue}`}</strong>
+            </TableCell>
+          ) : null}
+          {props.columnsOptions.get('bankedFee')?.checked ? (
+            <TableCell className="banked-fee">
+              <strong>{`${getCurrencyByCode(props.currency)}${totalBankedFee}`}</strong>
+            </TableCell>
+          ) : null}
+          {props.columnsOptions.get('platformFee')?.checked ? (
+            <TableCell className="platform-fee">
+              <strong>{`${getCurrencyByCode(props.currency)}${totalPlatformFee}`}</strong>
+            </TableCell>
+          ) : null}
+        </Row>
+      ) : null}
+      {!props.dataFound && props.isSearching ? (
+        <Row className="last">
+          <TableCell className="not-found">
+            <p>No matches records found</p>
           </TableCell>
-        ) : null}
-        {props.columnsOptions.get('value')?.checked ? (
-          <TableCell className="transaction-value">
-            <strong>{`${getCurrencyByCode(props.currency)}${totalValue}`}</strong>
-          </TableCell>
-        ) : null}
-        {props.columnsOptions.get('bankedFee')?.checked ? (
-          <TableCell className="banked-fee">
-            <strong>{`${getCurrencyByCode(props.currency)}${totalBankedFee}`}</strong>
-          </TableCell>
-        ) : null}
-        {props.columnsOptions.get('platformFee')?.checked ? (
-          <TableCell className="platform-fee">
-            <strong>{`${getCurrencyByCode(props.currency)}${totalPlatformFee}`}</strong>
-          </TableCell>
-        ) : null}
-      </Row>
+        </Row>
+      ) : null}
     </TableBody>
   );
 };

@@ -5,8 +5,10 @@ import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import { useDispatch, useSelector } from 'react-redux';
 import { SelectChangeEvent } from '@mui/material/Select';
+import InputAdornment from '@mui/material/InputAdornment';
+import dayjs from 'dayjs';
 import {
-  TableContent, Head, Wrapper, StyledAlert,
+  TableContent, Head, Wrapper, StyledAlert, StyledInput,
 } from './ReportingBanked.styled';
 import { SearchBarWrapper, TableCaption, TableWrapper } from '../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
@@ -24,6 +26,15 @@ import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
 import { getBankedStat } from '../../../../redux/actions/reporting.actions';
 import ReportingBankedTableBody from './ReportingBankedTableBody';
 import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
+import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
+
+export const convertBankedItems = (items: BankedItem[], currency: string = 'GBP') => items.map((item) => ({
+  ...item,
+  date: dayjs(item.date).format('DD/MM/YYYY HH:mm'),
+  value: `${getCurrencyByCode(currency)}${item.value}`,
+  bankedFee: `${getCurrencyByCode(currency)}${item.bankedFee}`,
+  platformFee: `${getCurrencyByCode(currency)}${item.platformFee}`,
+}));
 
 const ReportingBanked = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -34,11 +45,12 @@ const ReportingBanked = () => {
     pageSize: bankedData.pageSize,
     currentPage: bankedData.currentPage,
     columns: headCells,
-  });
+  }, convertBankedItems);
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
   const { page, pagesCount, rowsPerPage } = table.pagination;
   const { columnsOptions, visibleColumns, updateColumnsOptions } = table.customization;
+  const { updateSearchText, isFound, isSearching } = table.search;
 
   const changePage = (e: ChangeEvent, newPage?: number) => {
     e.preventDefault();
@@ -132,6 +144,18 @@ const ReportingBanked = () => {
             {`${bankedData.totalCount === 0 || bankedData.totalCount > 1 ? 'Entries' : 'Entry'}`}
           </p>
           <SearchBarWrapper className="search-wrapper" ref={actionsMenuRef}>
+            <StyledInput
+              name="search"
+              placeholder="Search by table columns"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <ZoomIconSmall />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={updateSearchText}
+            />
             <ActionsMenu options={actionsMenuOptions} />
           </SearchBarWrapper>
         </TableCaption>
@@ -152,6 +176,8 @@ const ReportingBanked = () => {
                 handleOrderDetailDrawer={handleOrderDetailDrawer}
                 columnsOptions={columnsOptions}
                 currency={totalBankedFee.currency}
+                dataFound={isFound}
+                isSearching={isSearching}
               />
             </Table>
           </TableContainer>
