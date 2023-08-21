@@ -1,16 +1,28 @@
-export const downloadFile = (url: string, fileName: string) => fetch(url, {
-  method: 'GET',
-  // headers: new Headers({
-  //     "Authorization": "Bearer " + token
-  // })
+import { Axios } from '../axios';
+
+export const downloadFile = (
+  url: string,
+  fileName: string,
+  body: any,
+  errorCb: (message: string | null) => void,
+) => Axios({
+  url,
+  data: body,
+  method: 'POST',
+  responseType: 'blob',
 })
-  .then((response) => response.blob())
-  .then((blob) => {
-    const fileUrl = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = fileUrl;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+  .then((response) => {
+    if (response.status === 200) {
+      const href = window.URL.createObjectURL(response.data);
+      const anchorElement = document.createElement('a');
+      anchorElement.href = href;
+      anchorElement.download = fileName;
+      document.body.appendChild(anchorElement);
+      anchorElement.click();
+      document.body.removeChild(anchorElement);
+      window.URL.revokeObjectURL(href);
+    }
+  })
+  .catch((error) => {
+    if (errorCb) errorCb(process.env.NODE_ENV === 'development' ? error.message : 'Failed request to load file');
   });

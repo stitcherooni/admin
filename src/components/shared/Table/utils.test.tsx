@@ -1,8 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
 import { ChangeEvent } from 'react';
 import { useSortingTable } from './utils';
-import { convertBankedItems } from '../../Dashboard/Reporting/ReportingBanked/ReportingBanked';
 import { cells, fakeDataRows } from './testData';
+import { convertBankedItems } from '../../Dashboard/Reporting/ReportingBanked/utils';
 
 describe('table utils', () => {
   test('if on search founded data should show founded rows', () => {

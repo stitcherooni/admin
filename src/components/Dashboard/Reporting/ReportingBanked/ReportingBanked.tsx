@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-one-expression-per-line */
 import React, {
   useMemo, useState, ChangeEvent, useRef,
 } from 'react';
@@ -6,7 +7,6 @@ import Table from '@mui/material/Table';
 import { useDispatch, useSelector } from 'react-redux';
 import { SelectChangeEvent } from '@mui/material/Select';
 import InputAdornment from '@mui/material/InputAdornment';
-import dayjs from 'dayjs';
 import {
   TableContent, Head, Wrapper, StyledAlert, StyledInput,
 } from './ReportingBanked.styled';
@@ -27,14 +27,11 @@ import { getBankedStat } from '../../../../redux/actions/reporting.actions';
 import ReportingBankedTableBody from './ReportingBankedTableBody';
 import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
 import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
-
-export const convertBankedItems = (items: BankedItem[], currency: string = 'GBP') => items.map((item) => ({
-  ...item,
-  date: dayjs(item.date).format('DD/MM/YYYY HH:mm'),
-  value: `${getCurrencyByCode(currency)}${item.value}`,
-  bankedFee: `${getCurrencyByCode(currency)}${item.bankedFee}`,
-  platformFee: `${getCurrencyByCode(currency)}${item.platformFee}`,
-}));
+import { downloadFile } from '../../../../utils/file';
+import Alert from '../../../shared/Alert/Alert';
+import {
+  convertBankedItems, getAvailableColumns, getBankedItemsIds, getSortingOrdering,
+} from './utils';
 
 const ReportingBanked = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -106,7 +103,7 @@ const ReportingBanked = () => {
     setOrderDetailOpen(!orderDetailOpen);
     setOrderDetails(order);
   };
-
+  const [error, setError] = useState<null | string>(null);
   const [showTestTransactions, setShowTestTransactions] = useState(false);
   const actionsMenuRef = useRef(null);
   const [openCustomizeMenu, setOpenCustomizeMenu] = useState(false);
@@ -118,6 +115,30 @@ const ReportingBanked = () => {
       switch (item.value) {
         case 'customize-view':
           return { ...item, handleClick: () => setOpenCustomizeMenu(true) };
+        case 'excel':
+          return {
+            ...item,
+            handleClick: () => downloadFile('/Report/bankedsexcel', 'excel.xls', {
+              ids: getBankedItemsIds(table.visibleRows),
+              columns: getAvailableColumns(table.customization.visibleColumns),
+              ordering: getSortingOrdering(
+                table.sorting.filters,
+                headCells,
+              ), // objects, key - field name, value - asc | desc
+            }, setError),
+          };
+        case 'pdf':
+          return {
+            ...item,
+            handleClick: () => downloadFile('/Report/bankedspdf', 'report.pdf', {
+              ids: getBankedItemsIds(table.visibleRows),
+              columns: getAvailableColumns(table.customization.visibleColumns),
+              ordering: getSortingOrdering(
+                table.sorting.filters,
+                headCells,
+              ), // objects, key - field name, value - asc | desc
+            }, setError),
+          };
         default:
           return item;
       }
@@ -130,14 +151,16 @@ const ReportingBanked = () => {
       <StatisticBar data={bankedStatisticData} />
       {!showTestTransactions ? null : (
         <StyledAlert type="warning">
-          Warning: You are viewing
-          {' '}
-          <strong>test</strong>
-          {' '}
-          Banked transactions
+          Warning: You are viewing <strong>test</strong> Banked transactions
         </StyledAlert>
       )}
       <TableContent>
+        {!error ? null : (
+          <>
+            <Alert type="error">{error}</Alert>
+            <br />
+          </>
+        )}
         <TableCaption>
           <p>
             <strong>{`${bankedData.totalCount} `}</strong>

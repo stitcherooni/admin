@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { Axios } from '../../axios';
 
 const createQueryString = (obj: any) => {
   let query = '?';
@@ -10,10 +11,9 @@ const createQueryString = (obj: any) => {
 };
 
 export const getBankedStat = createAsyncThunk('reporting/getBankedStat', async (params: any = null) => {
-  const url = `/api/Report/datareport?SchoolId=1&Type=banked&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
+  const url = `/Report/datareport?SchoolId=1&Type=banked&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
+  const response = await Axios(url);
+  return response.data;
 });
 
 export const getBookingStat = createAsyncThunk('reporting/getBookingsStat', async (params: any = null) => {

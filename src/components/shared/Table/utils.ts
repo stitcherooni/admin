@@ -124,7 +124,7 @@ const useTableSorting = () => {
   }, [sort]);
 
   return {
-    sort, setSort, convertedSort, handleRequestSort,
+    convertedSort, handleRequestSort,
   };
 };
 

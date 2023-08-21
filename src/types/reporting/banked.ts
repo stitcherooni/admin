@@ -14,6 +14,7 @@ export interface BankedProps {
 }
 
 export interface BankedItem {
+  id: number;
   num: number;
   orderId: number;
   status: string;
