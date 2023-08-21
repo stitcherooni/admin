@@ -176,4 +176,9 @@ export const TableCell = styled(Cell)`
 
 export const StyledAlert = styled(Alert)`
   margin-bottom: 24px;
+  margin-right: 16px;
+
+  @media screen and (min-width: 1280px) {
+    margin-right: 0;
+  }
 `;

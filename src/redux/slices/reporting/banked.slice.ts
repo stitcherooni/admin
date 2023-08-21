@@ -5,18 +5,18 @@ import {
 import { BankedProps } from '../../../types/reporting/banked';
 import { Price } from '../../../types/reporting';
 
-interface ReportingInitialState extends BankedProps {
+export interface BankedInitialState extends BankedProps {
   status: string;
 }
 
-const initialState: ReportingInitialState = {
+const initialState: BankedInitialState = {
   status: 'loading',
   data: [],
   totalOrdersCount: 0,
   totalSalesAmount: {} as Price,
   totalBankedFee: {} as Price,
   totalPlatformFees: {} as Price,
-  totalCount: 10,
+  totalCount: 0,
   totalPages: 1,
   currentPage: 1,
   pageSize: 10,

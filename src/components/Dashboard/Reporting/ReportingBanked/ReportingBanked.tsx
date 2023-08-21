@@ -32,10 +32,12 @@ import Alert from '../../../shared/Alert/Alert';
 import {
   convertBankedItems, getAvailableColumns, getBankedItemsIds, getSortingOrdering,
 } from './utils';
+import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
+import { BankedInitialState } from '../../../../redux/slices/reporting/banked.slice';
 
 const ReportingBanked = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const bankedData = useSelector((state: RootState) => state.reporting.banked);
+  const bankedData: BankedInitialState = useSelector((state: RootState) => state.reporting.banked);
   const table = useSortingTable<BankedItem>(bankedData.data ?? [], {
     totalCount: bankedData.totalCount,
     totalPages: bankedData.totalPages,
@@ -79,15 +81,15 @@ const ReportingBanked = () => {
       },
       {
         label: 'Total:',
-        value: `${getCurrencyByCode(totalSalesAmount.currency)}${totalSalesAmount.amount}`,
+        value: `${getCurrencyByCode(totalSalesAmount?.currency)}${!totalSalesAmount?.amount ? 0 : totalSalesAmount.amount}`,
       },
       {
         label: 'Banked Fee:',
-        value: `${getCurrencyByCode(totalBankedFee.currency)}${totalBankedFee.amount}`,
+        value: `${getCurrencyByCode(totalBankedFee?.currency)}${!totalBankedFee?.amount ? 0 : totalBankedFee.amount}`,
       },
       {
         label: 'Platform Fee:',
-        value: `${getCurrencyByCode(totalPlatformFees.currency)}${totalPlatformFees.amount}`,
+        value: `${getCurrencyByCode(totalPlatformFees?.currency)}${!totalPlatformFees?.amount ? 0 : totalPlatformFees.amount}`,
       },
     ],
     [totalOrdersCount, totalSalesAmount, totalBankedFee, totalPlatformFees],
@@ -146,8 +148,9 @@ const ReportingBanked = () => {
     [actionsOptions],
   );
 
-  return (
+  return bankedData.status === 'loading' ? <LoadingOverlay /> : (
     <Wrapper>
+      {!table.visibleRows.length ? <StyledAlert type="warning">There are no banked transactions</StyledAlert> : null}
       <StatisticBar data={bankedStatisticData} />
       {!showTestTransactions ? null : (
         <StyledAlert type="warning">
@@ -198,26 +201,28 @@ const ReportingBanked = () => {
                 rows={table.visibleRows}
                 handleOrderDetailDrawer={handleOrderDetailDrawer}
                 columnsOptions={columnsOptions}
-                currency={totalBankedFee.currency}
+                currency={totalBankedFee?.currency}
                 dataFound={isFound}
                 isSearching={isSearching}
               />
             </Table>
           </TableContainer>
-          <TablePagination
-            handleChangePage={changePage}
-            handleChangeRowsPerPage={changeRowsPerPage}
-            page={page}
-            pagesCount={pagesCount}
-            rowsPerPage={rowsPerPage}
-            options={[5, 10, 25]}
-          />
+          {!table.visibleRows.length ? null : (
+            <TablePagination
+              handleChangePage={changePage}
+              handleChangeRowsPerPage={changeRowsPerPage}
+              page={page}
+              pagesCount={pagesCount}
+              rowsPerPage={rowsPerPage}
+              options={[5, 10, 25]}
+            />
+          )}
         </TableWrapper>
         {!orderDetails ? null : (
           <StyledDrawer
             anchor="right"
             open={orderDetailOpen}
-            onClose={(e) => handleOrderDetailDrawer(e as any, null)}
+            onClose={(e) => handleOrderDetailDrawer(e as React.SyntheticEvent, null)}
           >
             <DrawerOverlay
               handleClick={handleOrderDetailDrawer}
