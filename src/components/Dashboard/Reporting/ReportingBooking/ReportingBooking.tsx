@@ -300,10 +300,6 @@ const ReportingBooking = () => {
 
                   (
                     <Row
-                      // hover
-                      // onClick={(event) => handleClick(event, row.id)}
-                      // role="checkbox"
-                      // aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.num}
                     >
@@ -338,7 +334,7 @@ const ReportingBooking = () => {
                         <p>{(row as any).sku}</p>
                       </TableCell>
                       <TableCell className="product">
-                        <p>{row.product}</p>
+                        <p>{row.product.bookingName}</p>
                       </TableCell>
                       <TableCell className="price">
                         <p>{`${(row as any).currency}${(row as any).price}`}</p>

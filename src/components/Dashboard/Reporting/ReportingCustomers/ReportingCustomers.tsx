@@ -155,6 +155,7 @@ const ReportingCustomers = () => {
                 rowCount={rows.length}
                 cells={headCells}
                 className="table-head"
+                checkbox={false}
               />
               <TableBody>
                 {table.visibleRows.map((row, index) => {
@@ -170,7 +171,7 @@ const ReportingCustomers = () => {
                       tabIndex={-1}
                       key={row.id}
                       // selected={isItemSelected}
-                      sx={{ cursor: 'pointer' }}
+                      // sx={{ cursor: 'pointer' }}
                     >
                       {/* <TableCell className="checkbox">
                         <StyledCheckbox
