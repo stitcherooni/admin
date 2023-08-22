@@ -11,7 +11,7 @@ import {
   TableContent, Head, Wrapper, StyledAlert, StyledInput,
 } from './ReportingBanked.styled';
 import { SearchBarWrapper, TableCaption, TableWrapper } from '../../../shared/Table/Table.styled';
-import { useSortingTable } from '../../../shared/Table/utils';
+import { copyTable, useSortingTable } from '../../../shared/Table/utils';
 import { actionsOptions, headCells, rows } from './table-data';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import StatisticBar from '../StatisticBar/StatisticBar';
@@ -119,6 +119,7 @@ const ReportingBanked = () => {
   const closeCustomizeMenu = () => {
     setOpenCustomizeMenu(false);
   };
+  const tableRef = useRef(null);
   const actionsMenuOptions = useMemo(
     () => actionsOptions.map((item) => {
       switch (item.value) {
@@ -166,6 +167,12 @@ const ReportingBanked = () => {
               dispatch(getBankedStatTest({ page, pageSize: rowsPerPage }));
             },
           };
+        case 'copy': {
+          return {
+            ...item,
+            handleClick: () => copyTable(tableRef),
+          };
+        }
         default:
           return item;
       }
@@ -177,7 +184,7 @@ const ReportingBanked = () => {
     <LoadingOverlay />
   ) : (
     <Wrapper>
-      {bankedData?.error ? <StyledAlert type="error">{ process.env.NODE_ENV === 'development' ? bankedData?.error : 'Something went wrong' }</StyledAlert> : null}
+      {bankedData?.error ? <StyledAlert type="error">{process.env.NODE_ENV === 'development' ? bankedData?.error : 'Something went wrong'}</StyledAlert> : null}
       {!showTestTransactions ? null : (
         <StyledAlert type="warning" testid="test-transactions">
           Warning: You are viewing <strong>test</strong> Banked transactions
@@ -217,7 +224,7 @@ const ReportingBanked = () => {
         </TableCaption>
         <TableWrapper>
           <TableContainer>
-            <Table sx={{ minWidth: 320 }} aria-labelledby="tableTitle" size="small">
+            <Table sx={{ minWidth: 320 }} aria-labelledby="tableTitle" size="small" ref={tableRef}>
               <Head
                 numSelected={selected.length}
                 onSelectAllClick={handleSelectAllClick}

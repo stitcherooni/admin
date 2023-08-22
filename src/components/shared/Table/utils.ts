@@ -1,5 +1,5 @@
 import {
-  ChangeEvent, useState, useMemo,
+  ChangeEvent, useState, useMemo, RefObject,
 } from 'react';
 import _orderBy from 'lodash.orderby';
 import { CellProps } from './TableHead/TableHead';
@@ -13,6 +13,32 @@ interface SortingTableProps {
 }
 
 type Order = 'desc' | 'asc';
+
+export const copyTable = (table: RefObject<HTMLTableElement | null>) => {
+  if (!table.current) return;
+  let range;
+  let selectedData;
+
+  // Ensure that range and selection are supported by the browsers
+  if (document.createRange && window.getSelection) {
+    range = document.createRange();
+    selectedData = window.getSelection();
+    // unselect any element in the page
+    if (selectedData) selectedData.removeAllRanges();
+
+    try {
+      range.selectNodeContents(table.current);
+      if (selectedData) selectedData.addRange(range);
+    } catch (e) {
+      range.selectNode(table.current);
+      if (selectedData) selectedData.addRange(range);
+    }
+
+    document.execCommand('copy');
+  }
+
+  if (selectedData) selectedData.removeAllRanges();
+};
 
 const createCellsOptions = (cells: CellProps[]) => {
   const options = new Map();
