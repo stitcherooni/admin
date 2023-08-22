@@ -59,7 +59,7 @@ const OrderDetails = (props: OrderDetailsProps) => {
         </Row>
         <Row>
           <strong>Value</strong>
-          <p>{`${getCurrencyByCode(data.value.currency)}${data.value.amount}`}</p>
+          <p>{`${getCurrencyByCode(data.value.currency, data.value.amount)}`}</p>
         </Row>
         <Row>
           <strong>Transaction ID</strong>

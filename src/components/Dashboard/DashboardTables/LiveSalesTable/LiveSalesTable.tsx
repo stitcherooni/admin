@@ -61,7 +61,7 @@ const LiveSalesTable = (props: LiveSalesTableProps) => {
                     <p>{dayjs(row.endDate).format('DD/MM/YYYY HH:MM')}</p>
                   </TableCell>
                   <TableCell className="price">
-                    <p>{`${getCurrencyByCode(row.currency)}${row.price}`}</p>
+                    <p>{`${getCurrencyByCode(row.currency, row.price)}`}</p>
                   </TableCell>
                   <TableCell className="quantity-sold">
                     <p>{row.quantitySold}</p>
@@ -70,7 +70,7 @@ const LiveSalesTable = (props: LiveSalesTableProps) => {
                     <p>{row.quantityLeft}</p>
                   </TableCell>
                   <TableCell className="sales">
-                    <p>{`${getCurrencyByCode(row.currency)}${row.sales}`}</p>
+                    <p>{`${getCurrencyByCode(row.currency, row.sales)}`}</p>
                   </TableCell>
                 </Row>
               ))}
@@ -87,7 +87,7 @@ const LiveSalesTable = (props: LiveSalesTableProps) => {
                   <strong>{props.totalQuantityLeft}</strong>
                 </TableCell>
                 <TableCell className="sales">
-                  <strong>{`${getCurrencyByCode(props.currency)}${props.totalSales}`}</strong>
+                  <strong>{`${getCurrencyByCode(props.currency, props.totalSales)}`}</strong>
                 </TableCell>
               </Row>
             </TableBody>

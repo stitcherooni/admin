@@ -65,10 +65,10 @@ const ReportingTableTotalDaySales = () => {
                   <p>{row.quantityToDate}</p>
                 </TableCell>
                 <TableCell className="total-sales">
-                  <p>{`${getCurrencyByCode(salesData.currency)}${row.totalSales}`}</p>
+                  <p>{`${getCurrencyByCode(salesData.currency, row.totalSales)}`}</p>
                 </TableCell>
                 <TableCell className="sales-to-date">
-                  <p>{`${getCurrencyByCode(salesData.currency)}${row.toDate}`}</p>
+                  <p>{`${getCurrencyByCode(salesData.currency, row.toDate)}`}</p>
                 </TableCell>
               </Row>
             ))}
@@ -81,10 +81,10 @@ const ReportingTableTotalDaySales = () => {
                 <strong>{salesData.data?.totalSoldByDay?.totalQuantityToDate}</strong>
               </TableCell>
               <TableCell className="total-sales">
-                <strong>{`${getCurrencyByCode(salesData.currency)}${salesData.data?.totalSoldByDay?.totalSales}`}</strong>
+                <strong>{`${getCurrencyByCode(salesData.currency, salesData.data?.totalSoldByDay?.totalSales ?? 0)}`}</strong>
               </TableCell>
               <TableCell className="sales-to-date">
-                <strong>{`${getCurrencyByCode(salesData.currency)}${salesData.data?.totalSoldByDay?.totalSalesToDate}`}</strong>
+                <strong>{`${getCurrencyByCode(salesData.currency, salesData.data?.totalSoldByDay?.totalSalesToDate ?? 0)}`}</strong>
               </TableCell>
             </Row>
           </TableBody>

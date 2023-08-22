@@ -55,17 +55,17 @@ const ReportingBankedTableBody = (props: ReportingBankedTableBodyProps) => {
           ) : null}
           {props.columnsOptions.get('value')?.checked ? (
             <TableCell className="transaction-value">
-              <p>{`${getCurrencyByCode(props.currency)}${row.value}`}</p>
+              <p>{`${getCurrencyByCode(props.currency, row.value)}`}</p>
             </TableCell>
           ) : null}
           {props.columnsOptions.get('bankedFee')?.checked ? (
             <TableCell className="banked-fee">
-              <p>{`${getCurrencyByCode(props.currency)}${row.bankedFee}`}</p>
+              <p>{`${getCurrencyByCode(props.currency, row.bankedFee)}`}</p>
             </TableCell>
           ) : null}
           {props.columnsOptions.get('platformFee')?.checked ? (
             <TableCell className="platform-fee">
-              <p>{`${getCurrencyByCode(props.currency)}${row.platformFee}`}</p>
+              <p>{`${getCurrencyByCode(props.currency, row.platformFee)}`}</p>
             </TableCell>
           ) : null}
         </Row>
@@ -89,17 +89,17 @@ const ReportingBankedTableBody = (props: ReportingBankedTableBodyProps) => {
           ) : null}
           {props.columnsOptions.get('value')?.checked ? (
             <TableCell className="transaction-value">
-              <strong>{`${getCurrencyByCode(props.currency)}${totalValue}`}</strong>
+              <strong>{`${getCurrencyByCode(props.currency, totalValue)}`}</strong>
             </TableCell>
           ) : null}
           {props.columnsOptions.get('bankedFee')?.checked ? (
             <TableCell className="banked-fee">
-              <strong>{`${getCurrencyByCode(props.currency)}${totalBankedFee}`}</strong>
+              <strong>{`${getCurrencyByCode(props.currency, totalBankedFee)}`}</strong>
             </TableCell>
           ) : null}
           {props.columnsOptions.get('platformFee')?.checked ? (
             <TableCell className="platform-fee">
-              <strong>{`${getCurrencyByCode(props.currency)}${totalPlatformFee}`}</strong>
+              <strong>{`${getCurrencyByCode(props.currency, totalPlatformFee)}`}</strong>
             </TableCell>
           ) : null}
         </Row>

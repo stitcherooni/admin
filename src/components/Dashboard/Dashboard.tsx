@@ -89,7 +89,7 @@ const Dashboard = () => {
           <SecondaryButton size="small">Customise View</SecondaryButton>
         </CustomizerMenu> */}
       </DashboardOverview>
-      <OverviewCards data={addCurrencyToStatistic(dashboardData.stat, '£')} />
+      <OverviewCards data={addCurrencyToStatistic(dashboardData.stat, 'GBP')} />
       <TablesContainer>
         <SalesAccordion expanded={open === 'live-sales'} onChange={handleChange('live-sales')}>
           <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>

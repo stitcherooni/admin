@@ -89,21 +89,15 @@ const ReportingBanked = () => {
       },
       {
         label: 'Total:',
-        value: `${getCurrencyByCode(totalSalesAmount?.currency)}${
-          !totalSalesAmount?.amount ? 0 : totalSalesAmount.amount
-        }`,
+        value: `${getCurrencyByCode(totalSalesAmount?.currency, !totalSalesAmount?.amount ? 0 : totalSalesAmount.amount)}`,
       },
       {
         label: 'Banked Fee:',
-        value: `${getCurrencyByCode(totalBankedFee?.currency)}${
-          !totalBankedFee?.amount ? 0 : totalBankedFee.amount
-        }`,
+        value: `${getCurrencyByCode(totalBankedFee?.currency, !totalBankedFee?.amount ? 0 : totalBankedFee.amount)}`,
       },
       {
         label: 'Platform Fee:',
-        value: `${getCurrencyByCode(totalPlatformFees?.currency)}${
-          !totalPlatformFees?.amount ? 0 : totalPlatformFees.amount
-        }`,
+        value: `${getCurrencyByCode(totalPlatformFees?.currency, !totalPlatformFees?.amount ? 0 : totalPlatformFees.amount)}`,
       },
     ],
     [totalOrdersCount, totalSalesAmount, totalBankedFee, totalPlatformFees],

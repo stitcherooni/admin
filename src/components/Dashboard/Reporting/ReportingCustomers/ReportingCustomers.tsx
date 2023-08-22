@@ -115,7 +115,7 @@ const ReportingCustomers = () => {
     },
     {
       label: 'Total Order Value:',
-      value: `${getCurrencyByCode(customersData.totalOrderValue.currency)}${customersData.totalOrderValue.amount}`,
+      value: `${getCurrencyByCode(customersData.totalOrderValue.currency, !customersData.totalOrderValue ? 0 : customersData.totalOrderValue.amount)}`,
     },
   ], [customersData.totalOrderValue, customersData.totalOrdersNumber]);
 
@@ -204,7 +204,7 @@ const ReportingCustomers = () => {
                         <p>{row.orders}</p>
                       </TableCell>
                       <TableCell className="order-value">
-                        <p>{`${getCurrencyByCode(row.value.currency)}${row.value.amount}`}</p>
+                        <p>{`${getCurrencyByCode(row.value.currency, row.value.amount)}`}</p>
                       </TableCell>
                       <TableCell className="actions">
                         <ActionsMenu options={actionsOptions} />

@@ -14,6 +14,7 @@ import { convertQuestionsToColumns, createAnswersColumns, mergeColumns } from '.
 import { AppDispatch, RootState } from '../../../../../redux/store';
 import { ProductQuestionHorizontal } from '../../../../../types/reporting/productQuestions';
 import { getProductQuestionsStat } from '../../../../../redux/actions/reporting.actions';
+import { getCurrencyByCode } from '../../../../../utils/currency';
 
 const ReportingProductTableHorizontal = () => {
   const productQuestionsData = useSelector((state: RootState) => state.reporting.productQuestions);
@@ -102,10 +103,10 @@ const ReportingProductTableHorizontal = () => {
                   <p>{row.product}</p>
                 </TableCell>
                 <TableCell className="price">
-                  <p>{`${(row as any).currency}${row.price}`}</p>
+                  <p>{`${getCurrencyByCode((row as any).currency, row.price)}`}</p>
                 </TableCell>
                 <TableCell className="order-value">
-                  <p>{`${(row as any).currency}${row.order}`}</p>
+                  <p>{`${getCurrencyByCode((row as any).currency, row.order)}`}</p>
                 </TableCell>
                 {row.answers.length ? createAnswersColumns([...row.answers]) : null}
                 <TableCell className="terms">

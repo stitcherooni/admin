@@ -6,9 +6,9 @@ import { CellProps } from '../../../shared/Table/TableHead/TableHead';
 export const convertBankedItems = (items: BankedItem[], currency: string = 'GBP') => items.map((item) => ({
   ...item,
   date: dayjs(item.date).format('DD/MM/YYYY HH:mm'),
-  value: `${getCurrencyByCode(currency)}${item.value}`,
-  bankedFee: `${getCurrencyByCode(currency)}${item.bankedFee}`,
-  platformFee: `${getCurrencyByCode(currency)}${item.platformFee}`,
+  value: `${getCurrencyByCode(currency, item.value)}`,
+  bankedFee: `${getCurrencyByCode(currency, item.bankedFee)}`,
+  platformFee: `${getCurrencyByCode(currency, item.platformFee)}`,
 }));
 
 export const getBankedItemsIds = (rowsList: BankedItem[]) => rowsList.map((item) => item.id);

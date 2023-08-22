@@ -90,22 +90,22 @@ const ReportingInvoices = () => {
                       <p>{(row as any).invoiceNo}</p>
                     </TableCell>
                     <TableCell className="issue-date">
-                      <p>{dayjs(row.issureDate).format('DD/MM/YYYY HH:MM')}</p>
+                      <p>{dayjs(row.issureDate).format('DD/MM/YYYY HH:mm')}</p>
                     </TableCell>
                     <TableCell className="due-date">
-                      <p>{dayjs(row.dueDate).format('DD/MM/YYYY HH:MM')}</p>
+                      <p>{dayjs(row.dueDate).format('DD/MM/YYYY HH:mm')}</p>
                     </TableCell>
                     <TableCell className="status">
                       <p>{row.status}</p>
                     </TableCell>
                     <TableCell className="net">
-                      <p>{`${getCurrencyByCode(row.currency)}${row.net}`}</p>
+                      <p>{`${getCurrencyByCode(row.currency, row.net)}`}</p>
                     </TableCell>
                     <TableCell className="vat">
-                      <p>{`${getCurrencyByCode(row.currency)}${row.vat}`}</p>
+                      <p>{`${getCurrencyByCode(row.currency, row.vat)}`}</p>
                     </TableCell>
                     <TableCell className="total">
-                      <p>{`${getCurrencyByCode(row.currency)}${row.total}`}</p>
+                      <p>{`${getCurrencyByCode(row.currency, row.total)}`}</p>
                     </TableCell>
                     <TableCell className="invoice">
                       <a href={row.invoice} target="_blank" rel="noreferrer">

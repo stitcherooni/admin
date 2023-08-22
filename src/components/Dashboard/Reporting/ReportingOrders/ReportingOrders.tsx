@@ -247,13 +247,13 @@ const ReportingOrders = () => {
                         <p>{row.type}</p>
                       </TableCell>
                       <TableCell className="orders-value">
-                        <p>{`${getCurrencyByCode(row.value.currency)}${row.value.amount}`}</p>
+                        <p>{`${getCurrencyByCode(row.value.currency, row.value.amount)}`}</p>
                       </TableCell>
                       <TableCell className="platform-fee">
-                        <p>{`${(row as any).currency}${row.platformFee}`}</p>
+                        <p>{`${getCurrencyByCode((row as any).currency ?? 'GBP', row.platformFee)}`}</p>
                       </TableCell>
                       <TableCell className="refunded">
-                        <p>{`${(row as any).currency}${row.refunded}`}</p>
+                        <p>{`${getCurrencyByCode((row as any).currency ?? 'GBP', row.refunded)}`}</p>
                       </TableCell>
                       <TableCell className="actions">
                         <ActionsMenu options={createTableActions(row, { selectOrderDetails })}

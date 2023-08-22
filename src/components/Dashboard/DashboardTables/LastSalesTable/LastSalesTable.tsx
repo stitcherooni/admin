@@ -49,7 +49,7 @@ const LastSalesTable = (props: LastSalesTableProps) => {
                     <p>{row.customerName}</p>
                   </TableCell>
                   <TableCell className="value">
-                    <p>{`${getCurrencyByCode(row.currency)}${row.value}`}</p>
+                    <p>{`${getCurrencyByCode(row.currency, row.value)}`}</p>
                   </TableCell>
                 </Row>
               ))}

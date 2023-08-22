@@ -71,10 +71,10 @@ const ReportingTableProductDaySales = (props: ReportingTableProductDaySalesProps
                   <p>{row.quantityToDate}</p>
                 </TableCell>
                 <TableCell className="total-sales">
-                  <p>{`${getCurrencyByCode(props.currency)}${row.totalSales}`}</p>
+                  <p>{`${getCurrencyByCode(props.currency, row.totalSales)}`}</p>
                 </TableCell>
                 <TableCell className="to-date">
-                  <p>{`${getCurrencyByCode(props.currency)}${row.toDate}`}</p>
+                  <p>{`${getCurrencyByCode(props.currency, row.toDate)}`}</p>
                 </TableCell>
               </Row>
             ))}
@@ -90,10 +90,10 @@ const ReportingTableProductDaySales = (props: ReportingTableProductDaySalesProps
                 <strong>{props.totalQuantityToDate}</strong>
               </TableCell>
               <TableCell className="total-sales">
-                <strong>{`${getCurrencyByCode(props.currency)}${props.totalSales}`}</strong>
+                <strong>{`${getCurrencyByCode(props.currency, props.totalSales ?? 0)}`}</strong>
               </TableCell>
               <TableCell className="to-date">
-                <strong>{`${getCurrencyByCode(props.currency)}${props.totalToDate}`}</strong>
+                <strong>{`${getCurrencyByCode(props.currency, props.totalToDate ?? 0)}`}</strong>
               </TableCell>
             </Row>
           </TableBody>

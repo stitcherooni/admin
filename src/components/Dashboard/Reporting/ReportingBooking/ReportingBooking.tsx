@@ -48,6 +48,7 @@ import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import { BookingStatEvents, BookingStatGroupByFilter, BookingStatItem } from '../../../../types/reporting/bookings';
 import { Order } from '../../../../types/reporting/orders';
+import { getCurrencyByCode } from '../../../../utils/currency';
 
 interface Filter {
   value: number | string;
@@ -337,7 +338,7 @@ const ReportingBooking = () => {
                         <p>{row.product.bookingName}</p>
                       </TableCell>
                       <TableCell className="price">
-                        <p>{`${(row as any).currency}${(row as any).price}`}</p>
+                        <p>{`${getCurrencyByCode((row as any).currency, (row as any).price)}`}</p>
                       </TableCell>
                       <TableCell className="quantity">
                         <p>{(row as any).quantity}</p>

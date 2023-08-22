@@ -48,10 +48,10 @@ const OrderDetailsTable = (props: Order) => {
                     <p>{row.quantity}</p>
                   </TableCell>
                   <TableCell className="price">
-                    <p>{`${getCurrencyByCode(row.price.currency)}${row.price.amount}`}</p>
+                    <p>{`${getCurrencyByCode(row.price.currency, row.price.amount)}`}</p>
                   </TableCell>
                   <TableCell className="line-amount">
-                    <p>{`${getCurrencyByCode(row.lineAmount.currency)}${row.lineAmount.amount}`}</p>
+                    <p>{`${getCurrencyByCode(row.lineAmount.currency, row.lineAmount.amount)}`}</p>
                   </TableCell>
                   <TableCell className="status">
                     <OrderStatusBadge
@@ -70,10 +70,10 @@ const OrderDetailsTable = (props: Order) => {
                   <strong>Total</strong>
                 </TableCell>
                 <TableCell className="price primary">
-                  <strong>{`${getCurrencyByCode('GBP')}${totalPrice}`}</strong>
+                  <strong>{`${getCurrencyByCode('GBP', totalPrice)}`}</strong>
                 </TableCell>
                 <TableCell className="line-amount primary">
-                  <strong>{`${getCurrencyByCode('GBP')}${totalLineAmount}`}</strong>
+                  <strong>{`${getCurrencyByCode('GBP', totalLineAmount)}`}</strong>
                 </TableCell>
                 <TableCell className="status primary" />
               </TableRow>

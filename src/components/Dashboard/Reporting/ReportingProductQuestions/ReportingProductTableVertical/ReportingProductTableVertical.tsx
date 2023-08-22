@@ -13,6 +13,7 @@ import TablePagination from '../../../../shared/Table/TablePagination/TablePagin
 import { AppDispatch, RootState } from '../../../../../redux/store';
 import { ProductQuestionVertical } from '../../../../../types/reporting/productQuestions';
 import { getProductQuestionsStat } from '../../../../../redux/actions/reporting.actions';
+import { getCurrencyByCode } from '../../../../../utils/currency';
 
 const ReportingProductTableVertical = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -94,7 +95,7 @@ const ReportingProductTableVertical = () => {
                   <p>{row.price}</p>
                 </TableCell>
                 <TableCell className="order-value">
-                  <p>{`${(row as any).currency}${row.order}`}</p>
+                  <p>{`${getCurrencyByCode((row as any).currency, row.order)}`}</p>
                 </TableCell>
                 <TableCell className="question">
                   <p>{row.question}</p>

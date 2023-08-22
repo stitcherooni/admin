@@ -91,15 +91,15 @@ const ReportingSales = () => {
     },
     {
       label: 'Average Sales Value:',
-      value: `${getCurrencyByCode(salesData.currency)}${salesData.avgSalesValue}`,
+      value: `${getCurrencyByCode(salesData.currency, !salesData.avgSalesValue ? 0 : salesData.avgSalesValue)}`,
     },
     {
       label: 'Total Sales Value:',
-      value: `${getCurrencyByCode(salesData.currency)}${salesData.totalSalesValue}`,
+      value: `${getCurrencyByCode(salesData.currency, !salesData.totalSalesValue ? 0 : salesData.totalSalesValue)}`,
     },
     {
       label: 'Platform & Booking Fees:',
-      value: `${getCurrencyByCode(salesData.currency)}${salesData.platformBookingFees}`,
+      value: `${getCurrencyByCode(salesData.currency, !salesData.platformBookingFees ? 0 : salesData.platformBookingFees)}`,
     },
   ], [
     salesData.totalSalesValue,

@@ -47,7 +47,7 @@ const MonthlyOrdersTable = (props: MonthlyOrdersTableProps) => {
                     <p>{row.orders}</p>
                   </TableCell>
                   <TableCell className="sales">
-                    <p>{`${getCurrencyByCode(row.currency)}${row.sales}`}</p>
+                    <p>{`${getCurrencyByCode(row.currency, row.sales)}`}</p>
                   </TableCell>
                 </Row>
               ))}
@@ -59,7 +59,7 @@ const MonthlyOrdersTable = (props: MonthlyOrdersTableProps) => {
                   <strong>{props.totalOrders}</strong>
                 </TableCell>
                 <TableCell className="sales">
-                  <strong>{`${getCurrencyByCode(props.currency)}${props.totalSales}`}</strong>
+                  <strong>{`${getCurrencyByCode(props.currency, props.totalSales)}`}</strong>
                 </TableCell>
               </Row>
             </TableBody>

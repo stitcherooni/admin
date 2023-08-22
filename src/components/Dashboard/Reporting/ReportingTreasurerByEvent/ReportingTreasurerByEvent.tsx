@@ -32,6 +32,7 @@ import TablePagination from '../../../shared/Table/TablePagination/TablePaginati
 import StatisticBar from '../StatisticBar/StatisticBar';
 import Select from '../../../shared/Select/Select';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
+import { getCurrencyByCode } from '../../../../utils/currency';
 
 interface Filter {
   value: number | string;
@@ -237,32 +238,31 @@ const ReportingTreasurerByEvent = () => {
                         <p>{row.order}</p>
                       </TableCell>
                       <TableCell className="line-price">
-                        <p>{`${row.currency}${row.value}`}</p>
+                        <p>{`${getCurrencyByCode(row.currency, row.value ?? 0)}`}</p>
                       </TableCell>
                       <TableCell className="gift-aid">
                         <p>{row.giftAid}</p>
                       </TableCell>
                       <TableCell className="refunded">
-                        <p>{`${row.currency}${row.refunded}`}</p>
+                        <p>{`${getCurrencyByCode(row.currency, row.refunded)}`}</p>
                       </TableCell>
                       <TableCell className="fee-not-paid">
-                        <p>{`${row.currency}${row.feeNotPaid}`}</p>
+                        <p>{`${getCurrencyByCode(row.currency, row.feeNotPaid)}`}</p>
                       </TableCell>
                       <TableCell className="fee-paid">
-                        <p>{`${row.currency}${row.feePaid}`}</p>
+                        <p>{`${getCurrencyByCode(row.currency, row.feePaid)}`}</p>
                       </TableCell>
                       <TableCell className="platform-fees-not-paid">
-                        <p>{`${row.currency}${row.platformFeesNotPaid}`}</p>
+                        <p>{`${getCurrencyByCode(row.currency, row.platformFeesNotPaid)}`}</p>
                       </TableCell>
                       <TableCell className="platform-fee-paid">
-                        <p>{`${row.currency}${row.platformFeePaid}`}</p>
+                        <p>{`${getCurrencyByCode(row.currency, row.platformFeePaid)}`}</p>
                       </TableCell>
                     </Row>
                   ))}
                 <Row
                   sx={{ cursor: 'pointer' }}
                 >
-                  <TableCell className="checkbox" />
                   <TableCell className="row-id hidden" />
                   <TableCell className="id hidden" />
                   <TableCell className="date hidden" />
@@ -278,23 +278,23 @@ const ReportingTreasurerByEvent = () => {
                     <p>0</p>
                   </TableCell>
                   <TableCell className="line-price">
-                    <p>£0.00</p>
+                    <p>{getCurrencyByCode('GBP', 0)}</p>
                   </TableCell>
                   <TableCell className="gift-aid" />
                   <TableCell className="refunded">
-                    <p>£0.00</p>
+                    <p>{getCurrencyByCode('GBP', 0)}</p>
                   </TableCell>
                   <TableCell className="fee-not-paid">
-                    <p>£0.00</p>
+                    <p>{getCurrencyByCode('GBP', 0)}</p>
                   </TableCell>
                   <TableCell className="fee-paid">
-                    <p>£0.00</p>
+                    <p>{getCurrencyByCode('GBP', 0)}</p>
                   </TableCell>
                   <TableCell className="platform-fees-not-paid">
-                    <p>£0.00</p>
+                    <p>{getCurrencyByCode('GBP', 0)}</p>
                   </TableCell>
                   <TableCell className="platform-fee-paid">
-                    <p>£0.00</p>
+                    <p>{getCurrencyByCode('GBP', 0)}</p>
                   </TableCell>
                 </Row>
               </TableBody>

@@ -25,6 +25,7 @@ import DeleteConfirmationModal from '../../../shared/Modals/DeleteConfirmationMo
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import StatisticBar from '../StatisticBar/StatisticBar';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
+import { getCurrencyByCode } from '../../../../utils/currency';
 
 const data = [
   {
@@ -154,16 +155,16 @@ const ReportingTreasurerByDate = () => {
                         <p>{row.order}</p>
                       </TableCell>
                       <TableCell className="line-price">
-                        <p>{`${row.currency}${row.value}`}</p>
+                        <p>{`${row.currency, row.value}`}</p>
                       </TableCell>
                       <TableCell className="gift-aid">
                         <p>{row.giftAid}</p>
                       </TableCell>
                       <TableCell className="refunded">
-                        <p>{`${row.currency}${row.refunded}`}</p>
+                        <p>{`${getCurrencyByCode(row.currency, row.refunded)}`}</p>
                       </TableCell>
                       <TableCell className="cost">
-                        <p>{`${row.currency}${(row as any).price}`}</p>
+                        <p>{`${getCurrencyByCode(row.currency, (row as any).price)}`}</p>
                       </TableCell>
                     </Row>
                   );
@@ -185,16 +186,16 @@ const ReportingTreasurerByDate = () => {
                     <p>0</p>
                   </TableCell>
                   <TableCell className="line-price hidden">
-                    <p>£0.00</p>
+                    <p>{getCurrencyByCode('GBP', 0)}</p>
                   </TableCell>
                   <TableCell className="gift-aid hidden">
                     <p></p>
                   </TableCell>
                   <TableCell className="refunded hidden">
-                    <p>£0.00</p>
+                    <p>{getCurrencyByCode('GBP', 0)}</p>
                   </TableCell>
                   <TableCell className="cost hidden">
-                    <p>£0.00</p>
+                    <p>{getCurrencyByCode('GBP', 0)}</p>
                   </TableCell>
                 </Row>
               </TableBody>

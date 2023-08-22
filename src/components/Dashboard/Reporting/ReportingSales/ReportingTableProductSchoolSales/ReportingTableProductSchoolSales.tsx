@@ -67,7 +67,7 @@ const ReportingTableProductSchoolSales = (props: ReportingTableProductSchoolSale
                   <p>{row.quantity}</p>
                 </TableCell>
                 <TableCell className="total-sales">
-                  <p>{`${getCurrencyByCode(props.currency)}${row.totalSales}`}</p>
+                  <p>{`${getCurrencyByCode(props.currency, row.totalSales ?? 0)}`}</p>
                 </TableCell>
               </Row>
             ))}
@@ -80,7 +80,7 @@ const ReportingTableProductSchoolSales = (props: ReportingTableProductSchoolSale
                 <strong>{props.totalQuantity}</strong>
               </TableCell>
               <TableCell className="total-sales">
-                <strong>{`${getCurrencyByCode(props.currency)}${props.totalSales}`}</strong>
+                <strong>{`${getCurrencyByCode(props.currency, props.totalSales ?? 0)}`}</strong>
               </TableCell>
             </Row>
           </TableBody>

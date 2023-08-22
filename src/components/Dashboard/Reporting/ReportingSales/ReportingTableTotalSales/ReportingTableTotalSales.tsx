@@ -74,7 +74,7 @@ const ReportingTableTotalSales = () => {
                   <p>{row.attaintment}</p>
                 </TableCell>
                 <TableCell className="total-sales">
-                  <p>{`${getCurrencyByCode(salesData.currency)}${row.totalSales}`}</p>
+                  <p>{`${getCurrencyByCode(salesData.currency, row.totalSales)}`}</p>
                 </TableCell>
               </Row>
             ))}
@@ -90,7 +90,7 @@ const ReportingTableTotalSales = () => {
               <TableCell className="difference" />
               <TableCell className="attaintment" />
               <TableCell className="total-sales accent">
-                <p>{`${getCurrencyByCode(salesData.currency)}${salesData.data?.totalSales?.totalSold}`}</p>
+                <p>{`${getCurrencyByCode(salesData.currency, salesData.data?.totalSales?.totalSold ?? 0)}`}</p>
               </TableCell>
             </Row>
           </TableBody>

@@ -4,6 +4,7 @@ import {
 } from './UpcomingEventCard.styled';
 import { GreenButton } from '../../../shared/Buttons/Buttons.styled';
 import EventPoster from '../../../../assets/images/event-poster.png';
+import { getCurrencyByCode } from '../../../../utils/currency';
 
 const UpcomingEventCard = () => (
   <Wrapper>
@@ -30,7 +31,7 @@ const UpcomingEventCard = () => (
           </Row>
           <Row>
             <strong>Ticket Price</strong>
-            <p>£5</p>
+            <p>{getCurrencyByCode('GBP', 5)}</p>
           </Row>
           <Row>
             <strong>Tickets Sold</strong>
