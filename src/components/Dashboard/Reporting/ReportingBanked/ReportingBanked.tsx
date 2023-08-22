@@ -23,28 +23,36 @@ import { Order } from '../../../../types/reporting/orders';
 import { StyledDrawer } from '../Reporting.styled';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
-import { getBankedStat } from '../../../../redux/actions/reporting.actions';
+import { getBankedStat, getBankedStatTest } from '../../../../redux/actions/reporting.actions';
 import ReportingBankedTableBody from './ReportingBankedTableBody';
 import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
 import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
 import { downloadFile } from '../../../../utils/file';
 import Alert from '../../../shared/Alert/Alert';
 import {
-  convertBankedItems, getAvailableColumns, getBankedItemsIds, getSortingOrdering,
+  convertBankedItems,
+  getAvailableColumns,
+  getBankedItemsIds,
+  getSortingOrdering,
 } from './utils';
 import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
 import { BankedInitialState } from '../../../../redux/slices/reporting/banked.slice';
 
 const ReportingBanked = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const [showTestTransactions, setShowTestTransactions] = useState(false);
   const bankedData: BankedInitialState = useSelector((state: RootState) => state.reporting.banked);
-  const table = useSortingTable<BankedItem>(bankedData.data ?? [], {
-    totalCount: bankedData.totalCount,
-    totalPages: bankedData.totalPages,
-    pageSize: bankedData.pageSize,
-    currentPage: bankedData.currentPage,
-    columns: headCells,
-  }, convertBankedItems);
+  const table = useSortingTable<BankedItem>(
+    !showTestTransactions ? bankedData?.data ?? [] : bankedData.testTransactions ?? [],
+    {
+      totalCount: bankedData.totalCount,
+      totalPages: bankedData.totalPages,
+      pageSize: bankedData.pageSize,
+      currentPage: bankedData.currentPage,
+      columns: headCells,
+    },
+    convertBankedItems,
+  );
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
   const { page, pagesCount, rowsPerPage } = table.pagination;
@@ -81,15 +89,21 @@ const ReportingBanked = () => {
       },
       {
         label: 'Total:',
-        value: `${getCurrencyByCode(totalSalesAmount?.currency)}${!totalSalesAmount?.amount ? 0 : totalSalesAmount.amount}`,
+        value: `${getCurrencyByCode(totalSalesAmount?.currency)}${
+          !totalSalesAmount?.amount ? 0 : totalSalesAmount.amount
+        }`,
       },
       {
         label: 'Banked Fee:',
-        value: `${getCurrencyByCode(totalBankedFee?.currency)}${!totalBankedFee?.amount ? 0 : totalBankedFee.amount}`,
+        value: `${getCurrencyByCode(totalBankedFee?.currency)}${
+          !totalBankedFee?.amount ? 0 : totalBankedFee.amount
+        }`,
       },
       {
         label: 'Platform Fee:',
-        value: `${getCurrencyByCode(totalPlatformFees?.currency)}${!totalPlatformFees?.amount ? 0 : totalPlatformFees.amount}`,
+        value: `${getCurrencyByCode(totalPlatformFees?.currency)}${
+          !totalPlatformFees?.amount ? 0 : totalPlatformFees.amount
+        }`,
       },
     ],
     [totalOrdersCount, totalSalesAmount, totalBankedFee, totalPlatformFees],
@@ -106,7 +120,6 @@ const ReportingBanked = () => {
     setOrderDetails(order);
   };
   const [error, setError] = useState<null | string>(null);
-  const [showTestTransactions, setShowTestTransactions] = useState(false);
   const actionsMenuRef = useRef(null);
   const [openCustomizeMenu, setOpenCustomizeMenu] = useState(false);
   const closeCustomizeMenu = () => {
@@ -120,26 +133,44 @@ const ReportingBanked = () => {
         case 'excel':
           return {
             ...item,
-            handleClick: () => downloadFile('/Report/bankedsexcel', 'excel.xls', {
-              ids: getBankedItemsIds(table.visibleRows),
-              columns: getAvailableColumns(table.customization.visibleColumns),
-              ordering: getSortingOrdering(
-                table.sorting.filters,
-                headCells,
-              ), // objects, key - field name, value - asc | desc
-            }, setError),
+            handleClick: () => downloadFile(
+              '/Report/bankedsexcel',
+              'excel.xls',
+              {
+                ids: getBankedItemsIds(table.visibleRows),
+                columns: getAvailableColumns(table.customization.visibleColumns),
+                ordering: getSortingOrdering(
+                  table.sorting.filters,
+                  headCells,
+                ), // objects, key - field name, value - asc | desc
+              },
+              setError,
+            ),
           };
         case 'pdf':
           return {
             ...item,
-            handleClick: () => downloadFile('/Report/bankedspdf', 'report.pdf', {
-              ids: getBankedItemsIds(table.visibleRows),
-              columns: getAvailableColumns(table.customization.visibleColumns),
-              ordering: getSortingOrdering(
-                table.sorting.filters,
-                headCells,
-              ), // objects, key - field name, value - asc | desc
-            }, setError),
+            handleClick: () => downloadFile(
+              '/Report/bankedspdf',
+              'report.pdf',
+              {
+                ids: getBankedItemsIds(table.visibleRows),
+                columns: getAvailableColumns(table.customization.visibleColumns),
+                ordering: getSortingOrdering(
+                  table.sorting.filters,
+                  headCells,
+                ), // objects, key - field name, value - asc | desc
+              },
+              setError,
+            ),
+          };
+        case 'test-transactions':
+          return {
+            ...item,
+            handleClick: () => {
+              setShowTestTransactions(true);
+              dispatch(getBankedStatTest({ page, pageSize: rowsPerPage }));
+            },
           };
         default:
           return item;
@@ -148,15 +179,20 @@ const ReportingBanked = () => {
     [actionsOptions],
   );
 
-  return bankedData.status === 'loading' ? <LoadingOverlay /> : (
+  return bankedData.status === 'loading' ? (
+    <LoadingOverlay />
+  ) : (
     <Wrapper>
-      {!table.visibleRows.length ? <StyledAlert type="warning">There are no banked transactions</StyledAlert> : null}
-      <StatisticBar data={bankedStatisticData} />
+      {bankedData?.error ? <StyledAlert type="error">{ process.env.NODE_ENV === 'development' ? bankedData?.error : 'Something went wrong' }</StyledAlert> : null}
       {!showTestTransactions ? null : (
-        <StyledAlert type="warning">
+        <StyledAlert type="warning" testid="test-transactions">
           Warning: You are viewing <strong>test</strong> Banked transactions
         </StyledAlert>
       )}
+      {!table.visibleRows.length ? (
+        <StyledAlert type="warning">There are no banked transactions</StyledAlert>
+      ) : null}
+      <StatisticBar data={bankedStatisticData} />
       <TableContent>
         {!error ? null : (
           <>
@@ -201,7 +237,7 @@ const ReportingBanked = () => {
                 rows={table.visibleRows}
                 handleOrderDetailDrawer={handleOrderDetailDrawer}
                 columnsOptions={columnsOptions}
-                currency={totalBankedFee?.currency}
+                currency={bankedData?.currency}
                 dataFound={isFound}
                 isSearching={isSearching}
               />

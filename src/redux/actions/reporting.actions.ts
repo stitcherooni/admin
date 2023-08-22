@@ -16,6 +16,12 @@ export const getBankedStat = createAsyncThunk('reporting/getBankedStat', async (
   return response.data;
 });
 
+export const getBankedStatTest = createAsyncThunk('reporting/getBankedStatTest', async (params: any = null) => {
+  const url = `/Report/testbankedreport?page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
+  const response = await Axios(url);
+  return response.data;
+});
+
 export const getBookingStat = createAsyncThunk('reporting/getBookingsStat', async (params: any = null) => {
   const url = `/api/Report/datareport?SchoolId=1&Type=bookings&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
   const response = await fetch(url);

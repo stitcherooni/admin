@@ -3,6 +3,7 @@ import { Order } from './orders';
 
 export interface BankedProps {
   data: BankedItem[];
+  testTransactions: BankedItem[];
   totalOrdersCount: number;
   totalSalesAmount: Price;
   totalBankedFee: Price;

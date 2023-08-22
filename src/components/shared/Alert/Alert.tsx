@@ -11,16 +11,18 @@ interface AlertProps {
   children: React.ReactNode;
   type: `${AlertTypes}`;
   className?: string;
+  testid?: string;
 }
 
 const Alert = (props: AlertProps) => (
-  <Wrapper className={`${props.type} ${props.className}`}>
+  <Wrapper className={`${props.type} ${props.className}`} data-testid={props.testid ?? ''}>
     {props.children}
   </Wrapper>
 );
 
 Alert.defaultProps = {
   className: '',
+  testid: '',
 };
 
 export default Alert;
