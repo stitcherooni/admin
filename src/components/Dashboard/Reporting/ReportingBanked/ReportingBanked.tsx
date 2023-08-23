@@ -61,8 +61,9 @@ const ReportingBanked = () => {
 
   const changePage = (e: ChangeEvent, newPage?: number) => {
     e.preventDefault();
+    const fn = showTestTransactions ? getBankedStatTest : getBankedStat;
     dispatch(
-      getBankedStat({
+      fn({
         page: newPage,
         pageSize: rowsPerPage,
       }),
@@ -70,8 +71,9 @@ const ReportingBanked = () => {
   };
 
   const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
+    const fn = showTestTransactions ? getBankedStatTest : getBankedStat;
     dispatch(
-      getBankedStat({
+      fn({
         page: 1,
         pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
       }),
