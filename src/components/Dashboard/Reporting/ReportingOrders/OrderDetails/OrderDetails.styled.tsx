@@ -120,12 +120,22 @@ export const TableCell = styled(Cell)`
     border-radius: 8px;
     color: ${(props) => props.theme.colors.main.white};
 
-    &.dispatched {
+    &.dispatched,
+    &.completed {
       background-color: ${(props) => props.theme.colors.main.green};
     }
 
-    &.other {
+    &.refunded,
+    &.failed,
+    &.deleted {
       background-color: ${(props) => props.theme.colors.main.pink};
+    }
+
+    &.partial-refunded,
+    &.awaiting-dispatch,
+    &.reserved,
+    &.test {
+      background-color: ${(props) => props.theme.colors.main.yellow};
     }
   }
 
@@ -162,7 +172,8 @@ export const TableCell = styled(Cell)`
     border-right: 1px solid rgba(122, 81, 145, 0.4);
   }
 
-  &.primary {
+  &.primary,
+  &.primary.row-id, &.primary.status {
     border-color: transparent;
   }
 `;

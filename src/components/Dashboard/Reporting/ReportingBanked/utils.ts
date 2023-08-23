@@ -11,7 +11,9 @@ export const convertBankedItems = (items: BankedItem[], currency: string = 'GBP'
   platformFee: `${getCurrencyByCode(currency, item.platformFee)}`,
 }));
 
-export const getBankedItemsIds = (rowsList: BankedItem[]) => rowsList.map((item) => item.id);
+export const getBankedItemsIds = (rowsList: BankedItem[]) => {
+  return rowsList.map((item) => item.order.transactionId);
+};
 export const getAvailableColumns = (cols: CellProps[]) => cols.map((col) => col.id);
 export const getSortingOrdering = (
   data: { orders: string[], fields: string[] },

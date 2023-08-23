@@ -29,6 +29,7 @@ const OrderDetails = (props: OrderDetailsProps) => {
   };
 
   const removeOrder = (e: React.SyntheticEvent, orderId: number) => {};
+  const status = getOrderStatus(data.status);
 
   return (
     <Wrapper>
@@ -52,9 +53,9 @@ const OrderDetails = (props: OrderDetailsProps) => {
         <Row>
           <strong>Status</strong>
           <OrderStatusBadge
-            className={`order-status ${getOrderStatus(data.status.toLowerCase())}`}
+            className={`order-status ${status.cls}`}
           >
-            {data.status}
+            {status.text}
           </OrderStatusBadge>
         </Row>
         <Row>

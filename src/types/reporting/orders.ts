@@ -11,6 +11,18 @@ export interface OrdersStatProps {
   pageSize: number;
 }
 
+export enum OrderStatus {
+  OrderDispatched = 'Dispatched',
+  OrderCompleted = 'Completed',
+  OrderDeleted = 'Deleted',
+  OrderReserved = 'Reserved',
+  OrderTest = 'Test',
+  OrderFailed = 'Failed',
+  OrderAwaitingDispatch = 'Awaiting dispatch',
+  OrderPartialRefund = 'Partial refund',
+  OrderRefunded = 'Refunded',
+}
+
 export interface Order {
   num: number;
   id: number;
@@ -28,7 +40,14 @@ export interface Order {
   type: string;
   platformFee: number;
   refunded: number;
-  history: OrderHistoryItem[];
+  history: OrderHistory;
+}
+
+interface OrderHistory {
+  data: OrderHistoryItem[];
+  refundedQuantity: number;
+  refundedPrice: number;
+  refundedLineAmount: number;
 }
 
 export interface OrderHistoryItem {
@@ -37,5 +56,5 @@ export interface OrderHistoryItem {
   quantity: number;
   price: Price;
   lineAmount: Price;
-  status: string;
+  status: keyof typeof OrderStatus;
 }
