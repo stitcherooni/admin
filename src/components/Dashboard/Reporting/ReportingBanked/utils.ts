@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { BankedItem } from '../../../../types/reporting/banked';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import { CellProps } from '../../../shared/Table/TableHead/TableHead';
+import { getBankedStat, getBankedStatTest } from '../../../../redux/actions/reporting.actions';
 
 export const convertBankedItems = (items: BankedItem[], currency: string = 'GBP') => items.map((item) => ({
   ...item,
@@ -32,4 +33,8 @@ export const getSortingOrdering = (
   }
 
   return res;
+};
+
+export const getFetchBankedFn = (showTestTransactions: boolean) => {
+  return showTestTransactions ? getBankedStatTest : getBankedStat;
 };

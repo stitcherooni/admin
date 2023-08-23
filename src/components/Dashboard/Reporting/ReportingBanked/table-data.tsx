@@ -51,14 +51,55 @@ export const headCells = [
 export const rows = [
   {
     num: 1,
-    orderId: 1260739,
-    transactionId: '4035b6f9-5726-47ac-b804-64a55c7bf274',
-    status: 'Paid',
-    date: '12/05/2021 20:05',
-    currency: '£',
-    value: 5,
-    bankedFee: 0.26,
-    platformFee: 0.15,
+    orderId: 44,
+    status: '26Status',
+    date: '2022-09-22T00:00:00',
+    value: 43,
+    bankedFee: 38,
+    platformFee: 31,
+    order: {
+      num: 1,
+      id: 3,
+      customerName: '22name',
+      customerId: 9,
+      status: '6status',
+      date: '2022-03-17T00:00:00',
+      orders: 16,
+      value: {
+        amount: 27,
+        currency: 'GBP',
+      },
+      schoolName: '12SchoolName',
+      email: '54@Email.com',
+      transactionId: '51',
+      payerEmail: '55@Email.com',
+      paymentMethod: null,
+      type: '39type',
+      platformFee: 6,
+      refunded: 31,
+      history: {
+        data: [
+          {
+            productId: 0,
+            productName: '17name',
+            quantity: 40,
+            price: {
+              amount: 36,
+              currency: 'GBP',
+            },
+            lineAmount: {
+              amount: 42,
+              currency: 'GBP',
+            },
+            status: 'OrderReserved',
+          },
+        ],
+        refundedQuantity: 44,
+        refundedPrice: 2,
+        refundedLineAmount: 91,
+      },
+    },
+    transactionId: 30,
   },
 ];
 
@@ -66,6 +107,11 @@ export const actionsOptions = [
   {
     value: 'test-transactions',
     label: 'Show Test Transactions',
+    icon: <ShoppingCartOutlinedIcon className="test-orders" />,
+  },
+  {
+    value: 'live-transactions',
+    label: 'Show Live Transactions',
     icon: <ShoppingCartOutlinedIcon className="test-orders" />,
   },
   {

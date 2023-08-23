@@ -3,10 +3,13 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { rest } from 'msw';
 import { renderWithProviders } from '../../../../tests-utils/test-utils';
-import { headCells } from './table-data';
+import { headCells, rows } from './table-data';
 import { server } from '../../../../tests-utils/server';
 import { BankedInitialState } from '../../../../redux/slices/reporting/banked.slice';
 import ReportingBanked from './ReportingBanked';
+import * as utils from './utils';
+
+jest.spyOn(utils, 'getFetchBankedFn');
 
 const columnsNames = headCells.map((item) => item.label);
 
@@ -157,6 +160,53 @@ describe('banked reporting', () => {
     await userEvent.keyboard('{Escape}');
     await waitFor(() => {
       expect(screen.getByTestId('test-transactions')).toBeInTheDocument();
+    });
+  });
+
+  test('if have test transactions we shouldnt see Test transactions button and need to see Live transactions', async () => {
+    renderWithProviders(<ReportingBanked />, {
+      preloadedState: {
+        reporting: {
+          banked: {
+            status: 'successed',
+            testTransactions: rows,
+          } as unknown as BankedInitialState,
+        },
+      },
+    });
+    await userEvent.click(screen.getByText(/Actions/));
+    await userEvent.click(screen.getByText(/Show Test Transactions/));
+
+    expect(screen.queryByText(/Show Test Transactions/)).not.toBeInTheDocument();
+    expect(utils.getFetchBankedFn).toHaveBeenCalledWith(true);
+
+    await userEvent.keyboard('{Escape}');
+    await userEvent.click(screen.getByText(/Actions/));
+
+    expect(screen.getByText(/Show Live Transactions/)).toBeInTheDocument();
+  });
+
+  test('if we click by Live transactions we shouldnt see Test transactions warning', async () => {
+    renderWithProviders(<ReportingBanked />, {
+      preloadedState: {
+        reporting: {
+          banked: {
+            status: 'successed',
+            testTransactions: rows,
+          } as unknown as BankedInitialState,
+        },
+      },
+    });
+    await userEvent.click(screen.getByText(/Actions/));
+    await userEvent.click(screen.getByText(/Show Test Transactions/));
+
+    await userEvent.keyboard('{Escape}');
+    await userEvent.click(screen.getByText(/Actions/));
+    await userEvent.click(screen.getByText(/Show Live Transactions/));
+    expect(utils.getFetchBankedFn).toHaveBeenCalledWith(false);
+
+    waitFor(() => {
+      expect(screen.queryByTestId('test-transactions')).not.toBeInTheDocument();
     });
   });
 });

@@ -23,7 +23,6 @@ import { Order } from '../../../../types/reporting/orders';
 import { StyledDrawer } from '../Reporting.styled';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
-import { getBankedStat, getBankedStatTest } from '../../../../redux/actions/reporting.actions';
 import ReportingBankedTableBody from './ReportingBankedTableBody';
 import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
 import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
@@ -33,6 +32,7 @@ import {
   convertBankedItems,
   getAvailableColumns,
   getBankedItemsIds,
+  getFetchBankedFn,
   getSortingOrdering,
 } from './utils';
 import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
@@ -61,7 +61,7 @@ const ReportingBanked = () => {
 
   const changePage = (e: ChangeEvent, newPage?: number) => {
     e.preventDefault();
-    const fn = showTestTransactions ? getBankedStatTest : getBankedStat;
+    const fn = getFetchBankedFn(showTestTransactions);
     dispatch(
       fn({
         page: newPage,
@@ -71,7 +71,7 @@ const ReportingBanked = () => {
   };
 
   const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    const fn = showTestTransactions ? getBankedStatTest : getBankedStat;
+    const fn = getFetchBankedFn(showTestTransactions);
     dispatch(
       fn({
         page: 1,
@@ -162,13 +162,23 @@ const ReportingBanked = () => {
             ),
           };
         case 'test-transactions':
-          return {
+          return !showTestTransactions ? {
             ...item,
             handleClick: () => {
+              const fn = getFetchBankedFn(true);
               setShowTestTransactions(true);
-              dispatch(getBankedStatTest({ page, pageSize: rowsPerPage }));
+              dispatch(fn({ page: 1, pageSize: rowsPerPage }));
             },
-          };
+          } : null;
+        case 'live-transactions':
+          return showTestTransactions ? {
+            ...item,
+            handleClick: () => {
+              const fn = getFetchBankedFn(false);
+              setShowTestTransactions(false);
+              dispatch(fn({ page: 1, pageSize: rowsPerPage }));
+            },
+          } : null;
         case 'copy': {
           return {
             ...item,
@@ -178,8 +188,8 @@ const ReportingBanked = () => {
         default:
           return item;
       }
-    }),
-    [actionsOptions],
+    }).filter((item) => item),
+    [actionsOptions, showTestTransactions],
   );
 
   return bankedData.status === 'loading' ? (
