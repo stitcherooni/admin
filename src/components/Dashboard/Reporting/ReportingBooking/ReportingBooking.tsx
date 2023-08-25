@@ -49,6 +49,7 @@ import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import { BookingStatEvents, BookingStatGroupByFilter, BookingStatItem } from '../../../../types/reporting/bookings';
 import { Order } from '../../../../types/reporting/orders';
 import { getCurrencyByCode } from '../../../../utils/currency';
+import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
 
 interface Filter {
   value: number | string;
@@ -207,7 +208,7 @@ const ReportingBooking = () => {
 
   // we neednt high requirements for filters, group by or other not required
 
-  return !bookingData.filters ? null : (
+  return bookingData.status === 'loading' ? <LoadingOverlay /> : (
     <Wrapper>
       <StyledAlert type="success" className="booking-alert">
         <p>
