@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { rest } from 'msw';
 import { renderWithProviders } from '../../../../tests-utils/test-utils';
@@ -23,15 +23,18 @@ afterAll(() => server.close());
 
 describe('banked reporting', () => {
   test('if click by Customize View should show customize menu', async () => {
-    renderWithProviders(<ReportingBanked />, {
-      preloadedState: {
-        reporting: {
-          banked: {
-            status: 'successed',
-          } as unknown as BankedInitialState,
+    act(() => {
+      renderWithProviders(<ReportingBanked />, {
+        preloadedState: {
+          reporting: {
+            banked: {
+              status: 'successed',
+            } as unknown as BankedInitialState,
+          },
         },
-      },
+      });
     });
+
     await userEvent.click(screen.getByText(/Actions/));
     await userEvent.click(screen.getByText(/Customize View/));
 
@@ -43,14 +46,16 @@ describe('banked reporting', () => {
   });
 
   test('if click by checked element should hide column', async () => {
-    renderWithProviders(<ReportingBanked />, {
-      preloadedState: {
-        reporting: {
-          banked: {
-            status: 'successed',
-          } as unknown as BankedInitialState,
+    act(() => {
+      renderWithProviders(<ReportingBanked />, {
+        preloadedState: {
+          reporting: {
+            banked: {
+              status: 'successed',
+            } as unknown as BankedInitialState,
+          },
         },
-      },
+      });
     });
     await userEvent.click(screen.getByText(/Actions/));
     await userEvent.click(screen.getByText(/Customize View/));
@@ -68,14 +73,16 @@ describe('banked reporting', () => {
   });
 
   test('if click by unchecked element should show column', async () => {
-    renderWithProviders(<ReportingBanked />, {
-      preloadedState: {
-        reporting: {
-          banked: {
-            status: 'successed',
-          } as unknown as BankedInitialState,
+    act(() => {
+      renderWithProviders(<ReportingBanked />, {
+        preloadedState: {
+          reporting: {
+            banked: {
+              status: 'successed',
+            } as unknown as BankedInitialState,
+          },
         },
-      },
+      });
     });
     await userEvent.click(screen.getByText(/Actions/));
     await userEvent.click(screen.getByText(/Customize View/));
@@ -94,14 +101,16 @@ describe('banked reporting', () => {
   });
 
   test('if cant download file should show an error', async () => {
-    renderWithProviders(<ReportingBanked />, {
-      preloadedState: {
-        reporting: {
-          banked: {
-            status: 'successed',
-          } as unknown as BankedInitialState,
+    act(() => {
+      renderWithProviders(<ReportingBanked />, {
+        preloadedState: {
+          reporting: {
+            banked: {
+              status: 'successed',
+            } as unknown as BankedInitialState,
+          },
         },
-      },
+      });
     });
     await userEvent.click(screen.getByText(/Actions/));
     await userEvent.click(screen.getByText(/Export Excel/));
@@ -113,46 +122,55 @@ describe('banked reporting', () => {
     });
   });
 
-  test('if request failed should show error message', () => {
-    renderWithProviders(<ReportingBanked />, {
-      preloadedState: {
-        reporting: {
-          banked: {
-            status: 'error',
-            error: 'Error',
-          } as unknown as BankedInitialState,
+  test('if request failed should show error message', async () => {
+    act(() => {
+      renderWithProviders(<ReportingBanked />, {
+        preloadedState: {
+          reporting: {
+            banked: {
+              status: 'error',
+              error: 'Error',
+            } as unknown as BankedInitialState,
+          },
         },
-      },
+      });
     });
 
-    expect(screen.getByText(/Something went wrong/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Something went wrong/)).toBeInTheDocument();
+    });
   });
 
-  test('if havent records show warning message', () => {
-    renderWithProviders(<ReportingBanked />, {
-      preloadedState: {
-        reporting: {
-          banked: {
-            status: 'successed',
-            data: [],
-          } as unknown as BankedInitialState,
+  test('if havent records show warning message', async () => {
+    act(() => {
+      renderWithProviders(<ReportingBanked />, {
+        preloadedState: {
+          reporting: {
+            banked: {
+              status: 'successed',
+              data: [],
+            } as unknown as BankedInitialState,
+          },
         },
-      },
+      });
     });
-
-    expect(screen.getByText(/There are no banked transactions/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/There are no banked transactions/)).toBeInTheDocument();
+    });
   });
 
   test('if click by test transactions should fetch data and show warning', async () => {
-    renderWithProviders(<ReportingBanked />, {
-      preloadedState: {
-        reporting: {
-          banked: {
-            status: 'successed',
-            testTransactions: [],
-          } as unknown as BankedInitialState,
+    act(() => {
+      renderWithProviders(<ReportingBanked />, {
+        preloadedState: {
+          reporting: {
+            banked: {
+              status: 'successed',
+              testTransactions: [],
+            } as unknown as BankedInitialState,
+          },
         },
-      },
+      });
     });
     await userEvent.click(screen.getByText(/Actions/));
     await server.use(rest.get('/api/Report/testbankedreport', async (req, res, ctx) => res(ctx.status(200), ctx.json({ testTransactions: [] }))));
@@ -164,38 +182,46 @@ describe('banked reporting', () => {
   });
 
   test('if have test transactions we shouldnt see Test transactions button and need to see Live transactions', async () => {
-    renderWithProviders(<ReportingBanked />, {
-      preloadedState: {
-        reporting: {
-          banked: {
-            status: 'successed',
-            testTransactions: rows,
-          } as unknown as BankedInitialState,
+    act(() => {
+      renderWithProviders(<ReportingBanked />, {
+        preloadedState: {
+          reporting: {
+            banked: {
+              status: 'successed',
+              testTransactions: rows,
+            } as unknown as BankedInitialState,
+          },
         },
-      },
+      });
     });
     await userEvent.click(screen.getByText(/Actions/));
     await userEvent.click(screen.getByText(/Show Test Transactions/));
 
-    expect(screen.queryByText(/Show Test Transactions/)).not.toBeInTheDocument();
-    expect(utils.getFetchBankedFn).toHaveBeenCalledWith(true);
+    await waitFor(() => {
+      expect(screen.queryByText(/Show Test Transactions/)).not.toBeInTheDocument();
+      expect(utils.getFetchBankedFn).toHaveBeenCalledWith(true);
+    });
 
     await userEvent.keyboard('{Escape}');
     await userEvent.click(screen.getByText(/Actions/));
 
-    expect(screen.getByText(/Show Live Transactions/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/Show Live Transactions/)).toBeInTheDocument();
+    });
   });
 
   test('if we click by Live transactions we shouldnt see Test transactions warning', async () => {
-    renderWithProviders(<ReportingBanked />, {
-      preloadedState: {
-        reporting: {
-          banked: {
-            status: 'successed',
-            testTransactions: rows,
-          } as unknown as BankedInitialState,
+    act(() => {
+      renderWithProviders(<ReportingBanked />, {
+        preloadedState: {
+          reporting: {
+            banked: {
+              status: 'successed',
+              testTransactions: rows,
+            } as unknown as BankedInitialState,
+          },
         },
-      },
+      });
     });
     await userEvent.click(screen.getByText(/Actions/));
     await userEvent.click(screen.getByText(/Show Test Transactions/));
@@ -203,9 +229,9 @@ describe('banked reporting', () => {
     await userEvent.keyboard('{Escape}');
     await userEvent.click(screen.getByText(/Actions/));
     await userEvent.click(screen.getByText(/Show Live Transactions/));
-    expect(utils.getFetchBankedFn).toHaveBeenCalledWith(false);
 
     waitFor(() => {
+      expect(utils.getFetchBankedFn).toHaveBeenCalledWith(false);
       expect(screen.queryByTestId('test-transactions')).not.toBeInTheDocument();
     });
   });

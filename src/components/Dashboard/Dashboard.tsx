@@ -2,6 +2,7 @@ import React, { SyntheticEvent, useEffect, useState } from 'react';
 import AccordionSummary from '@mui/material/AccordionSummary/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails/AccordionDetails';
 import { useDispatch, useSelector } from 'react-redux';
+import { Outlet } from 'react-router-dom';
 import {
   Wrapper,
   HorizontalAdv,
@@ -81,91 +82,95 @@ const Dashboard = () => {
   // totalCount, currentPage, pageSize needs for every table
 
   return dashboardData.status === 'loading' ? <LoadingOverlay /> : (
-    <Wrapper>
-      <LegalInformation />
-      <DashboardOverview>
-        <OverviewTitle>Your PTA Overview</OverviewTitle>
-        {/* <CustomizerMenu handleChange={() => {}} values={fakeState}>
-          <SecondaryButton size="small">Customise View</SecondaryButton>
-        </CustomizerMenu> */}
-      </DashboardOverview>
-      <OverviewCards data={addCurrencyToStatistic(dashboardData.stat, 'GBP')} />
-      <TablesContainer>
-        <SalesAccordion expanded={open === 'live-sales'} onChange={handleChange('live-sales')}>
-          <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
-            <h3>Current Live Sales</h3>
-          </AccordionSummary>
-          <AccordionDetails>
-            {dashboardData.currentLiveSales.data.map((item) => (
-              <React.Fragment key={item.key}>
-                <ProductName type="success" className="product-name">
-                  {item.key}
-                </ProductName>
-                <br />
-                <LiveSalesTable
-                  data={item.value.data}
-                  totalQuantitySold={item.value.totalQuantitySold}
-                  totalQuantityLeft={item.value.totalQuantityLeft}
-                  totalSales={item.value.totalSales}
-                  currency={item.value.currency}
-                  currentPage={item.value}
-                  pageSize={0}
-                />
-                <br />
-              </React.Fragment>
-            ))}
-          </AccordionDetails>
-        </SalesAccordion>
-        <SalesAccordion expanded={open === 'monthly-orders'} onChange={handleChange('monthly-orders')}>
-          <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
-            <h3>Monthly Orders</h3>
-          </AccordionSummary>
-          <AccordionDetails>
-            <MonthlyOrdersTable
-              data={dashboardData.monthlyOrders.data}
-              totalOrders={dashboardData.monthlyOrders.totqalOrders}
-              totalSales={dashboardData.monthlyOrders.totalSales}
-              currency="£"
-            />
-          </AccordionDetails>
-        </SalesAccordion>
-        <SalesAccordion expanded={open === 'monthly-customers-orders'} onChange={handleChange('monthly-customers-orders')}>
-          <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
-            <h3>Monthly Customers Registrations</h3>
-          </AccordionSummary>
-          <AccordionDetails>
-            <MonthlyCustomersRegTable
-              data={dashboardData.monthlyCustomersRegistrations.data}
-              totalCount={0}
-              totalRegistrations={dashboardData.monthlyCustomersRegistrations.totalRegistrations}
-            />
-          </AccordionDetails>
-        </SalesAccordion>
-        <SalesAccordion expanded={open === 'last-sales'} onChange={handleChange('last-sales')}>
-          <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
-            <h3>Last 25 Orders</h3>
-          </AccordionSummary>
-          <AccordionDetails>
-            <LastSalesTable data={dashboardData.lastOrders} />
-          </AccordionDetails>
-        </SalesAccordion>
-      </TablesContainer>
-      <HorizontalAdv>
-        <p>advertisement</p>
-        <img src={HorizontalBanner} alt="" />
-        <div className="link-wrapper">
-          <a href="/">View Advertising Opportunities</a>
-        </div>
-      </HorizontalAdv>
-      <UserActivityWrapper>
-        <UserActivity>
-          <SharePTACard />
-          <UpcomingEventCard />
-          <FAQAdvCard />
-          {/* <AdvCard /> */}
-        </UserActivity>
-      </UserActivityWrapper>
-    </Wrapper>
+    <>
+      <Outlet />
+      <Wrapper>
+        <LegalInformation />
+        <DashboardOverview>
+          <OverviewTitle>Your PTA Overview</OverviewTitle>
+          {/* <CustomizerMenu handleChange={() => {}} values={fakeState}>
+      <SecondaryButton size="small">Customise View</SecondaryButton>
+    </CustomizerMenu> */}
+        </DashboardOverview>
+        <OverviewCards data={addCurrencyToStatistic(dashboardData.stat, 'GBP')} />
+        <TablesContainer>
+          <SalesAccordion expanded={open === 'live-sales'} onChange={handleChange('live-sales')}>
+            <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
+              <h3>Current Live Sales</h3>
+            </AccordionSummary>
+            <AccordionDetails>
+              {dashboardData.currentLiveSales.data.map((item) => (
+                <React.Fragment key={item.key}>
+                  <ProductName type="success" className="product-name">
+                    {item.key}
+                  </ProductName>
+                  <br />
+                  <LiveSalesTable
+                    data={item.value.data}
+                    totalQuantitySold={item.value.totalQuantitySold}
+                    totalQuantityLeft={item.value.totalQuantityLeft}
+                    totalSales={item.value.totalSales}
+                    currency={item.value.currency}
+                    currentPage={item.value}
+                    pageSize={0}
+                  />
+                  <br />
+                </React.Fragment>
+              ))}
+            </AccordionDetails>
+          </SalesAccordion>
+          <SalesAccordion expanded={open === 'monthly-orders'} onChange={handleChange('monthly-orders')}>
+            <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
+              <h3>Monthly Orders</h3>
+            </AccordionSummary>
+            <AccordionDetails>
+              <MonthlyOrdersTable
+                data={dashboardData.monthlyOrders.data}
+                totalOrders={dashboardData.monthlyOrders.totqalOrders}
+                totalSales={dashboardData.monthlyOrders.totalSales}
+                currency="£"
+              />
+            </AccordionDetails>
+          </SalesAccordion>
+          <SalesAccordion expanded={open === 'monthly-customers-orders'} onChange={handleChange('monthly-customers-orders')}>
+            <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
+              <h3>Monthly Customers Registrations</h3>
+            </AccordionSummary>
+            <AccordionDetails>
+              <MonthlyCustomersRegTable
+                data={dashboardData.monthlyCustomersRegistrations.data}
+                totalCount={0}
+                totalRegistrations={dashboardData.monthlyCustomersRegistrations.totalRegistrations}
+              />
+            </AccordionDetails>
+          </SalesAccordion>
+          <SalesAccordion expanded={open === 'last-sales'} onChange={handleChange('last-sales')}>
+            <AccordionSummary expandIcon={<ShevronDown color={theme.colors.main.black} />}>
+              <h3>Last 25 Orders</h3>
+            </AccordionSummary>
+            <AccordionDetails>
+              <LastSalesTable data={dashboardData.lastOrders} />
+            </AccordionDetails>
+          </SalesAccordion>
+        </TablesContainer>
+        <HorizontalAdv>
+          <p>advertisement</p>
+          <img src={HorizontalBanner} alt="" />
+          <div className="link-wrapper">
+            <a href="/">View Advertising Opportunities</a>
+          </div>
+        </HorizontalAdv>
+        <UserActivityWrapper>
+          <UserActivity>
+            <SharePTACard />
+            <UpcomingEventCard />
+            <FAQAdvCard />
+            {/* <AdvCard /> */}
+          </UserActivity>
+        </UserActivityWrapper>
+      </Wrapper>
+
+    </>
   );
 };
 

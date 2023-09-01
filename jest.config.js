@@ -16,6 +16,9 @@ module.exports = {
       },
     ]
   },
+  transformIgnorePatterns: [
+    '<rootDir>/node_modules/(?!@azure/msal-react)'
+  ],
    // to obtain access to the matchers.
   setupFilesAfterEnv: ['<rootDir>/src/tests-utils/setupTests.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],

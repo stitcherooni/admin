@@ -1,15 +1,13 @@
-import { Axios } from '../axios';
+import { axiosInstance, globalConfig } from '../axios';
 
 export const downloadFile = (
   url: string,
   fileName: string,
   body: any,
   errorCb: (message: string | null) => void,
-) => Axios({
-  url,
-  data: body,
-  method: 'POST',
+) => axiosInstance.post(url, body, {
   responseType: 'blob',
+  ...globalConfig,
 })
   .then((response) => {
     if (response.status === 200) {

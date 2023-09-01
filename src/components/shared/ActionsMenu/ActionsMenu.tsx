@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React from 'react';
+import React, { ReactNode } from 'react';
 import {
   CustomizeMenu, CustomizeMenuItem, Button,
 } from './ActionsMenu.styled';
@@ -17,6 +17,7 @@ interface Option {
 interface ActionsMenuProps {
   options: Option[];
   menuName?: string;
+  children?: ReactNode;
 }
 
 const ActionsMenu = (props: ActionsMenuProps) => {
@@ -36,14 +37,16 @@ const ActionsMenu = (props: ActionsMenuProps) => {
 
   return (
     <>
-      <Button
-        endIcon={open ? <ShevronUp color={theme.colors.main.white} />
-          : <ShevronDown color={theme.colors.main.green} />}
-        onClick={handleClick}
-        open={open}
-      >
-        {props.menuName}
-      </Button>
+      {!props.children ? (
+        <Button
+          endIcon={open ? <ShevronUp color={theme.colors.main.white} />
+            : <ShevronDown color={theme.colors.main.green} />}
+          onClick={handleClick}
+          open={open}
+        >
+          {props.menuName}
+        </Button>
+      ) : <div onClick={handleClick}>{props.children}</div>}
       <CustomizeMenu
         disableScrollLock
         aria-labelledby="customize dashboard menu"
@@ -72,6 +75,7 @@ const ActionsMenu = (props: ActionsMenuProps) => {
 
 ActionsMenu.defaultProps = {
   menuName: 'Actions',
+  children: null,
 };
 
 export default ActionsMenu;

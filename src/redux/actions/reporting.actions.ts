@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { Axios } from '../../axios';
+import { axiosInstance, globalConfig } from '../../axios';
 
 const createQueryString = (obj: any) => {
   let query = '?';
@@ -12,13 +12,13 @@ const createQueryString = (obj: any) => {
 
 export const getBankedStat = createAsyncThunk('reporting/getBankedStat', async (params: any = null) => {
   const url = `/Report/datareport?SchoolId=1&Type=banked&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
-  const response = await Axios(url);
+  const response = await axiosInstance.get(url, globalConfig);
   return response.data;
 });
 
 export const getBankedStatTest = createAsyncThunk('reporting/getBankedStatTest', async (params: any = null) => {
   const url = `/Report/testbankedreport?page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
-  const response = await Axios(url);
+  const response = await axiosInstance.get(url);
   return response.data;
 });
 

@@ -6,6 +6,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
+const Dotenv = require('dotenv-webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = merge(common, {
@@ -36,6 +37,9 @@ module.exports = merge(common, {
       template: 'public/index.html',
       minify: true
     }),
+    new Dotenv({
+      path: './.env.production'
+    })
   ],
   optimization: {
     minimize: true,

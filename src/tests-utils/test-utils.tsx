@@ -5,12 +5,14 @@ import { Provider } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
 import { ThemeProvider as Mui } from '@mui/material/styles';
 import { BrowserRouter } from 'react-router-dom';
+import { MsalProvider } from '@azure/msal-react';
 import {
   AppStore, RootState, setupStore,
 } from '../redux/store';
 import { muiTheme } from '../App';
 import { theme } from '../styles/defaultTheme';
 import GlobalStyle from '../styles/globalStyles';
+import { msalInstance } from '..';
 
 const mockedUsedNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
@@ -36,16 +38,18 @@ export function renderWithProviders(
 ) {
   function Wrapper({ children }: PropsWithChildren<{}>): JSX.Element {
     return (
-      <Mui theme={muiTheme}>
-        <ThemeProvider theme={theme}>
-          <GlobalStyle />
-          <Provider store={store}>
-            <BrowserRouter>
-              {children}
-            </BrowserRouter>
-          </Provider>
-        </ThemeProvider>
-      </Mui>
+      <MsalProvider instance={msalInstance}>
+        <Mui theme={muiTheme}>
+          <ThemeProvider theme={theme}>
+            <GlobalStyle />
+            <Provider store={store}>
+              <BrowserRouter>
+                {children}
+              </BrowserRouter>
+            </Provider>
+          </ThemeProvider>
+        </Mui>
+      </MsalProvider>
     );
   }
   return { store, ...render(ui, { wrapper: Wrapper, ...renderOptions }) };
