@@ -12,12 +12,9 @@ interface ReportingInitialState extends BookingsStatProps {
 
 const initialState: ReportingInitialState = {
   status: 'loading',
-  totalPages: 1,
-  currentPage: 1,
-  pageSize: 10,
   filters: null,
   data: [],
-  totalCount: 0,
+  totalProductQuantity: 0,
 };
 
 export const bookingsSlice = createSlice({
@@ -36,10 +33,7 @@ export const bookingsSlice = createSlice({
           ...state,
           status: 'succeeded',
           data: action.payload.data,
-          totalCount: action.payload.totalCount,
-          totalPages: action.payload.totalPages,
-          currentPage: action.payload.currentPage,
-          pageSize: action.payload.pageSize,
+          totalProductQuantity: action.payload.totalProductQuantity,
         })
       )
       .addCase(getBookingStat.rejected, (state, action) => ({
@@ -55,10 +49,7 @@ export const bookingsSlice = createSlice({
         ...state,
         status: 'succeeded',
         data: action.payload.data,
-        totalCount: action.payload.totalCount,
-        totalPages: action.payload.totalPages,
-        currentPage: action.payload.currentPage,
-        pageSize: action.payload.pageSize,
+        totalProductQuantity: action.payload.totalProductQuantity,
       }))
       .addCase(sortBookingStat.rejected, (state, action) => ({
         ...state,

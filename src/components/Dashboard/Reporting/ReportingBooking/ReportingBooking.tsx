@@ -279,8 +279,8 @@ const ReportingBooking = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{`${bookingData.totalCount} `}</strong>
-            {`${bookingData.totalCount === 0 || bookingData.totalCount > 1 ? 'Entries' : 'Entry'}`}
+            <strong>{`${bookingData.totalProductQuantity} `}</strong>
+            {`${bookingData.totalProductQuantity === 0 || bookingData.totalProductQuantity > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -318,49 +318,49 @@ const ReportingBooking = () => {
                         <p>{row.num}</p>
                       </TableCell>
                       <TableCell className="first-name">
-                        <p>{(row as any).firstName}</p>
+                        <p>{row.firstName}</p>
                       </TableCell>
                       <TableCell className="last-name">
-                        <p>{(row as any).lastName}</p>
+                        <p>{row.lastName}</p>
                       </TableCell>
                       <TableCell className="booking-name">
                         <p>{row.bookingName}</p>
                       </TableCell>
                       <TableCell className="class">
-                        <p>{(row as any).class}</p>
+                        <p>{row.class}</p>
                       </TableCell>
                       <TableCell className="booking-info">
-                        <p>{(row as any).bookingInfo}</p>
+                        <p>{row.bookingInfo}</p>
                       </TableCell>
                       <TableCell className="sku">
-                        <p>{(row as any).sku}</p>
+                        <p>{row.sku}</p>
                       </TableCell>
                       <TableCell className="product">
-                        <p>{row.product.bookingName}</p>
+                        <p>{row.product.name}</p>
                       </TableCell>
                       <TableCell className="price">
-                        <p>{`${getCurrencyByCode((row as any).currency, (row as any).price)}`}</p>
+                        <p>{`${getCurrencyByCode(row?.currency ?? 'GBP', row.price)}`}</p>
                       </TableCell>
                       <TableCell className="quantity">
-                        <p>{(row as any).quantity}</p>
+                        <p>{row.quantity}</p>
                       </TableCell>
                       <TableCell className="order-id">
-                        <p>{(row as any).orderId}</p>
+                        <p>{row.orderId}</p>
                       </TableCell>
                       <TableCell className="order-date">
-                        <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
+                        <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
                       </TableCell>
                       <TableCell className="booked-by">
-                        <p>{(row as any).bookedBy}</p>
+                        <p>{row.customerName}</p>
                       </TableCell>
                       <TableCell className="phone">
-                        <p>{(row as any).phone}</p>
+                        <p>{row.phone}</p>
                       </TableCell>
                       <TableCell className="email">
-                        <p>{(row as any).email}</p>
+                        <p>{row.email}</p>
                       </TableCell>
                       <TableCell className="payment-method">
-                        <p>{(row as any).paymentMethod}</p>
+                        <p>{row.paymentMethod}</p>
                       </TableCell>
                       <TableCell className="actions">
                         <ActionsMenu options={tableActionsOptions} />
@@ -370,14 +370,16 @@ const ReportingBooking = () => {
               </TableBody>
             </Table>
           </StyledTableWrapper>
-          <TablePagination
-            handleChangePage={changePage}
-            handleChangeRowsPerPage={changeRowsPerPage}
-            page={page}
-            pagesCount={pagesCount}
-            rowsPerPage={rowsPerPage}
-            options={[5, 10, 25]}
-          />
+          { !bookingData.totalProductQuantity ? null : (
+            <TablePagination
+              handleChangePage={changePage}
+              handleChangeRowsPerPage={changeRowsPerPage}
+              page={page}
+              pagesCount={pagesCount}
+              rowsPerPage={rowsPerPage}
+              options={[5, 10, 25]}
+            />
+          ) }
         </TableWrapper>
       </TableContent>
       {openUpdateBooking

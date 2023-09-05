@@ -22,25 +22,22 @@ export const getBankedStatTest = createAsyncThunk('reporting/getBankedStatTest',
   return response.data;
 });
 
-export const getBookingStat = createAsyncThunk('reporting/getBookingsStat', async (params: any = null) => {
-  const url = `/api/Report/datareport?SchoolId=1&Type=bookings&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
+export const getBookingStat = createAsyncThunk('reporting/getBookingsStat', async () => {
+  const url = '/Report/datareport?Type=bookings';
+  const response = await axiosInstance.get(url);
+  return response.data;
 });
 
 export const getBookingFilters = createAsyncThunk('reporting/getBookingsFilters', async (organizationId: number) => {
-  const url = `/api/Report/bookingsfilters?OrganizationId=${organizationId}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
+  const url = `/Report/bookingsfilters?OrganizationId=${organizationId}`;
+  const response = await axiosInstance.get(url);
+  return response.data;
 });
 
 export const sortBookingStat = createAsyncThunk('reporting/sortBookingStat', async (params: any) => {
-  const baseUrl = '/api/Report/sortbookings';
-  const response = await fetch(baseUrl + createQueryString(params));
-  const data = await response.json();
-  return data;
+  const baseUrl = '/Report/sortbookings';
+  const response = await axiosInstance.get(baseUrl + createQueryString(params));
+  return response.data;
 });
 
 export const getChildBookingStat = createAsyncThunk('reporting/getChildBookingsStat', async (params: any = null) => {

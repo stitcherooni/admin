@@ -1,21 +1,41 @@
+import { Order } from './orders';
+
 export interface BookingsStatProps {
   data: BookingStatItem[];
-  totalCount: number;
-  totalPages: number;
-  currentPage: number;
-  pageSize: number;
+  totalProductQuantity: number;
   filters: BookingStatFilters | null;
 }
 
 export interface BookingStatItem {
   num: number;
-  id: number;
-  product: string;
+  firstName: string;
+  lastName: string;
+  class: string;
+  bookingInfo: string;
+  sku: number;
+  currency?: string;
+  price: number;
+  quantity: string;
+  orderId: number;
   customerName: string;
   bookingName: string;
+  paymentMethod: string;
+  phone: string;
+  order: Order;
+  email: string;
+  bookingsId: number[];
+  id: number;
+  product: BookingProduct;
   date: string;
-  contact: string;
   allergies: string[];
+}
+
+interface BookingProduct {
+  id: number;
+  name: string;
+  bookable: number;
+  productHideClass: boolean;
+  quantityInStock: number;
 }
 
 export interface BookingStatFilters {

@@ -14,6 +14,10 @@ export const InitAuthComponent = ({ instance }: InitAuthComponentProps) => {
     const callbackId = instance.addEventCallback((event) => {
       const { eventType } = event;
       const payload = event.payload as AuthenticationResult;
+      const error = event.error as AuthError;
+
+      if (error && error.errorCode === 'no_tokens_found') msalInstance.logoutRedirect();
+
       if (
         (eventType === EventType.LOGIN_SUCCESS || eventType === EventType.ACQUIRE_TOKEN_SUCCESS) && payload?.account
       ) {

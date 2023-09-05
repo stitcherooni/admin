@@ -14,12 +14,12 @@ export const headCells = [
     className: 'row-id',
   },
   {
-    id: 'first-name',
+    id: 'firstName',
     label: 'First Name',
     className: 'first-name',
   },
   {
-    id: 'last-name',
+    id: 'lastName',
     label: 'Last Name',
     className: 'last-name',
   },
@@ -44,7 +44,7 @@ export const headCells = [
     className: 'sku',
   },
   {
-    id: 'product',
+    id: 'product.name',
     label: 'Product',
     className: 'product',
   },
@@ -69,7 +69,7 @@ export const headCells = [
     className: 'order-date',
   },
   {
-    id: 'bookedBy',
+    id: 'customerName',
     label: 'Booked by',
     className: 'booked-by',
   },
@@ -84,7 +84,7 @@ export const headCells = [
     className: 'email',
   },
   {
-    id: 'payment-method',
+    id: 'paymentMethod',
     label: 'Payment method',
     className: 'payment-method',
   },

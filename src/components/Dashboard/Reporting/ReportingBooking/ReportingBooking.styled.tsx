@@ -208,7 +208,7 @@ export const Head = styled(TableHeadSorting)`
       & .order-date,
       & .booked-by {
         width: 12.7%;
-        min-width: 140px;
+        min-width: 145px;
       }
 
       & .phone {
@@ -336,7 +336,7 @@ export const TableCell = styled(Cell)`
     &.order-date,
     &.booked-by {
       width: 12.7%;
-      min-width: 140px;
+      min-width: 145px;
     }
 
     &.phone {
