@@ -1,15 +1,12 @@
 export interface InvoicesStatProps {
   data: InvoiceStatItem[];
-  totalCount: number;
-  totalPages: number;
-  currentPage: number;
-  pageSize: number;
 }
 
 export interface InvoiceStatItem {
+  invoiceNo: number;
   num: number;
   id: number;
-  issureDate: string;
+  issueDate: string;
   dueDate: string;
   status: string;
   net: number;

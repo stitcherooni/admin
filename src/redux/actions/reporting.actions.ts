@@ -75,12 +75,11 @@ export const getEmailTrackerStat = createAsyncThunk('reporting/getEmailTrackerSt
   return data;
 });
 
-export const getInvoicesStat = createAsyncThunk('reporting/getInvoicesStat', async (params: any = null) => {
-  const url = `/api/Report/datareport?SchoolId=1&Type=invoices&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
-});
+export const getInvoicesStat = createAsyncThunk('reporting/getInvoicesStat', async () => {
+  const url = '/Report/datareport?Type=invoices';
+  const response = await axiosInstance.get(url);
+  return response.data;
+}); 
 
 export const getOrdersStat = createAsyncThunk('reporting/getOrdersStatt', async (params: any = null) => {
   const url = `/api/Report/datareport?SchoolId=1&Type=orders&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;

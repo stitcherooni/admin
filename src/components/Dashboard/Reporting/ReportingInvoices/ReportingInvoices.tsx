@@ -24,34 +24,21 @@ import { InvoiceStatItem } from '../../../../types/reporting/invoices';
 const ReportingInvoices = () => {
   const dispatch = useDispatch<AppDispatch>();
   const invoicesData = useSelector((state: RootState) => state.reporting.invoices);
-  const table = useSortingTable<InvoiceStatItem>(invoicesData.data, {
-    totalCount: invoicesData.totalCount,
-    totalPages: invoicesData.totalPages,
-    pageSize: invoicesData.pageSize,
-    currentPage: invoicesData.currentPage,
-  });
+  const table = useSortingTable<InvoiceStatItem>(invoicesData.data);
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
   const { page, pagesCount, rowsPerPage } = table.pagination;
 
   const changePage = (e: ChangeEvent, newPage?: number) => {
     e.preventDefault();
-    dispatch(getInvoicesStat({
-      page: newPage,
-      pageSize: rowsPerPage,
-    }));
+    dispatch(getInvoicesStat());
   };
 
   const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(getInvoicesStat({
-      page: 1,
-      pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-    }));
+    dispatch(getInvoicesStat());
   };
 
   // please add protocol to invoice url
-  // add invoice no field
-  // rename issureDate to issueDate
 
   return (
     <Wrapper>
@@ -67,8 +54,8 @@ const ReportingInvoices = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{`${invoicesData.totalCount} `}</strong>
-            {`${invoicesData.totalCount === 0 || invoicesData.totalCount > 1 ? 'Entries' : 'Entry'}`}
+            <strong>{`${invoicesData.data.length} `}</strong>
+            {`${invoicesData.data.length === 0 || invoicesData.data.length > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -87,10 +74,10 @@ const ReportingInvoices = () => {
                 {table.visibleRows.map((row) => (
                   <Row key={row.num}>
                     <TableCell className="invoice-no">
-                      <p>{(row as any).invoiceNo}</p>
+                      <p>{row.invoiceNo}</p>
                     </TableCell>
                     <TableCell className="issue-date">
-                      <p>{dayjs(row.issureDate).format('DD/MM/YYYY HH:mm')}</p>
+                      <p>{dayjs(row.issueDate).format('DD/MM/YYYY HH:mm')}</p>
                     </TableCell>
                     <TableCell className="due-date">
                       <p>{dayjs(row.dueDate).format('DD/MM/YYYY HH:mm')}</p>

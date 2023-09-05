@@ -1,7 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import {
-  getInvoicesStat,
-} from '../../actions/reporting.actions';
+import { getInvoicesStat } from '../../actions/reporting.actions';
 import { InvoicesStatProps } from '../../../types/reporting/invoices';
 
 interface ReportingInitialState extends InvoicesStatProps {
@@ -11,10 +9,6 @@ interface ReportingInitialState extends InvoicesStatProps {
 const initialState: ReportingInitialState = {
   status: 'loading',
   data: [],
-  totalCount: 10,
-  totalPages: 1,
-  currentPage: 1,
-  pageSize: 10,
 };
 
 const invoicesSlice = createSlice({
@@ -31,10 +25,6 @@ const invoicesSlice = createSlice({
         ...state,
         status: 'succeeded',
         data: action.payload.data,
-        totalCount: action.payload.totalCount,
-        totalPages: action.payload.totalPages,
-        currentPage: action.payload.currentPage,
-        pageSize: action.payload.pageSize,
       }))
       .addCase(getInvoicesStat.rejected, (state, action) => ({
         ...state,

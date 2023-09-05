@@ -1,16 +1,16 @@
 export const headCells = [
   {
-    id: 'invoice-no',
+    id: 'invoiceNo',
     label: 'Invoice No',
     className: 'invoice-no',
   },
   {
-    id: 'issue-date',
+    id: 'issueDate',
     label: 'Issue Date',
     className: 'issue-date',
   },
   {
-    id: 'due-date',
+    id: 'dueDate',
     label: 'Due Date',
     className: 'due-date',
   },
@@ -35,7 +35,7 @@ export const headCells = [
     className: 'total',
   },
   {
-    id: 'view',
+    id: '',
     label: 'View',
     className: 'invoice',
   },
