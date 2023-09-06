@@ -2,19 +2,24 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import {
   getBookingFilters,
   getBookingStat,
+  getRandomBookingStat,
+  getTestBookingStat,
   sortBookingStat,
 } from '../../actions/reporting.actions';
 import { BookingsStatProps, BookingStatFilters } from '../../../types/reporting/bookings';
 
 export interface BookingInitialState extends BookingsStatProps {
   status: string;
+  error?: string | null;
 }
 
 const initialState: BookingInitialState = {
   status: 'loading',
   filters: null,
   data: [],
+  testData: [],
   totalProductQuantity: 0,
+  error: null,
 };
 
 export const bookingsSlice = createSlice({
@@ -34,6 +39,7 @@ export const bookingsSlice = createSlice({
           status: 'succeeded',
           data: action.payload.data,
           totalProductQuantity: action.payload.totalProductQuantity,
+          error: null,
         })
       )
       .addCase(getBookingStat.rejected, (state, action) => ({
@@ -50,8 +56,39 @@ export const bookingsSlice = createSlice({
         status: 'succeeded',
         data: action.payload.data,
         totalProductQuantity: action.payload.totalProductQuantity,
+        error: null,
       }))
       .addCase(sortBookingStat.rejected, (state, action) => ({
+        ...state,
+        status: 'error',
+        error: action.error.message,
+      }))
+      .addCase(getTestBookingStat.pending, (state) => ({
+        ...state,
+        status: 'loading',
+      }))
+      .addCase(getTestBookingStat.fulfilled, (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
+        ...state,
+        status: 'succeeded',
+        testData: action.payload.data,
+        error: null,
+      }))
+      .addCase(getTestBookingStat.rejected, (state, action) => ({
+        ...state,
+        status: 'error',
+        error: action.error.message,
+      }))
+      .addCase(getRandomBookingStat.pending, (state) => ({
+        ...state,
+        status: 'loading',
+      }))
+      .addCase(getRandomBookingStat.fulfilled, (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
+        ...state,
+        status: 'succeeded',
+        data: action.payload.data,
+        error: null,
+      }))
+      .addCase(getRandomBookingStat.rejected, (state, action) => ({
         ...state,
         status: 'error',
         error: action.error.message,
@@ -64,6 +101,7 @@ export const bookingsSlice = createSlice({
         ...state,
         status: 'succeeded',
         filters: action.payload,
+        error: null,
       }))
       .addCase(getBookingFilters.rejected, (state, action) => ({
         ...state,
