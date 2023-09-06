@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-one-expression-per-line */
 import React, {
   ChangeEvent, SyntheticEvent, useMemo, useRef, useState,
 } from 'react';
@@ -53,7 +54,11 @@ import {
 } from './utils';
 import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
-import { BookingStatEvents, BookingStatGroupByFilter, BookingStatItem } from '../../../../types/reporting/bookings';
+import {
+  BookingStatEvents,
+  BookingStatGroupByFilter,
+  BookingStatItem,
+} from '../../../../types/reporting/bookings';
 import { Order } from '../../../../types/reporting/orders';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
@@ -62,6 +67,7 @@ import BookingRandomModal from './BookingRandomModal/BookingRandomModal';
 import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
 import { downloadFile } from '../../../../utils/file';
 import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
+import Alert from '../../../shared/Alert/Alert';
 
 interface Filter {
   value: number | string;
@@ -81,13 +87,17 @@ interface ReportingFilters {
 const ReportingBooking = () => {
   const dispatch = useDispatch<AppDispatch>();
   const bookingData = useSelector((state: RootState) => state.reporting.bookings);
-  const table = useSortingTable<BookingStatItem>(bookingData.data, {
-    totalCount: bookingData.totalCount,
-    totalPages: bookingData.totalPages,
-    pageSize: bookingData.pageSize,
-    currentPage: bookingData.currentPage,
-    columns: headCells,
-  }, convertBookingItems);
+  const table = useSortingTable<BookingStatItem>(
+    bookingData.data,
+    {
+      totalCount: bookingData.totalCount,
+      totalPages: bookingData.totalPages,
+      pageSize: bookingData.pageSize,
+      currentPage: bookingData.currentPage,
+      columns: headCells,
+    },
+    convertBookingItems,
+  );
   const { page, pagesCount, rowsPerPage } = table.pagination;
   const {
     selected, handleSelectAllClick, checkIsSelected, handleClick,
@@ -101,7 +111,7 @@ const ReportingBooking = () => {
   };
 
   const [showRandom, setShowRandom] = useState(false);
-  const toggleShowRandom = () => setShowRandom(!openUpdateBooking);
+  const toggleShowRandom = () => setShowRandom(!showRandom);
 
   const handleCloseRandom = (e: SyntheticEvent<HTMLDivElement>) => {
     handleCloseModal(e, toggleShowRandom);
@@ -136,13 +146,15 @@ const ReportingBooking = () => {
         year: rootid,
       },
     }));
-    dispatch(sortBookingStat({
-      EventIds: value,
-      ProductIds: filters.product ?? '',
-      GroupBy: filters.groupBy ?? '',
-      page: bookingData.currentPage,
-      pageSize: bookingData.pageSize,
-    }));
+    dispatch(
+      sortBookingStat({
+        EventIds: value,
+        ProductIds: filters.product ?? '',
+        GroupBy: filters.groupBy ?? '',
+        page: bookingData.currentPage,
+        pageSize: bookingData.pageSize,
+      }),
+    );
   };
 
   const handleSelectFilters = (e: any, type: string) => {
@@ -151,13 +163,15 @@ const ReportingBooking = () => {
       [type]: e.target.value,
     }));
 
-    dispatch(sortBookingStat({
-      EventIds: filters.event?.value,
-      ProductIds: type === 'product' ? e.target.value : filters.product,
-      GroupBy: type === 'groupBy' ? e.target.value : filters.groupBy ?? '',
-      page: bookingData.currentPage,
-      pageSize: bookingData.pageSize,
-    }));
+    dispatch(
+      sortBookingStat({
+        EventIds: filters.event?.value,
+        ProductIds: type === 'product' ? e.target.value : filters.product,
+        GroupBy: type === 'groupBy' ? e.target.value : filters.groupBy ?? '',
+        page: bookingData.currentPage,
+        pageSize: bookingData.pageSize,
+      }),
+    );
   };
 
   const handleEventChange = (e: any) => handleChooseEvent(e);
@@ -241,78 +255,89 @@ const ReportingBooking = () => {
   const [showTestBookings, setShowTestBookings] = useState(false);
 
   const actionsMenuOptions = useMemo(
-    () => menuActionsOptions.map((item) => {
-      switch (item.value) {
-        case 'customize-view':
-          return { ...item, handleClick: () => setOpenCustomizeMenu(true) };
-        case 'excel':
-          return {
-            ...item,
-            handleClick: () => downloadFile(
-              '/Report/bookingsexcel',
-              'excel.xls',
-              {
-                ids: getBookingItemsIds(table.visibleRows),
-                columns: getAvailableColumns(table.customization.visibleColumns),
-                ordering: getSortingOrdering(
-                  table.sorting.filters,
-                  headCells,
-                ), // objects, key - field name, value - asc | desc
-              },
-              setError,
-            ),
-          };
-        case 'pdf':
-          return {
-            ...item,
-            handleClick: () => downloadFile(
-              '/Report/bookingspdf',
-              'report.pdf',
-              {
-                ids: getBookingItemsIds(table.visibleRows),
-                columns: getAvailableColumns(table.customization.visibleColumns),
-                ordering: getSortingOrdering(
-                  table.sorting.filters,
-                  headCells,
-                ), // objects, key - field name, value - asc | desc
-              },
-              setError,
-            ),
-          };
-        case 'test-bookings':
-          return !showTestBookings ? {
-            ...item,
-            handleClick: () => {
-              const fn = getFetchBookingsFn(true);
-              setShowTestBookings(true);
-              dispatch(fn());
-            },
-          } : null;
-        case 'live-bookings':
-          return showTestBookings ? {
-            ...item,
-            handleClick: () => {
-              const fn = getFetchBookingsFn(false);
-              setShowTestBookings(false);
-              dispatch(fn());
-            },
-          } : null;
-        case 'copy': {
-          return {
-            ...item,
-            handleClick: () => copyTable(tableRef),
-          };
+    () => menuActionsOptions
+      .map((item) => {
+        switch (item.value) {
+          case 'customize-view':
+            return { ...item, handleClick: () => setOpenCustomizeMenu(true) };
+          case 'excel':
+            return {
+              ...item,
+              handleClick: () => downloadFile(
+                '/Report/bookingsexcel',
+                'excel.xls',
+                {
+                  ids: getBookingItemsIds(table.visibleRows),
+                  columns: getAvailableColumns(table.customization.visibleColumns),
+                  ordering: getSortingOrdering(table.sorting.filters, headCells), // objects, key - field name, value - asc | desc
+                },
+                setError,
+              ),
+            };
+          case 'pdf':
+            return {
+              ...item,
+              handleClick: () => downloadFile(
+                '/Report/bookingspdf',
+                'report.pdf',
+                {
+                  ids: getBookingItemsIds(table.visibleRows),
+                  columns: getAvailableColumns(table.customization.visibleColumns),
+                  ordering: getSortingOrdering(table.sorting.filters, headCells), // objects, key - field name, value - asc | desc
+                },
+                setError,
+              ),
+            };
+          case 'test-bookings':
+            return !showTestBookings
+              ? {
+                ...item,
+                handleClick: () => {
+                  const fn = getFetchBookingsFn(true);
+                  setShowTestBookings(true);
+                  dispatch(fn());
+                },
+              }
+              : null;
+          case 'live-bookings':
+            return showTestBookings
+              ? {
+                ...item,
+                handleClick: () => {
+                  const fn = getFetchBookingsFn(false);
+                  setShowTestBookings(false);
+                  dispatch(fn());
+                },
+              }
+              : null;
+          case 'copy': {
+            return {
+              ...item,
+              handleClick: () => copyTable(tableRef),
+            };
+          }
+          case 'random': {
+            return {
+              ...item,
+              handleClick: () => setShowRandom(true),
+            };
+          }
+
+          default:
+            return item;
         }
-        default:
-          return item;
-      }
-    }).filter((item) => item),
+      })
+      .filter((item) => item),
     [menuActionsOptions, showTestBookings],
   );
 
   const actionsMenuRef = useRef(null);
 
-  return bookingData.status === 'loading' ? <LoadingOverlay /> : (
+  console.log(showRandom);
+
+  return bookingData.status === 'loading' ? (
+    <LoadingOverlay />
+  ) : (
     <Wrapper>
       <StyledAlert type="success" className="booking-alert">
         <p>
@@ -333,6 +358,26 @@ const ReportingBooking = () => {
           </Button>
         </p>
       </StyledAlert>
+      {bookingData?.error ? (
+        <>
+          <br />
+          <StyledAlert type="error">
+            {process.env.NODE_ENV === 'development' ? bookingData?.error : 'Something went wrong'}
+          </StyledAlert>
+        </>
+      ) : null}
+      {!showTestBookings ? null : (
+        <>
+          <br />
+          <StyledAlert type="warning" testid="test-bookings">
+            Warning: You are viewing <strong>test</strong> bookings
+          </StyledAlert>
+          <br />
+        </>
+      )}
+      {!table.visibleRows.length ? (
+        <StyledAlert type="warning">There are no bookings</StyledAlert>
+      ) : null}
       <Filters>
         <div>
           <Label
@@ -396,7 +441,9 @@ const ReportingBooking = () => {
         <TableCaption>
           <p>
             <strong>{`${bookingData.data.length} `}</strong>
-            {`${bookingData.data.length === 0 || bookingData.data.length > 1 ? 'Entries' : 'Entry'}`}
+            {`${
+              bookingData.data.length === 0 || bookingData.data.length > 1 ? 'Entries' : 'Entry'
+            }`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -412,98 +459,97 @@ const ReportingBooking = () => {
                 checkbox={false}
               />
               <TableBody>
-                {table.visibleRows.map((row, index) =>
-                // const isItemSelected = checkIsSelected(row.id);
-                // const labelId = `enhanced-table-checkbox-${index}`;
+                {table.visibleRows.map((row, index) => (
+                  // const isItemSelected = checkIsSelected(row.id);
+                  // const labelId = `enhanced-table-checkbox-${index}`;
 
-                  (
-                    <Row
-                      tabIndex={-1}
-                      key={row.num}
-                      className={table.visibleRows.length - 1 === index ? 'last' : ''}
-                    >
-                      {columnsOptions.get('num')?.checked ? (
-                        <TableCell className="row-id">
-                          <p>{row.num}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('firstName')?.checked ? (
-                        <TableCell className="first-name">
-                          <p>{row.firstName}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('lastName')?.checked ? (
-                        <TableCell className="last-name">
-                          <p>{row.lastName}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('bookingName')?.checked ? (
-                        <TableCell className="booking-name">
-                          <p>{row.bookingName}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('class')?.checked ? (
-                        <TableCell className="class">
-                          <p>{row.class}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('bookingInfo')?.checked ? (
-                        <TableCell className="booking-info">
-                          <p>{row.bookingInfo}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('sku')?.checked ? (
-                        <TableCell className="sku">
-                          <p>{row.sku}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('product.name')?.checked ? (
-                        <TableCell className="product">
-                          <p>{row.product.name}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('price')?.checked ? (
-                        <TableCell className="price">
-                          <p>{`${getCurrencyByCode(row?.currency ?? 'GBP', row.price)}`}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('quantity')?.checked ? (
-                        <TableCell className="quantity">
-                          <p>{row.quantity}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('orderId')?.checked ? (
-                        <TableCell className="order-id">
-                          <p>{row.orderId}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('date')?.checked ? (
-                        <TableCell className="order-date">
-                          <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('customerName')?.checked ? (
-                        <TableCell className="booked-by">
-                          <p>{row.customerName}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('phone')?.checked ? (
-                        <TableCell className="phone">
-                          <p>{row.phone}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('email')?.checked ? (
-                        <TableCell className="email">
-                          <p>{row.email}</p>
-                        </TableCell>
-                      ) : null}
-                      {columnsOptions.get('paymentMethod')?.checked ? (
-                        <TableCell className="payment-method">
-                          <p>{row.paymentMethod}</p>
-                        </TableCell>
-                      ) : null}
-                    </Row>
-                  ))}
+                  <Row
+                    tabIndex={-1}
+                    key={row.num}
+                    className={table.visibleRows.length - 1 === index ? 'last' : ''}
+                  >
+                    {columnsOptions.get('num')?.checked ? (
+                      <TableCell className="row-id">
+                        <p>{row.num}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('firstName')?.checked ? (
+                      <TableCell className="first-name">
+                        <p>{row.firstName}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('lastName')?.checked ? (
+                      <TableCell className="last-name">
+                        <p>{row.lastName}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('bookingName')?.checked ? (
+                      <TableCell className="booking-name">
+                        <p>{row.bookingName}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('class')?.checked ? (
+                      <TableCell className="class">
+                        <p>{row.class}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('bookingInfo')?.checked ? (
+                      <TableCell className="booking-info">
+                        <p>{row.bookingInfo}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('sku')?.checked ? (
+                      <TableCell className="sku">
+                        <p>{row.sku}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('product.name')?.checked ? (
+                      <TableCell className="product">
+                        <p>{row.product.name}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('price')?.checked ? (
+                      <TableCell className="price">
+                        <p>{`${getCurrencyByCode(row?.currency ?? 'GBP', row.price)}`}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('quantity')?.checked ? (
+                      <TableCell className="quantity">
+                        <p>{row.quantity}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('orderId')?.checked ? (
+                      <TableCell className="order-id">
+                        <p>{row.orderId}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('date')?.checked ? (
+                      <TableCell className="order-date">
+                        <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('customerName')?.checked ? (
+                      <TableCell className="booked-by">
+                        <p>{row.customerName}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('phone')?.checked ? (
+                      <TableCell className="phone">
+                        <p>{row.phone}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('email')?.checked ? (
+                      <TableCell className="email">
+                        <p>{row.email}</p>
+                      </TableCell>
+                    ) : null}
+                    {columnsOptions.get('paymentMethod')?.checked ? (
+                      <TableCell className="payment-method">
+                        <p>{row.paymentMethod}</p>
+                      </TableCell>
+                    ) : null}
+                  </Row>
+                ))}
                 {!isFound && isSearching ? (
                   <Row className="last">
                     <TableCell className="not-found">
@@ -514,7 +560,7 @@ const ReportingBooking = () => {
               </TableBody>
             </Table>
           </StyledTableWrapper>
-          { !bookingData.data.length ? null : (
+          {!bookingData.data.length ? null : (
             <TablePagination
               handleChangePage={changePage}
               handleChangeRowsPerPage={changeRowsPerPage}
@@ -523,7 +569,7 @@ const ReportingBooking = () => {
               rowsPerPage={rowsPerPage}
               options={[5, 10, 25]}
             />
-          ) }
+          )}
         </TableWrapper>
       </TableContent>
       {openUpdateBooking

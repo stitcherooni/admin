@@ -10,6 +10,7 @@ import { BookingsStatProps, BookingStatFilters } from '../../../types/reporting/
 
 interface ReportingInitialState extends BookingsStatProps {
   status: string;
+  error?: string | null;
 }
 
 const initialState: ReportingInitialState = {
@@ -19,6 +20,7 @@ const initialState: ReportingInitialState = {
   testData: [],
   randomData: [],
   totalProductQuantity: 0,
+  error: null,
 };
 
 export const bookingsSlice = createSlice({
@@ -38,6 +40,7 @@ export const bookingsSlice = createSlice({
           status: 'succeeded',
           data: action.payload.data,
           totalProductQuantity: action.payload.totalProductQuantity,
+          error: null,
         })
       )
       .addCase(getBookingStat.rejected, (state, action) => ({
@@ -54,6 +57,7 @@ export const bookingsSlice = createSlice({
         status: 'succeeded',
         data: action.payload.data,
         totalProductQuantity: action.payload.totalProductQuantity,
+        error: null,
       }))
       .addCase(sortBookingStat.rejected, (state, action) => ({
         ...state,
@@ -68,6 +72,7 @@ export const bookingsSlice = createSlice({
         ...state,
         status: 'succeeded',
         testData: action.payload.testData,
+        error: null,
       }))
       .addCase(getTestBookingStat.rejected, (state, action) => ({
         ...state,
@@ -82,6 +87,7 @@ export const bookingsSlice = createSlice({
         ...state,
         status: 'succeeded',
         randomData: action.payload.randomData,
+        error: null,
       }))
       .addCase(getRandomBookingStat.rejected, (state, action) => ({
         ...state,
@@ -96,6 +102,7 @@ export const bookingsSlice = createSlice({
         ...state,
         status: 'succeeded',
         filters: action.payload,
+        error: null,
       }))
       .addCase(getBookingFilters.rejected, (state, action) => ({
         ...state,

@@ -1,6 +1,7 @@
 import React, { MouseEventHandler } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
 import {
   Wrapper, Form,
 } from './BookingRandomModal.styled';
@@ -8,12 +9,15 @@ import { Input } from '../../../../shared/Input/Input.styled';
 import { GreenButton, SecondaryButton } from '../../../../shared/Buttons/Buttons.styled';
 import Label from '../../../../shared/Label/Label';
 import Alert from '../../../../shared/Alert/Alert';
+import { getRandomBookingStat } from '../../../../../redux/actions/reporting.actions';
+import { AppDispatch } from '../../../../../redux/store';
 
 interface BookingRandomModalProps {
   handleClose: () => void;
 }
 
 const BookingRandomModal = ({ handleClose }: BookingRandomModalProps) => {
+  const dispatch = useDispatch<AppDispatch>();
   const formik = useFormik({
     initialValues: {
       random: 0,
@@ -22,7 +26,8 @@ const BookingRandomModal = ({ handleClose }: BookingRandomModalProps) => {
       random: Yup.number().min(1, 'Value should be greater than 1'),
     }),
     onSubmit: (values) => {
-
+      dispatch(getRandomBookingStat(values.random));
+      handleClose();
     },
   });
 
