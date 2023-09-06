@@ -24,8 +24,7 @@ export const getBankedStatTest = createAsyncThunk('reporting/getBankedStatTest',
 });
 
 export const getBookingStat = createAsyncThunk('reporting/getBookingsStat', async () => {
-  // const url = '/Report/datareport?Type=bookings';
-  const url = 'http://localhost:3000/bookings';
+  const url = '/Report/datareport?Type=bookings';
   const response = await axiosInstance.get(url);
   return response.data;
 });
