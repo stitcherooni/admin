@@ -28,6 +28,18 @@ export const getBookingStat = createAsyncThunk('reporting/getBookingsStat', asyn
   return response.data;
 });
 
+export const getTestBookingStat = createAsyncThunk('reporting/getTestBookingStat', async () => {
+  const url = '/Report/datareport?Type=bookingtest';
+  const response = await axiosInstance.get(url);
+  return response.data;
+});
+
+export const getRandomBookingStat = createAsyncThunk('reporting/getRandomBookingStat', async (count: number) => {
+  const url = `/Report/datareport?Type=bookingrandom&Count=${count}`;
+  const response = await axiosInstance.get(url);
+  return response.data;
+});
+
 export const getBookingFilters = createAsyncThunk('reporting/getBookingsFilters', async (organizationId: number) => {
   const url = `/Report/bookingsfilters?OrganizationId=${organizationId}`;
   const response = await axiosInstance.get(url);
@@ -79,7 +91,7 @@ export const getInvoicesStat = createAsyncThunk('reporting/getInvoicesStat', asy
   const url = '/Report/datareport?Type=invoices';
   const response = await axiosInstance.get(url);
   return response.data;
-}); 
+});
 
 export const getOrdersStat = createAsyncThunk('reporting/getOrdersStatt', async (params: any = null) => {
   const url = `/api/Report/datareport?SchoolId=1&Type=orders&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;

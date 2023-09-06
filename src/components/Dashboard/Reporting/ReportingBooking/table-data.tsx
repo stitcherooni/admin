@@ -1,6 +1,7 @@
 import React from 'react';
 import ShuffleOutlinedIcon from '@mui/icons-material/ShuffleOutlined';
 import { ContentCopyOutlined, TuneOutlined } from '@mui/icons-material';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ListEditIcon from '../../../../assets/icons/list-edit-icon';
 import DeleteIcon from '../../../../assets/icons/delete-icon';
 import { theme } from '../../../../styles/defaultTheme';
@@ -137,6 +138,16 @@ export const menuActionsOptions = [
     value: 'random',
     label: 'Select Random',
     icon: <ShuffleOutlinedIcon className="random" />,
+  },
+  {
+    value: 'test-bookings',
+    label: 'Show Test Bookings',
+    icon: <ShoppingCartOutlinedIcon className="test-orders" />,
+  },
+  {
+    value: 'live-bookings',
+    label: 'Show Live Bookings',
+    icon: <ShoppingCartOutlinedIcon className="test-orders" />,
   },
   {
     value: 'email',

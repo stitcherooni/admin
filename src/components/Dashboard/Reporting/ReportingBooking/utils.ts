@@ -9,6 +9,7 @@ import {
 import dayjs from 'dayjs';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import { CellProps } from '../../../shared/Table/TableHead/TableHead';
+import { getBookingStat, getTestBookingStat } from '../../../../redux/actions/reporting.actions';
 
 const convertEventToOptions = (data: BookingEventStatFilter[]) =>
   data.map((item) => ({ value: item.eventId, label: item.eventName }));
@@ -80,6 +81,6 @@ export const getSortingOrdering = (
   return res;
 };
 
-export const getFetchBankedFn = (showTestTransactions: boolean) => {
-  // return showTestTransactions ? getBankedStatTest : getBankedStat;
+export const getFetchBookingsFn = (showTestBookings: boolean) => {
+  return showTestBookings ? getTestBookingStat : getBookingStat;
 };

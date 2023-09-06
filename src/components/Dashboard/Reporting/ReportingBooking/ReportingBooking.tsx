@@ -47,6 +47,7 @@ import {
   createSortByOptions,
   getAvailableColumns,
   getBookingItemsIds,
+  getFetchBookingsFn,
   getSortingOrdering,
   handleCloseModal,
 } from './utils';
@@ -237,6 +238,7 @@ const ReportingBooking = () => {
   };
 
   const [error, setError] = useState<null | string>(null);
+  const [showTestBookings, setShowTestBookings] = useState(false);
 
   const actionsMenuOptions = useMemo(
     () => menuActionsOptions.map((item) => {
@@ -277,24 +279,24 @@ const ReportingBooking = () => {
               setError,
             ),
           };
-        // case 'test-transactions':
-        //   return !showTestTransactions ? {
-        //     ...item,
-        //     handleClick: () => {
-        //       const fn = getFetchBankedFn(true);
-        //       setShowTestTransactions(true);
-        //       dispatch(fn({ page: 1, pageSize: rowsPerPage }));
-        //     },
-        //   } : null;
-        // case 'live-transactions':
-        //   return showTestTransactions ? {
-        //     ...item,
-        //     handleClick: () => {
-        //       const fn = getFetchBankedFn(false);
-        //       setShowTestTransactions(false);
-        //       dispatch(fn({ page: 1, pageSize: rowsPerPage }));
-        //     },
-        //   } : null;
+        case 'test-bookings':
+          return !showTestBookings ? {
+            ...item,
+            handleClick: () => {
+              const fn = getFetchBookingsFn(true);
+              setShowTestBookings(true);
+              dispatch(fn());
+            },
+          } : null;
+        case 'live-bookings':
+          return showTestBookings ? {
+            ...item,
+            handleClick: () => {
+              const fn = getFetchBookingsFn(false);
+              setShowTestBookings(false);
+              dispatch(fn());
+            },
+          } : null;
         case 'copy': {
           return {
             ...item,
@@ -305,7 +307,7 @@ const ReportingBooking = () => {
           return item;
       }
     }).filter((item) => item),
-    [menuActionsOptions],
+    [menuActionsOptions, showTestBookings],
   );
 
   const actionsMenuRef = useRef(null);
