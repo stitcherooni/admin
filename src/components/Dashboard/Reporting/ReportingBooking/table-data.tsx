@@ -88,11 +88,6 @@ export const headCells = [
     label: 'Payment method',
     className: 'payment-method',
   },
-  {
-    id: 'actions',
-    label: 'Actions',
-    className: 'actions',
-  },
 ];
 
 export const rows = [

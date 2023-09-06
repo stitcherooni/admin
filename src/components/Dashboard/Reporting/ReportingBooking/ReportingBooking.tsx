@@ -393,8 +393,8 @@ const ReportingBooking = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{`${bookingData.totalProductQuantity} `}</strong>
-            {`${bookingData.totalProductQuantity === 0 || bookingData.totalProductQuantity > 1 ? 'Entries' : 'Entry'}`}
+            <strong>{`${bookingData.data.length} `}</strong>
+            {`${bookingData.data.length === 0 || bookingData.data.length > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -420,57 +420,86 @@ const ReportingBooking = () => {
                       key={row.num}
                       className={table.visibleRows.length - 1 === index ? 'last' : ''}
                     >
-                      <TableCell className="row-id">
-                        <p>{row.num}</p>
-                      </TableCell>
-                      <TableCell className="first-name">
-                        <p>{row.firstName}</p>
-                      </TableCell>
-                      <TableCell className="last-name">
-                        <p>{row.lastName}</p>
-                      </TableCell>
-                      <TableCell className="booking-name">
-                        <p>{row.bookingName}</p>
-                      </TableCell>
-                      <TableCell className="class">
-                        <p>{row.class}</p>
-                      </TableCell>
-                      <TableCell className="booking-info">
-                        <p>{row.bookingInfo}</p>
-                      </TableCell>
-                      <TableCell className="sku">
-                        <p>{row.sku}</p>
-                      </TableCell>
-                      <TableCell className="product">
-                        <p>{row.product.name}</p>
-                      </TableCell>
-                      <TableCell className="price">
-                        <p>{`${getCurrencyByCode(row?.currency ?? 'GBP', row.price)}`}</p>
-                      </TableCell>
-                      <TableCell className="quantity">
-                        <p>{row.quantity}</p>
-                      </TableCell>
-                      <TableCell className="order-id">
-                        <p>{row.orderId}</p>
-                      </TableCell>
-                      <TableCell className="order-date">
-                        <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
-                      </TableCell>
-                      <TableCell className="booked-by">
-                        <p>{row.customerName}</p>
-                      </TableCell>
-                      <TableCell className="phone">
-                        <p>{row.phone}</p>
-                      </TableCell>
-                      <TableCell className="email">
-                        <p>{row.email}</p>
-                      </TableCell>
-                      <TableCell className="payment-method">
-                        <p>{row.paymentMethod}</p>
-                      </TableCell>
-                      <TableCell className="actions">
-                        <ActionsMenu options={tableActionsOptions} />
-                      </TableCell>
+                      {columnsOptions.get('num')?.checked ? (
+                        <TableCell className="row-id">
+                          <p>{row.num}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('firstName')?.checked ? (
+                        <TableCell className="first-name">
+                          <p>{row.firstName}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('lastName')?.checked ? (
+                        <TableCell className="last-name">
+                          <p>{row.lastName}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('bookingName')?.checked ? (
+                        <TableCell className="booking-name">
+                          <p>{row.bookingName}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('class')?.checked ? (
+                        <TableCell className="class">
+                          <p>{row.class}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('bookingInfo')?.checked ? (
+                        <TableCell className="booking-info">
+                          <p>{row.bookingInfo}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('sku')?.checked ? (
+                        <TableCell className="sku">
+                          <p>{row.sku}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('product.name')?.checked ? (
+                        <TableCell className="product">
+                          <p>{row.product.name}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('price')?.checked ? (
+                        <TableCell className="price">
+                          <p>{`${getCurrencyByCode(row?.currency ?? 'GBP', row.price)}`}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('quantity')?.checked ? (
+                        <TableCell className="quantity">
+                          <p>{row.quantity}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('orderId')?.checked ? (
+                        <TableCell className="order-id">
+                          <p>{row.orderId}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('date')?.checked ? (
+                        <TableCell className="order-date">
+                          <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('customerName')?.checked ? (
+                        <TableCell className="booked-by">
+                          <p>{row.customerName}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('phone')?.checked ? (
+                        <TableCell className="phone">
+                          <p>{row.phone}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('email')?.checked ? (
+                        <TableCell className="email">
+                          <p>{row.email}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('paymentMethod')?.checked ? (
+                        <TableCell className="payment-method">
+                          <p>{row.paymentMethod}</p>
+                        </TableCell>
+                      ) : null}
                     </Row>
                   ))}
                 {!isFound && isSearching ? (
@@ -483,7 +512,7 @@ const ReportingBooking = () => {
               </TableBody>
             </Table>
           </StyledTableWrapper>
-          { !bookingData.totalProductQuantity ? null : (
+          { !bookingData.data.length ? null : (
             <TablePagination
               handleChangePage={changePage}
               handleChangeRowsPerPage={changeRowsPerPage}
