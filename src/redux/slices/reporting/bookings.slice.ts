@@ -2,9 +2,10 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import {
   getBookingFilters,
   getBookingStat,
+  getBookingsEditData,
   sortBookingStat,
 } from '../../actions/reporting.actions';
-import { BookingsStatProps, BookingStatFilters } from '../../../types/reporting/bookings';
+import { BookingsStatProps, BookingStatFilters, EditBookingData } from '../../../types/reporting/bookings';
 
 interface ReportingInitialState extends BookingsStatProps {
   status: string;
@@ -15,12 +16,17 @@ const initialState: ReportingInitialState = {
   filters: null,
   data: [],
   totalProductQuantity: 0,
+  editBookingData: {} as EditBookingData,
 };
 
 export const bookingsSlice = createSlice({
   name: 'bookings',
   initialState,
-  reducers: {},
+  reducers: {
+    resetEditBookingData: (state) => {
+      state.editBookingData = {} as EditBookingData;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(getBookingStat.pending, (state) => ({
@@ -34,7 +40,7 @@ export const bookingsSlice = createSlice({
           status: 'succeeded',
           data: action.payload.data,
           totalProductQuantity: action.payload.totalProductQuantity,
-        })
+        }),
       )
       .addCase(getBookingStat.rejected, (state, action) => ({
         ...state,
@@ -69,8 +75,24 @@ export const bookingsSlice = createSlice({
         ...state,
         status: 'error',
         error: action.error.message,
+      }))
+      .addCase(getBookingsEditData.pending, (state) => ({
+        ...state,
+        status: 'loading',
+      }))
+      .addCase(getBookingsEditData.fulfilled, (state, action: PayloadAction<EditBookingData>) => ({
+        ...state,
+        status: 'succeeded',
+        editBookingData: action.payload,
+      }))
+      .addCase(getBookingsEditData.rejected, (state, action) => ({
+        ...state,
+        status: 'error',
+        error: action.error.message,
       }));
   },
 });
+
+export const { resetEditBookingData } = bookingsSlice.actions;
 
 export default bookingsSlice.reducer;

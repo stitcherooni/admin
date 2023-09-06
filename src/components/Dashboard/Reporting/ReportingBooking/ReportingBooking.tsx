@@ -37,7 +37,7 @@ import NestedMenu from '../../../shared/NestedMenu/NestedMenu';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import Select from '../../../shared/Select/Select';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { getBookingStat, sortBookingStat } from '../../../../redux/actions/reporting.actions';
+import { getBookingStat, getBookingsEditData, sortBookingStat } from '../../../../redux/actions/reporting.actions';
 import {
   createEventsOptions,
   createProductOptions,
@@ -50,6 +50,7 @@ import { BookingStatEvents, BookingStatGroupByFilter, BookingStatItem } from '..
 import { Order } from '../../../../types/reporting/orders';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
+import { resetEditBookingData } from '../../../../redux/slices/reporting/bookings.slice';
 
 interface Filter {
   value: number | string;
@@ -81,7 +82,11 @@ const ReportingBooking = () => {
   } = table.selection;
   const { handleRequestSort } = table.sorting;
   const [openUpdateBooking, setOpenUpdateBooking] = useState(false);
-  const toggleOpenUpdateBooking = () => setOpenUpdateBooking(!openUpdateBooking);
+  const toggleOpenUpdateBooking = (booking?: BookingStatItem | null) => {
+    if (!openUpdateBooking && booking?.id) dispatch(getBookingsEditData(booking));
+    else dispatch(resetEditBookingData());
+    setOpenUpdateBooking(!openUpdateBooking);
+  };
 
   const handleCloseUpdateBooking = (e: SyntheticEvent<HTMLDivElement>) => {
     handleCloseModal(e, toggleOpenUpdateBooking);
@@ -318,7 +323,7 @@ const ReportingBooking = () => {
                         <p>{row.num}</p>
                       </TableCell>
                       <TableCell className="first-name">
-                        <p>{row.firstName}</p>
+                        <p onClick={() => toggleOpenUpdateBooking(row)}>{row.firstName}</p>
                       </TableCell>
                       <TableCell className="last-name">
                         <p>{row.lastName}</p>
@@ -345,7 +350,7 @@ const ReportingBooking = () => {
                         <p>{row.quantity}</p>
                       </TableCell>
                       <TableCell className="order-id">
-                        <p>{row.orderId}</p>
+                        <p className="link" onClick={(e) => handleOrderDetailDrawer(e, row.order)}>{row.orderId}</p>
                       </TableCell>
                       <TableCell className="order-date">
                         <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
@@ -398,7 +403,7 @@ const ReportingBooking = () => {
           document.body,
         )
         : null}
-      {/* {!orderDetails ? null : (
+      {!orderDetails ? null : (
         <StyledDrawer
           anchor="right"
           open={orderDetailOpen}
@@ -408,10 +413,10 @@ const ReportingBooking = () => {
             handleClick={handleOrderDetailDrawer}
             handleKeydown={handleOrderDetailDrawer}
           >
-            <OrderDetails data={orderDetails} needsActions={false} />
+            <OrderDetails data={orderDetails} needsActions={false} type="booking" />
           </DrawerOverlay>
         </StyledDrawer>
-      )} */}
+      )}
     </Wrapper>
   );
 };

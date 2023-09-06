@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { axiosInstance, globalConfig } from '../../axios';
+import { BookingStatItem } from '../../types/reporting/bookings';
 
 const createQueryString = (obj: any) => {
   let query = '?';
@@ -23,7 +24,8 @@ export const getBankedStatTest = createAsyncThunk('reporting/getBankedStatTest',
 });
 
 export const getBookingStat = createAsyncThunk('reporting/getBookingsStat', async () => {
-  const url = '/Report/datareport?Type=bookings';
+  // const url = '/Report/datareport?Type=bookings';
+  const url = 'http://localhost:3000/bookings';
   const response = await axiosInstance.get(url);
   return response.data;
 });
@@ -32,6 +34,16 @@ export const getBookingFilters = createAsyncThunk('reporting/getBookingsFilters'
   const url = `/Report/bookingsfilters?OrganizationId=${organizationId}`;
   const response = await axiosInstance.get(url);
   return response.data;
+});
+
+export const getBookingsEditData = createAsyncThunk('reporting/getBookingsEditData', async (booking: BookingStatItem) => {
+  const productsUrl = `/Report/bookingproducts?BookingId=${booking.id}`;
+  const productsRes = await axiosInstance.get(productsUrl);
+
+  const questionsUrl = `/Report/bookingquestionsandanswers?BookingId=${booking.id}`;
+  const questionsRes = await axiosInstance.get(questionsUrl);
+
+  return { products: productsRes.data, questions: questionsRes.data, selectedBooking: booking };
 });
 
 export const sortBookingStat = createAsyncThunk('reporting/sortBookingStat', async (params: any) => {

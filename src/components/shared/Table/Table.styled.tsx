@@ -91,7 +91,7 @@ export const Cell = styled.td`
     overflow: hidden;
   }
 
-  & a {
+  & a, & .link {
     font-weight: 700;
     color: ${(props) => props.theme.colors.main.purple};
   }

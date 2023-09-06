@@ -4,6 +4,13 @@ export interface BookingsStatProps {
   data: BookingStatItem[];
   totalProductQuantity: number;
   filters: BookingStatFilters | null;
+  editBookingData: EditBookingData;
+}
+
+export interface EditBookingData {
+  products: any;
+  questions: any;
+  selectedBooking: BookingStatItem;
 }
 
 export interface BookingStatItem {
@@ -15,7 +22,7 @@ export interface BookingStatItem {
   sku: number;
   currency?: string;
   price: number;
-  quantity: string;
+  quantity: number;
   orderId: number;
   customerName: string;
   bookingName: string;
