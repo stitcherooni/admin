@@ -9,7 +9,7 @@ import ButtonIconPdf from '../../../../assets/icons/button-icon-pdf';
 
 export const headCells = [
   {
-    id: 'row-id',
+    id: 'num',
     label: '##',
     className: 'row-id',
   },
@@ -64,7 +64,7 @@ export const headCells = [
     className: 'order-id',
   },
   {
-    id: 'orderDate',
+    id: 'date',
     label: 'Order Date',
     className: 'order-date',
   },

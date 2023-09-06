@@ -1,5 +1,5 @@
 import React, {
-  ChangeEvent, SyntheticEvent, useMemo, useState,
+  ChangeEvent, SyntheticEvent, useMemo, useRef, useState,
 } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { SelectChangeEvent } from '@mui/material/Select';
 import dayjs from 'dayjs';
+import InputAdornment from '@mui/material/InputAdornment';
 import {
   Col,
   Filters,
@@ -19,6 +20,7 @@ import {
   Head,
   Wrapper,
   Button,
+  StyledInput,
 } from './ReportingBooking.styled';
 import {
   Row,
@@ -26,7 +28,7 @@ import {
   StyledTableWrapper,
   TableWrapper,
 } from '../../../shared/Table/Table.styled';
-import { useSortingTable } from '../../../shared/Table/utils';
+import { copyTable, useSortingTable } from '../../../shared/Table/utils';
 import { headCells, menuActionsOptions, tableActionsOptions } from './table-data';
 import { Overlay, StyledDrawer } from '../Reporting.styled';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
@@ -39,9 +41,13 @@ import Select from '../../../shared/Select/Select';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { getBookingStat, sortBookingStat } from '../../../../redux/actions/reporting.actions';
 import {
+  convertBookingItems,
   createEventsOptions,
   createProductOptions,
   createSortByOptions,
+  getAvailableColumns,
+  getBookingItemsIds,
+  getSortingOrdering,
   handleCloseModal,
 } from './utils';
 import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
@@ -50,6 +56,11 @@ import { BookingStatEvents, BookingStatGroupByFilter, BookingStatItem } from '..
 import { Order } from '../../../../types/reporting/orders';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
+import { Input } from '../../../shared/Input/Input.styled';
+import BookingRandomModal from './BookingRandomModal/BookingRandomModal';
+import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
+import { downloadFile } from '../../../../utils/file';
+import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
 
 interface Filter {
   value: number | string;
@@ -74,7 +85,8 @@ const ReportingBooking = () => {
     totalPages: bookingData.totalPages,
     pageSize: bookingData.pageSize,
     currentPage: bookingData.currentPage,
-  });
+    columns: headCells,
+  }, convertBookingItems);
   const { page, pagesCount, rowsPerPage } = table.pagination;
   const {
     selected, handleSelectAllClick, checkIsSelected, handleClick,
@@ -85,6 +97,13 @@ const ReportingBooking = () => {
 
   const handleCloseUpdateBooking = (e: SyntheticEvent<HTMLDivElement>) => {
     handleCloseModal(e, toggleOpenUpdateBooking);
+  };
+
+  const [showRandom, setShowRandom] = useState(false);
+  const toggleShowRandom = () => setShowRandom(!openUpdateBooking);
+
+  const handleCloseRandom = (e: SyntheticEvent<HTMLDivElement>) => {
+    handleCloseModal(e, toggleShowRandom);
   };
 
   const [openQflowModal, setQflowModalOpen] = useState(false);
@@ -189,6 +208,10 @@ const ReportingBooking = () => {
     setOrderDetails(order);
   };
 
+  const { updateSearchText, isFound, isSearching } = table.search;
+  const tableRef = useRef(null);
+  const { columnsOptions, visibleColumns, updateColumnsOptions } = table.customization;
+
   // add button 'show test bookings'
   // add logic for column sorting
   // add logic for table customization
@@ -207,6 +230,85 @@ const ReportingBooking = () => {
   // filters group by should be array, not object
 
   // we neednt high requirements for filters, group by or other not required
+
+  const [openCustomizeMenu, setOpenCustomizeMenu] = useState(false);
+  const closeCustomizeMenu = () => {
+    setOpenCustomizeMenu(false);
+  };
+
+  const [error, setError] = useState<null | string>(null);
+
+  const actionsMenuOptions = useMemo(
+    () => menuActionsOptions.map((item) => {
+      switch (item.value) {
+        case 'customize-view':
+          return { ...item, handleClick: () => setOpenCustomizeMenu(true) };
+        case 'excel':
+          return {
+            ...item,
+            handleClick: () => downloadFile(
+              '/Report/bookingsexcel',
+              'excel.xls',
+              {
+                ids: getBookingItemsIds(table.visibleRows),
+                columns: getAvailableColumns(table.customization.visibleColumns),
+                ordering: getSortingOrdering(
+                  table.sorting.filters,
+                  headCells,
+                ), // objects, key - field name, value - asc | desc
+              },
+              setError,
+            ),
+          };
+        case 'pdf':
+          return {
+            ...item,
+            handleClick: () => downloadFile(
+              '/Report/bookingspdf',
+              'report.pdf',
+              {
+                ids: getBookingItemsIds(table.visibleRows),
+                columns: getAvailableColumns(table.customization.visibleColumns),
+                ordering: getSortingOrdering(
+                  table.sorting.filters,
+                  headCells,
+                ), // objects, key - field name, value - asc | desc
+              },
+              setError,
+            ),
+          };
+        // case 'test-transactions':
+        //   return !showTestTransactions ? {
+        //     ...item,
+        //     handleClick: () => {
+        //       const fn = getFetchBankedFn(true);
+        //       setShowTestTransactions(true);
+        //       dispatch(fn({ page: 1, pageSize: rowsPerPage }));
+        //     },
+        //   } : null;
+        // case 'live-transactions':
+        //   return showTestTransactions ? {
+        //     ...item,
+        //     handleClick: () => {
+        //       const fn = getFetchBankedFn(false);
+        //       setShowTestTransactions(false);
+        //       dispatch(fn({ page: 1, pageSize: rowsPerPage }));
+        //     },
+        //   } : null;
+        case 'copy': {
+          return {
+            ...item,
+            handleClick: () => copyTable(tableRef),
+          };
+        }
+        default:
+          return item;
+      }
+    }).filter((item) => item),
+    [menuActionsOptions],
+  );
+
+  const actionsMenuRef = useRef(null);
 
   return bookingData.status === 'loading' ? <LoadingOverlay /> : (
     <Wrapper>
@@ -271,8 +373,20 @@ const ReportingBooking = () => {
           </FiltersWrapper>
         </div>
         <div>
-          <SearchBarWrapper className="search-wrapper">
-            <ActionsMenu options={menuActionsOptions} />
+          <SearchBarWrapper className="search-wrapper" ref={actionsMenuRef}>
+            <StyledInput
+              name="search"
+              placeholder="Search by table columns"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <ZoomIconSmall />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={updateSearchText}
+            />
+            <ActionsMenu options={actionsMenuOptions} />
           </SearchBarWrapper>
         </div>
       </Filters>
@@ -285,13 +399,13 @@ const ReportingBooking = () => {
         </TableCaption>
         <TableWrapper>
           <StyledTableWrapper>
-            <Table sx={{ minWidth: 320 }} aria-labelledby="tableTitle" size="small">
+            <Table sx={{ minWidth: 320 }} aria-labelledby="tableTitle" size="small" ref={tableRef}>
               <Head
                 numSelected={selected.length}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={bookingData.data.length}
-                cells={headCells}
+                cells={visibleColumns ?? []}
                 className="table-head"
                 checkbox={false}
               />
@@ -304,16 +418,8 @@ const ReportingBooking = () => {
                     <Row
                       tabIndex={-1}
                       key={row.num}
+                      className={table.visibleRows.length - 1 === index ? 'last' : ''}
                     >
-                      {/* <TableCell className="checkbox">
-                        <StyledCheckbox
-                          checked={isItemSelected}
-                          inputProps={{
-                            'aria-labelledby': labelId,
-                          }}
-                          size="small"
-                        />
-                      </TableCell> */}
                       <TableCell className="row-id">
                         <p>{row.num}</p>
                       </TableCell>
@@ -367,6 +473,13 @@ const ReportingBooking = () => {
                       </TableCell>
                     </Row>
                   ))}
+                {!isFound && isSearching ? (
+                  <Row className="last">
+                    <TableCell className="not-found">
+                      <p>No matches records found</p>
+                    </TableCell>
+                  </Row>
+                ) : null}
               </TableBody>
             </Table>
           </StyledTableWrapper>
@@ -390,6 +503,14 @@ const ReportingBooking = () => {
           document.body,
         )
         : null}
+      {showRandom
+        ? createPortal(
+          <Overlay onClick={handleCloseRandom} className="overlay">
+            <BookingRandomModal handleClose={toggleShowRandom} />
+          </Overlay>,
+          document.body,
+        )
+        : null}
       {openQflowModal
         ? createPortal(
           <Overlay onClick={handleCloseQflowModal} className="overlay">
@@ -398,6 +519,15 @@ const ReportingBooking = () => {
           document.body,
         )
         : null}
+      {actionsMenuRef.current && openCustomizeMenu ? (
+        <CustomizeTableColumnsPopup
+          anchorEl={actionsMenuRef.current}
+          open={openCustomizeMenu}
+          onClose={closeCustomizeMenu}
+          options={columnsOptions}
+          updatePopup={updateColumnsOptions}
+        />
+      ) : null}
       {/* {!orderDetails ? null : (
         <StyledDrawer
           anchor="right"

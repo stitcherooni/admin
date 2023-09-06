@@ -178,6 +178,8 @@ export const useSortingTable = <T extends {}>(rows: T[],
     setSelected([]);
   };
 
+  console.log(rows.length);
+
   const checkIsSelected = (id: string) => selected.indexOf(id) !== -1;
 
   const handleClick = (event: any, id: string) => {
