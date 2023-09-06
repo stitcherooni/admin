@@ -29,13 +29,13 @@ export const getBookingStat = createAsyncThunk('reporting/getBookingsStat', asyn
 });
 
 export const getTestBookingStat = createAsyncThunk('reporting/getTestBookingStat', async () => {
-  const url = '/Report/datareport?Type=bookingtest';
+  const url = '/Report/datareport?Type=bookingstest';
   const response = await axiosInstance.get(url);
   return response.data;
 });
 
 export const getRandomBookingStat = createAsyncThunk('reporting/getRandomBookingStat', async (count: number) => {
-  const url = `/Report/datareport?Type=bookingrandom&Count=${count}`;
+  const url = `/Report/datareport?Type=randombookings&Count=${count}`;
   const response = await axiosInstance.get(url);
   return response.data;
 });

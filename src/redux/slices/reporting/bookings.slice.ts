@@ -18,7 +18,6 @@ const initialState: BookingInitialState = {
   filters: null,
   data: [],
   testData: [],
-  randomData: [],
   totalProductQuantity: 0,
   error: null,
 };
@@ -71,7 +70,7 @@ export const bookingsSlice = createSlice({
       .addCase(getTestBookingStat.fulfilled, (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
         ...state,
         status: 'succeeded',
-        testData: action.payload.testData,
+        testData: action.payload.data,
         error: null,
       }))
       .addCase(getTestBookingStat.rejected, (state, action) => ({
@@ -86,7 +85,7 @@ export const bookingsSlice = createSlice({
       .addCase(getRandomBookingStat.fulfilled, (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
         ...state,
         status: 'succeeded',
-        randomData: action.payload.randomData,
+        data: action.payload.data,
         error: null,
       }))
       .addCase(getRandomBookingStat.rejected, (state, action) => ({

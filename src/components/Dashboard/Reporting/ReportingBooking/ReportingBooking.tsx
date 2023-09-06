@@ -86,9 +86,13 @@ interface ReportingFilters {
 
 const ReportingBooking = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const [showTestBookings, setShowTestBookings] = useState(false);
+
   const bookingData = useSelector((state: RootState) => state.reporting.bookings);
-  const table = useSortingTable<BookingStatItem>(
-    bookingData.data,
+  const rows = useMemo(() => {
+    return !showTestBookings ? bookingData.data ?? [] : bookingData.testData ?? []
+  }, [showTestBookings, bookingData]);
+  const table = useSortingTable<BookingStatItem>(rows,
     {
       totalCount: bookingData.totalCount,
       totalPages: bookingData.totalPages,
@@ -252,7 +256,6 @@ const ReportingBooking = () => {
   };
 
   const [error, setError] = useState<null | string>(null);
-  const [showTestBookings, setShowTestBookings] = useState(false);
 
   const actionsMenuOptions = useMemo(
     () => menuActionsOptions
@@ -436,11 +439,17 @@ const ReportingBooking = () => {
         </div>
       </Filters>
       <TableContent>
+        {!error ? null : (
+          <>
+            <Alert type="error">{error}</Alert>
+            <br />
+          </>
+        )}
         <TableCaption>
           <p>
-            <strong>{`${bookingData.data.length} `}</strong>
+            <strong>{`${table.visibleRows.length} `}</strong>
             {`${
-              bookingData.data.length === 0 || bookingData.data.length > 1 ? 'Entries' : 'Entry'
+              table.visibleRows.length === 0 || table.visibleRows.length > 1 ? 'Entries' : 'Entry'
             }`}
           </p>
         </TableCaption>
@@ -451,7 +460,7 @@ const ReportingBooking = () => {
                 numSelected={selected.length}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={bookingData.data.length}
+                rowCount={rows?.length}
                 cells={visibleColumns ?? []}
                 className="table-head"
                 checkbox={false}
@@ -558,7 +567,7 @@ const ReportingBooking = () => {
               </TableBody>
             </Table>
           </StyledTableWrapper>
-          {!bookingData.data.length ? null : (
+          {!bookingData.data?.length ? null : (
             <TablePagination
               handleChangePage={changePage}
               handleChangeRowsPerPage={changeRowsPerPage}

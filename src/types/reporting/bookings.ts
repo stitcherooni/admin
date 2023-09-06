@@ -3,7 +3,6 @@ import { Order } from './orders';
 export interface BookingsStatProps {
   data: BookingStatItem[];
   testData: BookingStatItem[];
-  randomData: BookingStatItem[];
   totalProductQuantity: number;
   filters: BookingStatFilters | null;
 }
