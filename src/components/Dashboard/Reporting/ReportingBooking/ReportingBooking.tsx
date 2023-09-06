@@ -333,8 +333,6 @@ const ReportingBooking = () => {
 
   const actionsMenuRef = useRef(null);
 
-  console.log(showRandom);
-
   return bookingData.status === 'loading' ? (
     <LoadingOverlay />
   ) : (
@@ -520,7 +518,7 @@ const ReportingBooking = () => {
                     ) : null}
                     {columnsOptions.get('orderId')?.checked ? (
                       <TableCell className="order-id">
-                        <p>{row.orderId}</p>
+                        <p onClick={(e) => handleOrderDetailDrawer(e, row.order)}>{row.orderId}</p>
                       </TableCell>
                     ) : null}
                     {columnsOptions.get('date')?.checked ? (
@@ -605,7 +603,7 @@ const ReportingBooking = () => {
           updatePopup={updateColumnsOptions}
         />
       ) : null}
-      {/* {!orderDetails ? null : (
+      {!orderDetails ? null : (
         <StyledDrawer
           anchor="right"
           open={orderDetailOpen}
@@ -615,10 +613,10 @@ const ReportingBooking = () => {
             handleClick={handleOrderDetailDrawer}
             handleKeydown={handleOrderDetailDrawer}
           >
-            <OrderDetails data={orderDetails} needsActions={false} />
+            <OrderDetails data={orderDetails} needsActions={false} type="booking" />
           </DrawerOverlay>
         </StyledDrawer>
-      )} */}
+      )}
     </Wrapper>
   );
 };

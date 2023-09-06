@@ -84,6 +84,10 @@ export const InitAuthComponent = ({ instance }: InitAuthComponentProps) => {
           instance.loginRedirect(resetPasswordRequest);
         }
       }
+
+      if (event.error && (event.error as AuthError).errorMessage.includes('AADB2C90080')) {
+        instance.logoutRedirect({ postLogoutRedirectUri: document.location.href.split('//')[1] });
+      }
     });
 
     return () => {
