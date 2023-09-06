@@ -345,7 +345,7 @@ const ReportingBooking = () => {
                         <p>{row.quantity}</p>
                       </TableCell>
                       <TableCell className="order-id">
-                        <p>{row.orderId}</p>
+                        <p onClick={(e) => handleOrderDetailDrawer(e, row.order)}>{row.orderId}</p>
                       </TableCell>
                       <TableCell className="order-date">
                         <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
@@ -398,7 +398,7 @@ const ReportingBooking = () => {
           document.body,
         )
         : null}
-      {/* {!orderDetails ? null : (
+      {!orderDetails ? null : (
         <StyledDrawer
           anchor="right"
           open={orderDetailOpen}
@@ -408,10 +408,10 @@ const ReportingBooking = () => {
             handleClick={handleOrderDetailDrawer}
             handleKeydown={handleOrderDetailDrawer}
           >
-            <OrderDetails data={orderDetails} needsActions={false} />
+            <OrderDetails data={orderDetails} needsActions={false} type="booking" />
           </DrawerOverlay>
         </StyledDrawer>
-      )} */}
+      )}
     </Wrapper>
   );
 };
