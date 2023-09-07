@@ -84,7 +84,7 @@ describe('Reporting Bookings', () => {
     });
 
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Export Doors Validation List/));
+    await userEvent.click(screen.getByText(/Customize View/));
 
     await waitFor(() => {
       columnsNames.forEach((item) => {
@@ -107,7 +107,7 @@ describe('Reporting Bookings', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Export Doors Validation List/));
+    await userEvent.click(screen.getByText(/Customize View/));
     await userEvent.click(screen.getByDisplayValue('##'));
 
     await waitFor(() => {
@@ -135,7 +135,7 @@ describe('Reporting Bookings', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Export Doors Validation List/));
+    await userEvent.click(screen.getByText(/Customize View/));
     await userEvent.click(screen.getByDisplayValue('##'));
     await userEvent.click(screen.getByDisplayValue('##'));
 

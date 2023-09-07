@@ -403,7 +403,7 @@ export const menuActionsOptions = [
   },
   {
     value: 'customize-view',
-    label: 'Export Doors Validation List',
+    label: 'Customize View',
     icon: <TuneOutlined className="customize-view" />,
   },
   {
