@@ -1,11 +1,12 @@
 import React, {
-  ChangeEvent, SyntheticEvent, useMemo, useState,
+  ChangeEvent, SyntheticEvent, useMemo, useRef, useState,
 } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { SelectChangeEvent } from '@mui/material/Select';
+import InputAdornment from '@mui/material/InputAdornment';
 import {
   Col,
   Filters,
@@ -19,10 +20,11 @@ import {
   Wrapper,
   TableWrapper,
   Button,
+  StyledInput,
 } from './ReportingChildBooking.styled';
 import { Row, StyledTableWrapper } from '../../../shared/Table/Table.styled';
-import { useSortingTable } from '../../../shared/Table/utils';
-import { headCells, menuActionsOptions, rows } from './table-data';
+import { copyTable, useSortingTable } from '../../../shared/Table/utils';
+import { headCells, menuActionsOptions } from './table-data';
 import { Overlay } from '../Reporting.styled';
 import Label from '../../../shared/Label/Label';
 import NestedMenu from '../../../shared/NestedMenu/NestedMenu';
@@ -33,9 +35,16 @@ import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { createEventsOptions, handleCloseModal } from '../ReportingBooking/utils';
 import { getChildBookingStat, sortChildBookingStat } from '../../../../redux/actions/reporting.actions';
-import { createSortByOptions } from './utils';
+import {
+  createSortByOptions, getAvailableColumns,
+  getChildBookingItemsIds, getFetchChildBookingsFn, getSortingOrdering,
+} from './utils';
 import QflowModal from '../QflowModal/QflowModal';
 import { BookingStatEvents, ChildBookingStatItem } from '../../../../types/reporting/bookings';
+import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
+import { downloadFile } from '../../../../utils/file';
+import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
+import { updateSelectedFilters } from '../../../../redux/slices/reporting/childBookings.slice';
 
 interface Filter {
   value: number | string;
@@ -53,14 +62,20 @@ interface ReportingFilters {
 
 const ReportingChildBooking = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const [showTestBookings, setShowTestBookings] = useState(false);
   const childBookingData = useSelector((state: RootState) => state.reporting.childBookings);
-  const table = useSortingTable<ChildBookingStatItem>(childBookingData.data, {
-    totalCount: childBookingData.totalCount,
-    totalPages: childBookingData.totalPages,
-    pageSize: childBookingData.pageSize,
-    currentPage: childBookingData.currentPage,
-  });
-  const { page, pagesCount, rowsPerPage } = table.pagination;
+  const headCols = useMemo(() => {
+    if (childBookingData.selectedFilters.groupBy !== 'noGroup') {
+      return headCells.filter((item) => item.id !== 'class');
+    }
+
+    return headCells;
+  }, [childBookingData.selectedFilters.groupBy, headCells]);
+  const rows = useMemo(() => (!showTestBookings ? childBookingData.data ??
+     [] : childBookingData.testData ?? []), [showTestBookings, childBookingData]);
+  const table = useSortingTable<ChildBookingStatItem>(rows, { columns: headCols, totalCount: rows.length });
+  const { page, pagesCount, rowsPerPage, totalRows, 
+    handleChangePage, handleChangeRowsPerPage } = table.pagination;
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
   const [openUpdateBooking, setOpenUpdateBooking] = useState(false);
@@ -77,18 +92,10 @@ const ReportingChildBooking = () => {
     handleCloseModal(e, toggleOpenQflowModal);
   };
 
-  const [filters, setSelectedFilters] = useState<ReportingFilters>({
-    event: {
-      value: '',
-      year: '',
-      label: '',
-    },
-    groupBy: '',
-  });
   const handleChooseEvent = (e: any) => {
     const { value, label, rootid } = e.currentTarget.dataset;
-    setSelectedFilters((currentFilters) => ({
-      ...currentFilters,
+    dispatch(updateSelectedFilters({
+      ...childBookingData.selectedFilters,
       event: {
         value,
         label,
@@ -97,22 +104,18 @@ const ReportingChildBooking = () => {
     }));
     dispatch(sortChildBookingStat({
       EventIds: value,
-      GroupBy: filters.groupBy ?? '',
-      page: childBookingData.currentPage,
-      pageSize: childBookingData.pageSize,
+      GroupBy: childBookingData.selectedFilters.groupBy ?? '',
     }));
   };
 
   const handleSelectFilters = (e: any) => {
-    setSelectedFilters((currentFilters) => ({
-      ...currentFilters,
+    dispatch(updateSelectedFilters({
+      ...childBookingData.selectedFilters,
       groupBy: e.target.value,
     }));
     dispatch(sortChildBookingStat({
-      EventIds: filters.event?.value ?? '',
-      GroupBy: filters.groupBy ?? '',
-      page: childBookingData.currentPage,
-      pageSize: childBookingData.pageSize,
+      EventIds: childBookingData.selectedFilters.event?.value ?? '',
+      GroupBy: e.target.value ?? '',
     }));
   };
 
@@ -162,6 +165,96 @@ const ReportingChildBooking = () => {
     [childBookingData?.filters?.groupBy],
   );
 
+  const { updateSearchText, isFound, isSearching } = table.search;
+  const tableRef = useRef(null);
+  const { columnsOptions, visibleColumns, updateColumnsOptions } = table.customization;
+
+  const [openCustomizeMenu, setOpenCustomizeMenu] = useState(false);
+  const closeCustomizeMenu = () => {
+    setOpenCustomizeMenu(false);
+  };
+
+  const [error, setError] = useState<null | string>(null);
+
+  const actionsMenuOptions = useMemo(
+    () => menuActionsOptions
+      .map((item) => {
+        switch (item.value) {
+          case 'customize-view':
+            return { ...item, handleClick: () => setOpenCustomizeMenu(true) };
+          case 'excel':
+            return {
+              ...item,
+              handleClick: () => downloadFile(
+                '/Report/childonlybookingsexcel',
+                'excel.xls',
+                {
+                  ids: getChildBookingItemsIds(table.visibleRows),
+                  columns: getAvailableColumns(table.customization.visibleColumns),
+                  ordering: getSortingOrdering(table.sorting.filters, headCols), // objects, key - field name, value - asc | desc
+                },
+                setError,
+              ),
+            };
+          case 'pdf':
+            return {
+              ...item,
+              handleClick: () => downloadFile(
+                '/Report/childonlybookingspdf',
+                'report.pdf',
+                {
+                  ids: getChildBookingItemsIds(table.visibleRows),
+                  columns: getAvailableColumns(table.customization.visibleColumns),
+                  ordering: getSortingOrdering(table.sorting.filters, headCols), // objects, key - field name, value - asc | desc
+                },
+                setError,
+              ),
+            };
+          case 'test-bookings':
+            return !showTestBookings
+              ? {
+                ...item,
+                handleClick: () => {
+                  const fn = getFetchChildBookingsFn(true);
+                  setShowTestBookings(true);
+                  dispatch(fn({
+                    eventIds: childBookingData.selectedFilters.event?.value ?? '',
+                    groupBy: childBookingData.selectedFilters.groupBy ?? '',
+                  }));
+                },
+              }
+              : null;
+          case 'live-bookings':
+            return showTestBookings
+              ? {
+                ...item,
+                handleClick: () => {
+                  const fn = getFetchChildBookingsFn(false);
+                  setShowTestBookings(false);
+                  dispatch(fn({
+                    eventIds: childBookingData.selectedFilters.event?.value ?? '',
+                    groupBy: childBookingData.selectedFilters.groupBy ?? '',
+                  }));
+                },
+              }
+              : null;
+          case 'copy': {
+            return {
+              ...item,
+              handleClick: () => copyTable(tableRef),
+            };
+          }
+
+          default:
+            return item;
+        }
+      })
+      .filter((item) => item),
+    [menuActionsOptions, showTestBookings],
+  );
+
+  const actionsMenuRef = useRef(null);
+
   // group by filter should be array
   // not need on url product id params
 
@@ -184,6 +277,28 @@ const ReportingChildBooking = () => {
           <Button onClick={toggleOpenQflowModal}>See more information</Button>
         </p>
       </StyledAlert>
+      {childBookingData?.error || error ? (
+        <>
+          <br />
+          <StyledAlert type="error">
+            {process.env.NODE_ENV === 'development' ? childBookingData?.error : error ?? 'Something went wrong'}
+          </StyledAlert>
+        </>
+      ) : null}
+      {!showTestBookings ? null : (
+        <>
+          <br />
+          <StyledAlert type="warning" testid="test-bookings">
+            Warning: You are viewing
+            {' '}
+            <strong>test</strong>
+            {' '}
+            bookings
+          </StyledAlert>
+          <br />
+        </>
+      )}
+      {childBookingData.selectedFilters.event.year === '' || !table.visibleRows.length ? <StyledAlert type="warning">There are no bookings</StyledAlert> : null}
       <Filters>
         <div>
           <Label
@@ -199,9 +314,9 @@ const ReportingChildBooking = () => {
               <p className="filter-title">Event</p>
               <NestedMenu
                 options={eventOptions}
-                rootId={!filters?.event ? null : filters?.event.year}
-                buttonLabel={!filters?.event ? null : filters?.event.label}
-                selectedId={!filters?.event ? null : filters?.event.value}
+                rootId={!childBookingData.selectedFilters?.event ? null : childBookingData.selectedFilters?.event.year}
+                buttonLabel={!childBookingData.selectedFilters?.event ? null : childBookingData.selectedFilters?.event.label}
+                selectedId={!childBookingData.selectedFilters?.event ? null : childBookingData.selectedFilters?.event.value}
                 handleChoose={handleEventChange}
                 placeholder="Select Event"
               />
@@ -210,88 +325,141 @@ const ReportingChildBooking = () => {
               <p className="filter-title">Group By</p>
               <Select
                 options={groupByOptions}
-                value={filters?.groupBy}
+                value={childBookingData.selectedFilters?.groupBy}
                 onChange={handleGroupByChange}
                 placeholder="Group By"
               />
             </Col>
           </FiltersWrapper>
         </div>
-        <div>
-          <SearchBarWrapper className="search-wrapper">
-            <ActionsMenu options={menuActionsOptions} />
-          </SearchBarWrapper>
-        </div>
-      </Filters>
-      <TableContent>
-        <TableCaption>
-          <p>
-            <strong>{`${childBookingData.totalCount} `}</strong>
-            {`${childBookingData.totalCount === 0 || childBookingData.totalCount > 1 ? 'Entries' : 'Entry'}`}
-          </p>
-        </TableCaption>
-        <TableWrapper>
-          <StyledTableWrapper>
-            <Table sx={{ minWidth: 320 }} aria-labelledby="tableTitle" size="small">
-              <Head
-                numSelected={selected.length}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleRequestSort}
-                rowCount={rows.length}
-                cells={headCells}
-                className="table-head"
-                checkbox={false}
-              />
-              <TableBody>
-                <Row sx={{ cursor: 'pointer' }}>
-                  <TableCell className="total">
-                    <strong>0 Sold</strong>
-                  </TableCell>
-                </Row>
-                {table.visibleRows.map((row) => (
-                  <Row key={row.num}>
-                    <TableCell className="first-name">
-                      <p>{row.firstName}</p>
-                    </TableCell>
-                    <TableCell className="last-name">
-                      <p>{row.lastName}</p>
-                    </TableCell>
-                    <TableCell className="booked-by">
-                      <p>{row.bookedBy}</p>
-                    </TableCell>
-                    <TableCell className="medical">
-                      <p>{row.allergies}</p>
-                    </TableCell>
-                    <TableCell className="phone">
-                      <p>{row.phone}</p>
-                    </TableCell>
-                  </Row>
-                ))}
-              </TableBody>
-            </Table>
-          </StyledTableWrapper>
-          <TablePagination
-            handleChangePage={changePage}
-            handleChangeRowsPerPage={changeRowsPerPage}
-            page={page}
-            pagesCount={pagesCount}
-            rowsPerPage={rowsPerPage}
-            options={[5, 10, 25]}
+        <SearchBarWrapper className="search-wrapper" ref={actionsMenuRef}>
+          <StyledInput
+            name="search"
+            placeholder="Search by table columns"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <ZoomIconSmall />
+                </InputAdornment>
+              ),
+            }}
+            onChange={updateSearchText}
           />
-        </TableWrapper>
-      </TableContent>
-      {/* {openDeleteModal
-        ? createPortal(
-          <Overlay onClick={handleCloseDeleteModal} className="overlay">
-            <DeleteConfirmationModal
-              deleteItemName={namesToDelete}
-              confirm={console.log}
-              cancel={console.log}
+          <ActionsMenu options={actionsMenuOptions} />
+        </SearchBarWrapper>
+      </Filters>
+      {childBookingData.selectedFilters.event?.year !== '' || !table.visibleRows.length ? (
+        <TableContent>
+          <TableCaption>
+            <p>
+              <strong>{`${totalRows} `}</strong>
+              {`${totalRows === 0 || totalRows > 1 ? 'Entries' : 'Entry'}`}
+            </p>
+          </TableCaption>
+          <TableWrapper>
+            <StyledTableWrapper>
+              <Table sx={{ minWidth: 320 }} aria-labelledby="tableTitle" size="small" ref={tableRef}>
+                <Head
+                  numSelected={selected.length}
+                  onSelectAllClick={handleSelectAllClick}
+                  onRequestSort={handleRequestSort}
+                  rowCount={rows.length}
+                  cells={visibleColumns}
+                  className="table-head"
+                  checkbox={false}
+                />
+                <TableBody>
+                  {childBookingData.selectedFilters.groupBy !== 'noGroup' && table.visibleRows.length ? (
+                    <Row>
+                      {columnsOptions.get('firstName')?.checked ? (
+                        <TableCell className="first-name hidden sum" />
+                      ) : null}
+                      {columnsOptions.get('lastName')?.checked ? (
+                        <TableCell className="last-name hidden sum" />
+                      ) : null}
+                      {columnsOptions.get('class')?.checked && childBookingData.selectedFilters.groupBy === 'noGroup' ? (
+                        <TableCell className="class hidden sum" />
+                      ) : null}
+                      {columnsOptions.get('bookedBy')?.checked ? (
+                        <TableCell className="booked-by hidden sum" />
+                      ) : null}
+                      {columnsOptions.get('allergies')?.checked ? (
+                        <TableCell className="medical hidden sum" />
+                      ) : null}
+                      {columnsOptions.get('phone')?.checked ? (
+                        <TableCell className="phone hidden sum">
+                          <strong>{`${childBookingData.soldQuantity} Sold`}</strong>
+                        </TableCell>
+                      ) : null}
+                    </Row>
+                  ) : null}
+                  {table.visibleRows.map((row, i) => (
+                    <Row
+                      key={row.num}
+                      className={table.visibleRows.length - 1 === i ? 'last' : ''}
+                    >
+                      {columnsOptions.get('firstName')?.checked ? (
+                        <TableCell className="first-name">
+                          <p>{row.firstName}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('lastName')?.checked ? (
+                        <TableCell className="last-name">
+                          <p>{row.lastName}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('class')?.checked && childBookingData.selectedFilters.groupBy === 'noGroup' ? (
+                        <TableCell className="class">
+                          <p>{row.class}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('bookedBy')?.checked ? (
+                        <TableCell className="booked-by">
+                          <p>{row.bookedBy}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('allergies')?.checked ? (
+                        <TableCell className="medical">
+                          <p>{row.allergies}</p>
+                        </TableCell>
+                      ) : null}
+                      {columnsOptions.get('phone')?.checked ? (
+                        <TableCell className="phone">
+                          <p>{row.phone}</p>
+                        </TableCell>
+                      ) : null}
+                    </Row>
+                  ))}
+                  {!isFound && isSearching ? (
+                    <Row className="last">
+                      <TableCell className="not-found" extended={childBookingData.selectedFilters.groupBy === 'noGroup'}>
+                        <p>No matches records found</p>
+                      </TableCell>
+                    </Row>
+                  ) : null}
+                </TableBody>
+              </Table>
+            </StyledTableWrapper>
+            <TablePagination
+              handleChangePage={handleChangePage}
+              handleChangeRowsPerPage={handleChangeRowsPerPage}
+              page={page}
+              pagesCount={pagesCount}
+              rowsPerPage={rowsPerPage}
+              options={[5, 10, 25]}
             />
-          </Overlay>,
-          document.body,
-        )
-        : null} */}
+          </TableWrapper>
+        </TableContent>
+      ) : null}
+      {actionsMenuRef.current && openCustomizeMenu ? (
+        <CustomizeTableColumnsPopup
+          anchorEl={actionsMenuRef.current}
+          open={openCustomizeMenu}
+          onClose={closeCustomizeMenu}
+          options={columnsOptions}
+          updatePopup={updateColumnsOptions}
+        />
+      ) : null}
       {openQflowModal
         ? createPortal(
           <Overlay onClick={handleCloseQflowModal} className="overlay">

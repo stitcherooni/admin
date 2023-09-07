@@ -2,28 +2,42 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import {
   getChildBookingFilters,
   getChildBookingStat,
+  getTestChildBookingStat,
   sortChildBookingStat,
 } from '../../actions/reporting.actions';
 import { ChildBookingFilters, ChildOnlyBookingsStatProps } from '../../../types/reporting/bookings';
+import { ReportingFiltersChildBookings } from '../../../components/Dashboard/Reporting/ReportingChildBooking/ReportingChildBooking';
 
-interface ReportingInitialState extends ChildOnlyBookingsStatProps {
+export interface ReportingChildBookingsInitialState extends ChildOnlyBookingsStatProps {
   status: string;
+  error?: string | null;
+  selectedFilters: ReportingFiltersChildBookings;
 }
 
-const initialState: ReportingInitialState = {
+const initialState: ReportingChildBookingsInitialState = {
   status: 'loading',
   data: [],
-  totalCount: 10,
-  totalPages: 1,
-  currentPage: 1,
-  pageSize: 10,
+  testData: [],
+  soldQuantity: 0,
   filters: null,
+  selectedFilters: {
+    event: {
+      value: '',
+      year: '',
+      label: '',
+    },
+    groupBy: '',
+  } as ReportingFiltersChildBookings,
 };
 
 const childBookingsSlice = createSlice({
   name: 'childBookings',
   initialState,
-  reducers: {},
+  reducers: {
+    updateSelectedFilters: (state, action) => {
+      state.selectedFilters = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(getChildBookingStat.pending, (state) => ({
@@ -32,17 +46,34 @@ const childBookingsSlice = createSlice({
       }))
       .addCase(
         getChildBookingStat.fulfilled,
-        (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
+        (state, action: PayloadAction<Omit<ReportingChildBookingsInitialState, 'status'>>) => ({
           ...state,
           status: 'succeeded',
           data: action.payload.data,
-          totalCount: action.payload.totalCount,
-          totalPages: action.payload.totalPages,
-          currentPage: action.payload.currentPage,
-          pageSize: action.payload.pageSize,
+          soldQuantity: action.payload.soldQuantity,
+          error: null,
         }),
       )
       .addCase(getChildBookingStat.rejected, (state, action) => ({
+        ...state,
+        status: 'error',
+        error: action.error.message,
+      }))
+      .addCase(getTestChildBookingStat.pending, (state) => ({
+        ...state,
+        status: 'loading',
+      }))
+      .addCase(
+        getTestChildBookingStat.fulfilled,
+        (state, action: PayloadAction<Omit<ReportingChildBookingsInitialState, 'status'>>) => ({
+          ...state,
+          status: 'succeeded',
+          testData: action.payload.data,
+          soldQuantity: action.payload.soldQuantity,
+          error: null,
+        }),
+      )
+      .addCase(getTestChildBookingStat.rejected, (state, action) => ({
         ...state,
         status: 'error',
         error: action.error.message,
@@ -53,14 +84,12 @@ const childBookingsSlice = createSlice({
       }))
       .addCase(
         sortChildBookingStat.fulfilled,
-        (state, action: PayloadAction<Omit<ReportingInitialState, 'status'>>) => ({
+        (state, action: PayloadAction<Omit<ReportingChildBookingsInitialState, 'status'>>) => ({
           ...state,
           status: 'succeeded',
           data: action.payload.data,
-          totalCount: action.payload.totalCount,
-          totalPages: action.payload.totalPages,
-          currentPage: action.payload.currentPage,
-          pageSize: action.payload.pageSize,
+          soldQuantity: action.payload.soldQuantity,
+          error: null,
         }),
       )
       .addCase(sortChildBookingStat.rejected, (state, action) => ({
@@ -78,6 +107,7 @@ const childBookingsSlice = createSlice({
           ...state,
           status: 'succeeded',
           filters: action.payload,
+          error: null,
         }),
       )
       .addCase(getChildBookingFilters.rejected, (state, action) => ({
@@ -87,5 +117,7 @@ const childBookingsSlice = createSlice({
       }));
   },
 });
+
+export const { updateSelectedFilters } = childBookingsSlice.actions;
 
 export default childBookingsSlice.reducer;

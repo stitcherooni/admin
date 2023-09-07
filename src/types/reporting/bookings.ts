@@ -65,10 +65,8 @@ export interface BookingStatGroupByFilter {
 
 export interface ChildOnlyBookingsStatProps {
   data: ChildBookingStatItem[];
-  totalCount: number;
-  totalPages: number;
-  currentPage: number;
-  pageSize: number;
+  testData: ChildBookingStatItem[];
+  soldQuantity: number;
   filters: ChildBookingFilters | null;
 }
 
@@ -81,6 +79,7 @@ export interface ChildBookingStatItem {
   allergies: string[];
   phone: number;
   soldQuantity: number;
+  class?: string;
 }
 
 export interface ChildBookingFilters {

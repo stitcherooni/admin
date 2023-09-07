@@ -66,6 +66,7 @@ const NestedMenu = (props: NestedMenuProps) => {
                   <SubList className="sub-list">
                     {item.subMenu?.map((option) => (
                       <ListItem
+                        data-testid="test"
                         className={`list-item sub-item ${option.value.toString() === props.selectedId ? 'selected' : ''}`}
                         key={option.value}
                         onClick={selectItem}

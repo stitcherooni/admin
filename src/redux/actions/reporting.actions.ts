@@ -73,6 +73,13 @@ export const sortChildBookingStat = createAsyncThunk('reporting/sortChildBooking
   return data;
 });
 
+export const getTestChildBookingStat = createAsyncThunk('reporting/getTestChildBookingStat', async (params: any) => {
+  const baseUrl = '/api/Report/sortchildbookings';
+  const response = await fetch(baseUrl + createQueryString(params));
+  const data = await response.json();
+  return data;
+});
+
 export const getCustomersStat = createAsyncThunk('reporting/getCustomersStat', async (params: any = null) => {
   const url = `/api/Report/datareport?Type=customers&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
   const response = await fetch(url);

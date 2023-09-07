@@ -1,5 +1,5 @@
 import React from 'react';
-import ShuffleOutlinedIcon from '@mui/icons-material/ShuffleOutlined';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { ContentCopyOutlined, TuneOutlined } from '@mui/icons-material';
 import { theme } from '../../../../styles/defaultTheme';
 import MessageIcon from '../../../../assets/icons/message-icon';
@@ -7,14 +7,19 @@ import ButtonIconPdf from '../../../../assets/icons/button-icon-pdf';
 
 export const headCells = [
   {
-    id: 'first-name',
+    id: 'firstName',
     label: 'First Name',
     className: 'first-name',
   },
   {
-    id: 'last-name',
+    id: 'lastName',
     label: 'Last Name',
     className: 'last-name',
+  },
+  {
+    id: 'class',
+    label: 'Class',
+    className: 'class',
   },
   {
     id: 'bookedBy',
@@ -22,7 +27,7 @@ export const headCells = [
     className: 'booked-by',
   },
   {
-    id: 'medical',
+    id: 'allergies',
     label: 'Dietary / Medical',
     className: 'medical',
   },
@@ -82,9 +87,29 @@ export const groupByOptions = [
 
 export const menuActionsOptions = [
   {
+    value: 'test-bookings',
+    label: 'Show Test Bookings',
+    icon: <ShoppingCartOutlinedIcon className="test-orders" />,
+  },
+  {
+    value: 'live-bookings',
+    label: 'Show Live Bookings',
+    icon: <ShoppingCartOutlinedIcon className="test-orders" />,
+  },
+  {
+    value: 'customize-view',
+    label: 'Customize View',
+    icon: <TuneOutlined className="customize-view" />,
+  },
+  {
     value: 'copy',
     label: 'Copy',
     icon: <ContentCopyOutlined className="copy" />,
+  },
+  {
+    value: 'excel',
+    label: 'Export Excel',
+    icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {
     value: 'pdf',

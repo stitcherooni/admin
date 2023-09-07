@@ -6,4 +6,6 @@ export const server = setupServer(
   rest.post('/api/Report/bankedsexcel', null as any),
   rest.get('/api/Report/datareport', null as any),
   rest.get('/api/Report/testbankedreport', null as any),
+  rest.get('/api/Report/sortchildbookings', null as any),
+
 );

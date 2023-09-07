@@ -112,7 +112,7 @@ const useTableCustomization = (columns: CellProps[]) => {
   };
   const visibleColumns = useMemo(() => {
     if (!columns.length) return [];
-    return columns.filter((item) => columnsOptions.get(item.id).checked);
+    return columns.filter((item) => columnsOptions.get(item.id)?.checked);
   }, [columns, columnsOptions]);
 
   return { columnsOptions, updateColumnsOptions, visibleColumns };
@@ -159,7 +159,7 @@ export const useSortingTable = <T extends {}>(rows: T[],
   } = useTableSearching(
     {
       rows,
-      converted: convertCb ? convertCb(rows) : [],
+      converted: convertCb ? convertCb(rows) : rows,
     },
     other?.columns?.map((item) => item.id) ?? [],
   );

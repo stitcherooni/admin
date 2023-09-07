@@ -4,6 +4,7 @@ import Alert from '../../../shared/Alert/Alert';
 import TableHeadSorting from '../../../shared/Table/TableHeadSorting/TableHeadSorting';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import { BaseButton } from '../../../shared/Buttons/Buttons.styled';
+import { Input } from '../../../shared/Input/Input.styled';
 
 export const Wrapper = styled.div``;
 
@@ -67,7 +68,7 @@ export const SearchBarWrapper = styled.div`
     width: initial;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     justify-content: flex-end;
     padding-right: 0;
 
@@ -103,7 +104,8 @@ export const Head = styled(TableHeadSorting)`
   &.table-head {
     & .first-name,
     & .last-name,
-    & .booked-by {
+    & .booked-by,
+    & .class {
       width: 140px;
     }
 
@@ -122,7 +124,8 @@ export const Head = styled(TableHeadSorting)`
     &.table-head {
       & .first-name,
       & .last-name,
-      & .booked-by {
+      & .booked-by,
+      & .class {
         width: 12.7%;
         min-width: 140px;
       }
@@ -140,7 +143,7 @@ export const Head = styled(TableHeadSorting)`
   }
 `;
 
-export const TableCell = styled(Cell)`
+export const TableCell = styled(Cell)<{ extended?: boolean }>`
   &.checkbox {
     width: 40px;
     min-width: 40px;
@@ -148,7 +151,8 @@ export const TableCell = styled(Cell)`
 
   &.first-name,
   &.last-name,
-  &.booked-by {
+  &.booked-by,
+  &.class {
     width: 140px;
   }
 
@@ -161,13 +165,13 @@ export const TableCell = styled(Cell)`
     border-right: 1px solid rgba(122, 81, 145, 0.4);
   }
 
-  &.total {
-    width: 85.37%;
-    padding-right: 24px;
-    justify-content: flex-end;
+  &.sum {
     color: ${(props) => props.theme.colors.main.brightGreen};
     background-color: ${(props) => props.theme.colors.main.lightGreen};
-    border-right: 1px solid rgba(122, 81, 145, 0.4);
+  }
+
+  &.not-found {
+    width: 100%;
   }
 
   &.hidden {
@@ -177,7 +181,8 @@ export const TableCell = styled(Cell)`
   @media screen and (min-width: 1280px) {
     &.first-name,
     &.last-name,
-    &.booked-by {
+    &.booked-by,
+    &.class {
       width: 12.7%;
       min-width: 140px;
     }
@@ -191,10 +196,16 @@ export const TableCell = styled(Cell)`
       width: 18.69%;
       min-width: 206px;
     }
+    
+    &.not-found {
+      width: ${(props) => (!props.extended ? '85.37%' : 'calc(100% - 33px)')};
+    }
   }
 `;
 
 export const StyledAlert = styled(Alert)`
+  margin-top: 16px;
+
   &.booking-alert {
     margin-right: 16px;
   }
@@ -231,5 +242,35 @@ export const Button = styled(BaseButton)`
     border: none;
     text-decoration: underline;
     color: ${(props) => props.theme.colors.main.purple};
+  }
+`;
+
+export const StyledInput = styled(Input)`
+  &.search-input {
+    display: none;
+  }
+
+  & .MuiInputBase-root.MuiInputBase-formControl {
+      height: 40px;
+    }
+
+    & .MuiInputBase-input.MuiOutlinedInput-input {
+      padding: 0;
+
+      &::placeholder {
+        color: ${(props) => props.theme.colors.main.black};
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 20px;
+        opacity: 1;
+      }
+    }
+
+  @media screen and (min-width: 1280px) {
+    &.search-input {
+      display: block;
+    }
+
+    width: 320px;
   }
 `;
