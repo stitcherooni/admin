@@ -25,11 +25,10 @@ import {
 } from './ReportingBooking.styled';
 import {
   Row,
-  StyledCheckbox,
   StyledTableWrapper,
   TableWrapper,
 } from '../../../shared/Table/Table.styled';
-import { copyTable, useSortingTable } from '../../../shared/Table/utils';
+import { useSortingTable } from '../../../shared/Table/utils';
 import { headCells, menuActionsOptions, tableActionsOptions } from './table-data';
 import { Overlay, StyledDrawer } from '../Reporting.styled';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
@@ -40,7 +39,7 @@ import NestedMenu from '../../../shared/NestedMenu/NestedMenu';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import Select from '../../../shared/Select/Select';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { getBookingStat, sortBookingStat } from '../../../../redux/actions/reporting.actions';
+import { sortBookingStat } from '../../../../redux/actions/reporting.actions';
 import {
   convertBookingItems,
   createEventsOptions,
@@ -54,20 +53,10 @@ import {
 } from './utils';
 import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
-import {
-  BookingStatEvents,
-  BookingStatGroupByFilter,
-  BookingStatItem,
-} from '../../../../types/reporting/bookings';
+import { BookingStatEvents, BookingStatGroupByFilter, BookingStatItem } from '../../../../types/reporting/bookings';
 import { Order } from '../../../../types/reporting/orders';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
-import { Input } from '../../../shared/Input/Input.styled';
-import BookingRandomModal from './BookingRandomModal/BookingRandomModal';
-import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
-import { downloadFile } from '../../../../utils/file';
-import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
-import Alert from '../../../shared/Alert/Alert';
 
 interface Filter {
   value: number | string;
@@ -89,19 +78,12 @@ const ReportingBooking = () => {
   const [showTestBookings, setShowTestBookings] = useState(false);
 
   const bookingData = useSelector((state: RootState) => state.reporting.bookings);
-  const rows = useMemo(() => {
-    return !showTestBookings ? bookingData.data ?? [] : bookingData.testData ?? []
-  }, [showTestBookings, bookingData]);
-  const table = useSortingTable<BookingStatItem>(rows,
-    {
-      totalCount: bookingData.totalCount,
-      totalPages: bookingData.totalPages,
-      pageSize: bookingData.pageSize,
-      currentPage: bookingData.currentPage,
-      columns: headCells,
-    },
-    convertBookingItems,
-  );
+  const table = useSortingTable<BookingStatItem>(bookingData.data, {
+    totalCount: bookingData.totalCount,
+    totalPages: bookingData.totalPages,
+    pageSize: bookingData.pageSize,
+    currentPage: bookingData.currentPage,
+  });
   const { page, pagesCount, rowsPerPage } = table.pagination;
   const {
     selected, handleSelectAllClick, checkIsSelected, handleClick,
@@ -150,15 +132,13 @@ const ReportingBooking = () => {
         year: rootid,
       },
     }));
-    dispatch(
-      sortBookingStat({
-        EventIds: value,
-        ProductIds: filters.product ?? '',
-        GroupBy: filters.groupBy ?? '',
-        page: bookingData.currentPage,
-        pageSize: bookingData.pageSize,
-      }),
-    );
+    dispatch(sortBookingStat({
+      EventIds: value,
+      ProductIds: filters.product ?? '',
+      GroupBy: filters.groupBy ?? '',
+      page: bookingData.currentPage,
+      pageSize: bookingData.pageSize,
+    }));
   };
 
   const handleSelectFilters = (e: any, type: string) => {
@@ -167,39 +147,18 @@ const ReportingBooking = () => {
       [type]: e.target.value,
     }));
 
-    dispatch(
-      sortBookingStat({
-        EventIds: filters.event?.value,
-        ProductIds: type === 'product' ? e.target.value : filters.product,
-        GroupBy: type === 'groupBy' ? e.target.value : filters.groupBy ?? '',
-        page: bookingData.currentPage,
-        pageSize: bookingData.pageSize,
-      }),
-    );
+    dispatch(sortBookingStat({
+      EventIds: filters.event?.value,
+      ProductIds: type === 'product' ? e.target.value : filters.product,
+      GroupBy: type === 'groupBy' ? e.target.value : filters.groupBy ?? '',
+      page: bookingData.currentPage,
+      pageSize: bookingData.pageSize,
+    }));
   };
 
   const handleEventChange = (e: any) => handleChooseEvent(e);
   const handleProductChange = (e: any) => handleSelectFilters(e, 'product');
   const handleGroupByChange = (e: any) => handleSelectFilters(e, 'groupBy');
-
-  const changePage = (e: ChangeEvent, newPage?: number) => {
-    e.preventDefault();
-    dispatch(
-      getBookingStat({
-        page: newPage,
-        pageSize: rowsPerPage,
-      }),
-    );
-  };
-
-  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(
-      getBookingStat({
-        page: 1,
-        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-      }),
-    );
-  };
 
   const eventOptions = useMemo(
     () => createEventsOptions(bookingData?.filters?.events ?? ([] as BookingStatEvents[])),
@@ -359,26 +318,6 @@ const ReportingBooking = () => {
           </Button>
         </p>
       </StyledAlert>
-      {bookingData?.error ? (
-        <>
-          <br />
-          <StyledAlert type="error">
-            {process.env.NODE_ENV === 'development' ? bookingData?.error : 'Something went wrong'}
-          </StyledAlert>
-        </>
-      ) : null}
-      {!showTestBookings ? null : (
-        <>
-          <br />
-          <StyledAlert type="warning" testid="test-bookings">
-            Warning: You are viewing <strong>test</strong> bookings
-          </StyledAlert>
-          <br />
-        </>
-      )}
-      {!table.visibleRows.length ? (
-        <StyledAlert type="warning">There are no bookings</StyledAlert>
-      ) : null}
       <Filters>
         <div>
           <Label
@@ -447,10 +386,8 @@ const ReportingBooking = () => {
         )}
         <TableCaption>
           <p>
-            <strong>{`${table.visibleRows.length} `}</strong>
-            {`${
-              table.visibleRows.length === 0 || table.visibleRows.length > 1 ? 'Entries' : 'Entry'
-            }`}
+            <strong>{`${bookingData.totalProductQuantity} `}</strong>
+            {`${bookingData.totalProductQuantity === 0 || bookingData.totalProductQuantity > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -460,8 +397,8 @@ const ReportingBooking = () => {
                 numSelected={selected.length}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={rows?.length}
-                cells={visibleColumns ?? []}
+                rowCount={bookingData.data.length}
+                cells={headCells}
                 className="table-head"
                 checkbox={false}
               />
@@ -567,10 +504,10 @@ const ReportingBooking = () => {
               </TableBody>
             </Table>
           </StyledTableWrapper>
-          {!bookingData.data?.length ? null : (
+          { !bookingData.totalProductQuantity ? null : (
             <TablePagination
-              handleChangePage={changePage}
-              handleChangeRowsPerPage={changeRowsPerPage}
+              handleChangePage={handleChangePage}
+              handleChangeRowsPerPage={handleChangeRowsPerPage}
               page={page}
               pagesCount={pagesCount}
               rowsPerPage={rowsPerPage}
