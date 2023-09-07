@@ -361,6 +361,8 @@ export const TableCell = styled(Cell)`
 `;
 
 export const StyledAlert = styled(Alert)`
+  margin: 16px 0;
+
   &.booking-alert {
     margin-right: 16px;
   }

@@ -25,12 +25,11 @@ import {
 } from './ReportingBooking.styled';
 import {
   Row,
-  StyledCheckbox,
   StyledTableWrapper,
   TableWrapper,
 } from '../../../shared/Table/Table.styled';
 import { copyTable, useSortingTable } from '../../../shared/Table/utils';
-import { headCells, menuActionsOptions, tableActionsOptions } from './table-data';
+import { headCells, menuActionsOptions } from './table-data';
 import { Overlay, StyledDrawer } from '../Reporting.styled';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
 import BookingEditModal from './BookingEditModal/BookingEditModal';
@@ -40,7 +39,7 @@ import NestedMenu from '../../../shared/NestedMenu/NestedMenu';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import Select from '../../../shared/Select/Select';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { getBookingStat, sortBookingStat } from '../../../../redux/actions/reporting.actions';
+import { sortBookingStat } from '../../../../redux/actions/reporting.actions';
 import {
   convertBookingItems,
   createEventsOptions,
@@ -56,13 +55,11 @@ import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import {
   BookingStatEvents,
-  BookingStatGroupByFilter,
   BookingStatItem,
 } from '../../../../types/reporting/bookings';
 import { Order } from '../../../../types/reporting/orders';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
-import { Input } from '../../../shared/Input/Input.styled';
 import BookingRandomModal from './BookingRandomModal/BookingRandomModal';
 import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
 import { downloadFile } from '../../../../utils/file';
@@ -89,20 +86,18 @@ const ReportingBooking = () => {
   const [showTestBookings, setShowTestBookings] = useState(false);
 
   const bookingData = useSelector((state: RootState) => state.reporting.bookings);
-  const rows = useMemo(() => {
-    return !showTestBookings ? bookingData.data ?? [] : bookingData.testData ?? []
-  }, [showTestBookings, bookingData]);
-  const table = useSortingTable<BookingStatItem>(rows,
+  const rows = useMemo(() => (!showTestBookings ? bookingData.data ?? [] : bookingData.testData ?? []), [showTestBookings, bookingData]);
+  const table = useSortingTable<BookingStatItem>(
+    rows,
     {
-      totalCount: bookingData.totalCount,
-      totalPages: bookingData.totalPages,
-      pageSize: bookingData.pageSize,
-      currentPage: bookingData.currentPage,
       columns: headCells,
+      totalCount: rows.length,
     },
     convertBookingItems,
   );
-  const { page, pagesCount, rowsPerPage } = table.pagination;
+  const {
+    page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
+  } = table.pagination;
   const {
     selected, handleSelectAllClick, checkIsSelected, handleClick,
   } = table.selection;
@@ -155,8 +150,6 @@ const ReportingBooking = () => {
         EventIds: value,
         ProductIds: filters.product ?? '',
         GroupBy: filters.groupBy ?? '',
-        page: bookingData.currentPage,
-        pageSize: bookingData.pageSize,
       }),
     );
   };
@@ -172,8 +165,6 @@ const ReportingBooking = () => {
         EventIds: filters.event?.value,
         ProductIds: type === 'product' ? e.target.value : filters.product,
         GroupBy: type === 'groupBy' ? e.target.value : filters.groupBy ?? '',
-        page: bookingData.currentPage,
-        pageSize: bookingData.pageSize,
       }),
     );
   };
@@ -181,25 +172,6 @@ const ReportingBooking = () => {
   const handleEventChange = (e: any) => handleChooseEvent(e);
   const handleProductChange = (e: any) => handleSelectFilters(e, 'product');
   const handleGroupByChange = (e: any) => handleSelectFilters(e, 'groupBy');
-
-  const changePage = (e: ChangeEvent, newPage?: number) => {
-    e.preventDefault();
-    dispatch(
-      getBookingStat({
-        page: newPage,
-        pageSize: rowsPerPage,
-      }),
-    );
-  };
-
-  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(
-      getBookingStat({
-        page: 1,
-        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-      }),
-    );
-  };
 
   const eventOptions = useMemo(
     () => createEventsOptions(bookingData?.filters?.events ?? ([] as BookingStatEvents[])),
@@ -360,21 +332,14 @@ const ReportingBooking = () => {
         </p>
       </StyledAlert>
       {bookingData?.error ? (
-        <>
-          <br />
-          <StyledAlert type="error">
-            {process.env.NODE_ENV === 'development' ? bookingData?.error : 'Something went wrong'}
-          </StyledAlert>
-        </>
+        <StyledAlert type="error">
+          {process.env.NODE_ENV === 'development' ? bookingData?.error : 'Something went wrong'}
+        </StyledAlert>
       ) : null}
       {!showTestBookings ? null : (
-        <>
-          <br />
-          <StyledAlert type="warning" testid="test-bookings">
-            Warning: You are viewing <strong>test</strong> bookings
-          </StyledAlert>
-          <br />
-        </>
+        <StyledAlert type="warning" testid="test-bookings">
+          Warning: You are viewing <strong>test</strong> bookings
+        </StyledAlert>
       )}
       {!table.visibleRows.length ? (
         <StyledAlert type="warning">There are no bookings</StyledAlert>
@@ -447,9 +412,9 @@ const ReportingBooking = () => {
         )}
         <TableCaption>
           <p>
-            <strong>{`${table.visibleRows.length} `}</strong>
+            <strong>{`${totalRows} `}</strong>
             {`${
-              table.visibleRows.length === 0 || table.visibleRows.length > 1 ? 'Entries' : 'Entry'
+              totalRows === 0 || totalRows > 1 ? 'Entries' : 'Entry'
             }`}
           </p>
         </TableCaption>
@@ -460,7 +425,7 @@ const ReportingBooking = () => {
                 numSelected={selected.length}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={rows?.length}
+                rowCount={totalRows ?? 0}
                 cells={visibleColumns ?? []}
                 className="table-head"
                 checkbox={false}
@@ -567,10 +532,10 @@ const ReportingBooking = () => {
               </TableBody>
             </Table>
           </StyledTableWrapper>
-          {!bookingData.data?.length ? null : (
+          {!totalRows ? null : (
             <TablePagination
-              handleChangePage={changePage}
-              handleChangeRowsPerPage={changeRowsPerPage}
+              handleChangePage={handleChangePage}
+              handleChangeRowsPerPage={handleChangeRowsPerPage}
               page={page}
               pagesCount={pagesCount}
               rowsPerPage={rowsPerPage}

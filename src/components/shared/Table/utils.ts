@@ -5,11 +5,8 @@ import _orderBy from 'lodash.orderby';
 import { CellProps } from './TableHead/TableHead';
 
 interface SortingTableProps {
-  totalCount: number;
-  totalPages: number;
-  currentPage: number;
-  pageSize: number;
   columns?: CellProps[];
+  totalCount?: number;
 }
 
 type Order = 'desc' | 'asc';
@@ -166,8 +163,8 @@ export const useSortingTable = <T extends {}>(rows: T[],
     },
     other?.columns?.map((item) => item.id) ?? [],
   );
-  const [page, setPage] = useState(!other?.currentPage ? 1 : other?.currentPage);
-  const [rowsPerPage, setRowsPerPage] = useState(!other?.pageSize ? 10 : other?.pageSize);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -214,10 +211,10 @@ export const useSortingTable = <T extends {}>(rows: T[],
   const { convertedSort, handleRequestSort } = useTableSorting();
 
   const visibleRows = useMemo(
-    () => (!other ? _orderBy(rows, convertedSort.fields, convertedSort.orders).slice(
+    () => _orderBy(rows, convertedSort.fields, convertedSort.orders).slice(
       (page - 1) * rowsPerPage,
       (page - 1) * rowsPerPage + rowsPerPage,
-    ) : _orderBy(rows, convertedSort.fields, convertedSort.orders)),
+    ),
     [convertedSort, page, rowsPerPage, rows, other],
   );
 
@@ -225,8 +222,8 @@ export const useSortingTable = <T extends {}>(rows: T[],
     if (searchText.length) {
       return Math.ceil(foundData.length / rowsPerPage);
     }
-    return other?.totalPages ? other?.totalPages : Math.ceil(rows.length / rowsPerPage);
-  }, [rows.length, rowsPerPage, foundData, searchText, other?.totalPages]);
+    return Math.ceil(rows.length / rowsPerPage);
+  }, [rows.length, rowsPerPage, foundData, searchText]);
 
   const {
     columnsOptions, updateColumnsOptions,
@@ -245,12 +242,13 @@ export const useSortingTable = <T extends {}>(rows: T[],
       filters: convertedSort,
     },
     pagination: {
-      page: other?.currentPage ? other.currentPage : page,
+      page,
       handleChangePage,
-      rowsPerPage: other?.pageSize ? other.pageSize : rowsPerPage,
+      rowsPerPage,
       handleChangeRowsPerPage,
       pagesCount,
       pageSizes: [10, 25, 50, 100],
+      totalRows: !searchText.length ? other?.totalCount : foundData.length,
     },
     visibleRows: !searchText.length ? visibleRows : foundData as unknown as T[],
     customization: {
