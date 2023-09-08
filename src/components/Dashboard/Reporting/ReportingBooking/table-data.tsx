@@ -387,6 +387,11 @@ export const menuActionsOptions = [
     icon: <ShuffleOutlinedIcon className="random" />,
   },
   {
+    value: 'pdf-customize-view',
+    label: 'Export Doors Validation List',
+    icon: <TuneOutlined className="customize-view" />,
+  },
+  {
     value: 'test-bookings',
     label: 'Show Test Bookings',
     icon: <ShoppingCartOutlinedIcon className="test-orders" />,

@@ -69,7 +69,7 @@ describe('Reporting Bookings', () => {
     });
   });
 
-  test('if click by Export doors list should show customize menu', async () => {
+  test('if click by Customize View should show customize menu', async () => {
     act(() => {
       renderWithProviders(<ReportingBooking />, {
         preloadedState: {
@@ -172,6 +172,31 @@ describe('Reporting Bookings', () => {
       expect(screen.queryByText('Failed request to load file')).toBeInTheDocument();
     });
   });
+
+  test('if click by Export doors list should show customize menu', async () => {
+    act(() => {
+      renderWithProviders(<ReportingBooking />, {
+        preloadedState: {
+          reporting: {
+            bookings: {
+              status: 'successed',
+              data: rows,
+            } as unknown as BookingInitialState,
+          },
+        },
+      });
+    });
+
+    await userEvent.click(screen.getByText(/Actions/));
+    await userEvent.click(screen.getByText(/Export Doors Validation List/));
+
+    server.use(rest.post('/api/Report/bookingsexcel', async (req, res, ctx) => res(ctx.status(400), ctx.json({ message: 'Failed request to load file' }))));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Failed request to load file')).toBeInTheDocument();
+    });
+  });
+
 
   test('if request failed should show error message', async () => {
     act(() => {

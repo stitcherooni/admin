@@ -253,7 +253,21 @@ const ReportingBooking = () => {
             return {
               ...item,
               handleClick: () => downloadFile(
-                '/Report/bookingspdf',
+                '/Report/bookingspdf?format=table',
+                'report.pdf',
+                {
+                  ids: getBookingItemsIds(table.visibleRows),
+                  columns: getAvailableColumns(table.customization.visibleColumns),
+                  ordering: getSortingOrdering(table.sorting.filters, headCells), // objects, key - field name, value - asc | desc
+                },
+                setError,
+              ),
+            };
+            case 'pdf-customize-view':
+            return {
+              ...item,
+              handleClick: () => downloadFile(
+                '/Report/bookingspdf?format=doorValidation',
                 'report.pdf',
                 {
                   ids: getBookingItemsIds(table.visibleRows),
