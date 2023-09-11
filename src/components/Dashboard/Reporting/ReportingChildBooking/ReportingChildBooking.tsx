@@ -33,18 +33,19 @@ import TablePagination from '../../../shared/Table/TablePagination/TablePaginati
 import Select from '../../../shared/Select/Select';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { createEventsOptions, handleCloseModal } from '../ReportingBooking/utils';
+import { createEventsOptions } from '../ReportingBooking/utils';
 import { getChildBookingStat, sortChildBookingStat } from '../../../../redux/actions/reporting.actions';
 import {
   createSortByOptions, getAvailableColumns,
   getChildBookingItemsIds, getFetchChildBookingsFn, getSortingOrdering,
 } from './utils';
-import QflowModal from '../QflowModal/QflowModal';
 import { BookingStatEvents, ChildBookingStatItem } from '../../../../types/reporting/bookings';
 import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
 import { downloadFile } from '../../../../utils/file';
 import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
 import { updateSelectedFilters } from '../../../../redux/slices/reporting/childBookings.slice';
+import { handleCloseModal } from '../../../../utils/modals';
+import Qflow from '../Qflow/Qflow';
 
 interface Filter {
   value: number | string;
@@ -83,13 +84,6 @@ const ReportingChildBooking = () => {
 
   const handleCloseUpdateBooking = (e: SyntheticEvent<HTMLDivElement>) => {
     handleCloseModal(e, toggleOpenUpdateBooking);
-  };
-
-  const [openQflowModal, setQflowModalOpen] = useState(false);
-  const toggleOpenQflowModal = () => setQflowModalOpen(!openQflowModal);
-
-  const handleCloseQflowModal = (e: SyntheticEvent<HTMLDivElement>) => {
-    handleCloseModal(e, toggleOpenQflowModal);
   };
 
   const handleChooseEvent = (e: any) => {
@@ -260,23 +254,7 @@ const ReportingChildBooking = () => {
 
   return (
     <Wrapper>
-      <StyledAlert type="success" className="booking-alert">
-        <p>
-          Good news
-          {' '}
-          <strong>Test User</strong>
-          , we’ve integrated with
-          {' '}
-          <a href="https://www.getqflow.com/features" target="_blank" rel="noreferrer">
-            Qflow
-          </a>
-          {' '}
-          which is a simple and intuitive ticket scanning and guest list app that you can use to
-          scan your guests in to your events.
-          <br />
-          <Button onClick={toggleOpenQflowModal}>See more information</Button>
-        </p>
-      </StyledAlert>
+      <Qflow />
       {childBookingData?.error || error ? (
         <>
           <br />
@@ -460,14 +438,6 @@ const ReportingChildBooking = () => {
           updatePopup={updateColumnsOptions}
         />
       ) : null}
-      {openQflowModal
-        ? createPortal(
-          <Overlay onClick={handleCloseQflowModal} className="overlay">
-            <QflowModal handleClose={toggleOpenQflowModal} />
-          </Overlay>,
-          document.body,
-        )
-        : null}
     </Wrapper>
   );
 };

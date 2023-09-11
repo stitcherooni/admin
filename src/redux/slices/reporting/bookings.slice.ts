@@ -7,10 +7,12 @@ import {
   sortBookingStat,
 } from '../../actions/reporting.actions';
 import { BookingsStatProps, BookingStatFilters } from '../../../types/reporting/bookings';
+import { ReportingBookingsFilters } from '../../../components/Dashboard/Reporting/ReportingBooking/ReportingBookingFilters';
 
 export interface BookingInitialState extends BookingsStatProps {
   status: string;
   error?: string | null;
+  selectedFilters: ReportingBookingsFilters;
 }
 
 const initialState: BookingInitialState = {
@@ -20,12 +22,28 @@ const initialState: BookingInitialState = {
   testData: [],
   totalProductQuantity: 0,
   error: null,
+  selectedFilters: {
+    event: {
+      value: '',
+      label: '',
+      year: '',
+    },
+    product: '',
+    groupBy: '',
+  },
 };
 
 export const bookingsSlice = createSlice({
   name: 'bookings',
   initialState,
-  reducers: {},
+  reducers: {
+    resetSelectedFilters: (state) => {
+      state.selectedFilters = initialState.selectedFilters;
+    },
+    updateSelectedFilters: (state, action) => {
+      state.selectedFilters = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(getBookingStat.pending, (state) => ({
@@ -110,5 +128,7 @@ export const bookingsSlice = createSlice({
       }));
   },
 });
+
+export const { resetSelectedFilters, updateSelectedFilters } = bookingsSlice.actions;
 
 export default bookingsSlice.reducer;

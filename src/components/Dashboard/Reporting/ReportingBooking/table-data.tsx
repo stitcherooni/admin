@@ -417,6 +417,11 @@ export const menuActionsOptions = [
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {
+    value: 'pdf-customize-view',
+    label: 'Export Doors Validation List',
+    icon: <ButtonIconPdf color={theme.colors.main.black} />,
+  },
+  {
     value: 'pdf',
     label: 'Export Pdf',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,

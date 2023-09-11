@@ -1,5 +1,6 @@
+/* eslint-disable react/jsx-one-expression-per-line */
 import React from 'react';
-import { Wrapper } from './QflowModal.styled';
+import { Wrapper } from './Qflow.styled';
 import QflowLogo from '../../../../assets/images/qflow-logo.svg';
 import IosLogo from '../../../../assets/images/ios-logo.png';
 import AndroidLogo from '../../../../assets/images/android-logo.png';
@@ -14,15 +15,10 @@ const QflowModal = (props: QflowModalProps) => (
     <img src={QflowLogo} alt="" className="logo" />
     <h3>Sync to Qflow</h3>
     <p>
-      We’ve integrated with
-      {' '}
-      <a href="#">Qflow</a>
-      {' '}
+      We’ve integrated with <a href="#">Qflow</a>
       which is a simple an intuitive ticket scanning and
       guest list app that you can sue to scan your guests in to your events. As
-      {' '}
       <strong>Friends of the Grove</strong>
-      {' '}
       is on our premium plan we have included this facility
       free of charge.
     </p>

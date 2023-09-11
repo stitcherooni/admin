@@ -42,7 +42,7 @@ interface BookingProduct {
 export interface BookingStatFilters {
   events: BookingStatEvents[];
   products: BookingStatProductFilter[];
-  groupBy: BookingStatGroupByFilter;
+  groupBy: BookingStatGroupByFilter[];
 }
 
 export interface BookingStatEvents {

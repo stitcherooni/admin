@@ -36,9 +36,9 @@ import TablePagination from '../../../shared/Table/TablePagination/TablePaginati
 import StatisticBar from '../StatisticBar/StatisticBar';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { getEmailTrackerStat } from '../../../../redux/actions/reporting.actions';
-import { handleCloseModal } from '../ReportingBooking/utils';
 import { Order } from '../../../../types/reporting/orders';
 import { EmailTrackerStatItem } from '../../../../types/reporting/emailTracker';
+import { handleCloseModal } from '../../../../utils/modals';
 
 const getStatusIcon = (row: any, field: string) => {
   switch (true) {

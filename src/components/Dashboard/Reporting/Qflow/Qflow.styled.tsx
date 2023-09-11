@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import Alert from '../../../shared/Alert/Alert';
+import { BaseButton } from '../../../shared/Buttons/Buttons.styled';
 
 export const Wrapper = styled.div`
   position: absolute;
@@ -59,5 +61,28 @@ export const Wrapper = styled.div`
     & .buttons-wrapper {
       flex-direction: row;
     }
+  }
+`;
+
+export const StyledAlert = styled(Alert)`
+  margin: 16px 0;
+
+  &.booking-alert {
+    margin-right: 16px;
+  }
+
+  @media screen and (min-width: 1280px) {
+    &.booking-alert {
+      margin: 24px 0 0 0;
+    }
+  }
+`;
+
+export const Button = styled(BaseButton)`
+  &.MuiButtonBase-root.MuiButton-root {
+    padding: 0;
+    border: none;
+    text-decoration: underline;
+    color: ${(props) => props.theme.colors.main.purple};
   }
 `;

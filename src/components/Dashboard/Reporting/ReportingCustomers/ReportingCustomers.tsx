@@ -36,8 +36,8 @@ import StatisticBar from '../StatisticBar/StatisticBar';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { getCustomersStat } from '../../../../redux/actions/reporting.actions';
 import { getCurrencyByCode } from '../../../../utils/currency';
-import { handleCloseModal } from '../ReportingBooking/utils';
 import { CustomerStatItem } from '../../../../types/reporting/customers';
+import { handleCloseModal } from '../../../../utils/modals';
 
 const ReportingCustomers = () => {
   const dispatch = useDispatch<AppDispatch>();

@@ -14,7 +14,6 @@ import * as utils from './utils';
 
 jest.spyOn(utils, 'getFetchBookingsFn');
 
-
 beforeAll(() => {
   server.listen({
     onUnhandledRequest: 'warn',
@@ -24,6 +23,22 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 const columnsNames = headCells.map((item) => item.label);
+const filters = {
+  events: {
+    2020: [{ eventId: '1', eventName: 1 }],
+  },
+  products: [{ productId: '1', productName: 'Test' }],
+  groupBy: [{ id: 'className', name: 'Class Name' }],
+};
+const selectedFilters = {
+  event: {
+    value: '1',
+    label: '1',
+    year: 2020,
+  },
+  product: '1',
+  groupBy: 'className',
+};
 
 describe('Reporting Bookings', () => {
   test('if we click by Select random we should see modal for choose random bookings counts', async () => {
@@ -34,6 +49,8 @@ describe('Reporting Bookings', () => {
             bookings: {
               status: 'successed',
               testData: rows,
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
@@ -56,6 +73,8 @@ describe('Reporting Bookings', () => {
             bookings: {
               status: 'successed',
               data: rows,
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
@@ -77,6 +96,8 @@ describe('Reporting Bookings', () => {
             bookings: {
               status: 'successed',
               data: rows,
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
@@ -101,6 +122,8 @@ describe('Reporting Bookings', () => {
             bookings: {
               status: 'successed',
               data: rows,
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
@@ -129,6 +152,8 @@ describe('Reporting Bookings', () => {
             bookings: {
               status: 'successed',
               data: rows,
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
@@ -150,7 +175,7 @@ describe('Reporting Bookings', () => {
     });
   });
 
-  test('if cant download file should show an error', async () => {
+  test('if cant download excel file should show an error', async () => {
     act(() => {
       renderWithProviders(<ReportingBooking />, {
         preloadedState: {
@@ -158,6 +183,8 @@ describe('Reporting Bookings', () => {
             bookings: {
               status: 'successed',
               data: rows,
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
@@ -173,6 +200,31 @@ describe('Reporting Bookings', () => {
     });
   });
 
+  test('if cant download Export Doors Validation List file should show an error', async () => {
+    act(() => {
+      renderWithProviders(<ReportingBooking />, {
+        preloadedState: {
+          reporting: {
+            bookings: {
+              status: 'successed',
+              data: rows,
+              filters,
+              selectedFilters,
+            } as unknown as BookingInitialState,
+          },
+        },
+      });
+    });
+    await userEvent.click(screen.getByText(/Actions/));
+    await userEvent.click(screen.getByText(/Export Doors Validation List/));
+
+    server.use(rest.post('/api/Report/bookingspdf', async (req, res, ctx) => res(ctx.status(400), ctx.json({ message: 'Failed request to load file' }))));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Failed request to load file')).toBeInTheDocument();
+    });
+  });
+
   test('if request failed should show error message', async () => {
     act(() => {
       renderWithProviders(<ReportingBooking />, {
@@ -182,6 +234,8 @@ describe('Reporting Bookings', () => {
               status: 'error',
               error: 'Error',
               data: rows,
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
@@ -201,6 +255,8 @@ describe('Reporting Bookings', () => {
             bookings: {
               status: 'successed',
               data: [],
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
@@ -219,6 +275,8 @@ describe('Reporting Bookings', () => {
             bookings: {
               status: 'successed',
               testData: rows,
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
@@ -241,6 +299,8 @@ describe('Reporting Bookings', () => {
             bookings: {
               status: 'successed',
               testData: rows,
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
@@ -270,6 +330,8 @@ describe('Reporting Bookings', () => {
             bookings: {
               status: 'successed',
               testData: rows,
+              filters,
+              selectedFilters,
             } as unknown as BookingInitialState,
           },
         },
