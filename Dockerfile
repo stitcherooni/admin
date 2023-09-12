@@ -6,11 +6,19 @@ RUN npm i
 COPY . ./
 RUN npm run build
 
+FROM node:18.15.0 as test
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm test > testresults.xml
+
 FROM httpd:alpine
 WORKDIR /usr/local/apache2/htdocs/
 RUN rm -rf ./*
 
 COPY --from=build /app/build/ .
+COPY --from=test /app/testresults.xml /app/testresults/testresults.xml
 COPY public/ /var/www/html/
 
 # Enable necessary Apache modules for proxying
