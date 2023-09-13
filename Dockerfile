@@ -13,7 +13,7 @@ RUN npm install
 COPY . .
 RUN npm test
 
-FROM httpd:alpine
+FROM docker.io/httpd:alpine
 WORKDIR /usr/local/apache2/htdocs/
 RUN rm -rf ./*
 

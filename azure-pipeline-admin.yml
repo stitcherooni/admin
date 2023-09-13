@@ -1,0 +1,39 @@
+trigger: none
+
+pool:
+  name: internal-agent
+
+variables:
+  tag: "$(Build.BuildId)"
+  appName: admin
+
+resources:
+  - repo: self
+
+stages:
+  - stage: Build
+    displayName: Build and push stage
+    jobs:
+      - job: Build
+        displayName: Build
+        variables:
+          - group: internal
+        steps:
+          - task: Bash@3
+            displayName: Build and Push Image to Azure Container Registry
+            inputs:
+              targetType: inline
+              script: |
+                podman build -f $(Build.SourcesDirectory)/Dockerfile -t $(appName):$(tag) .
+                podman create -ti --name $(appName) $(appName):$(tag)
+                podman cp $(appName):/app/testresults/ $(Build.ArtifactStagingDirectory)/testresults 
+                podman rm -fv $(appName)
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/testresults.xml'
+              searchFolder: '$(Build.ArtifactStagingDirectory)/testresults'
+              mergeTestResults: true
+              #failTaskOnFailedTests: true
+              testRunTitle: 'UnitTest'
