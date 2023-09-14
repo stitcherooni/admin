@@ -20,7 +20,7 @@ stages:
           - group: internal
         steps:
           - task: Bash@3
-            displayName: Build and Push Image to Azure Container Registry
+            displayName: Build and run Unit Test
             inputs:
               targetType: inline
               script: |
@@ -36,4 +36,4 @@ stages:
               searchFolder: '$(Build.ArtifactStagingDirectory)/testresults'
               mergeTestResults: true
               #failTaskOnFailedTests: true
-              testRunTitle: 'UnitTest'
+              testRunTitle: 'Unit Test Publish'
