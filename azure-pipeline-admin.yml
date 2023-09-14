@@ -37,3 +37,11 @@ stages:
               mergeTestResults: true
               #failTaskOnFailedTests: true
               testRunTitle: 'Unit Test Publish'
+
+          - task: Bash@3
+            displayName: Push Image to Azure Container Registry
+            inputs:
+              targetType: inline
+              script: |
+                podman login -u $(internalSP) -p $(internalSPSecret) $(acrName)
+                podman push $(appName):$(tag) $(acrName)/$(appName):$(tag)
