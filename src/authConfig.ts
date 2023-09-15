@@ -77,6 +77,11 @@ export const msalConfig = {
   },
 };
 
+const apiConfig = {
+  b2cScopes: ['https://apipitaevents.onmicrosoft.com/api-gateway/gateway.read'],
+  webApi: 'https://apipitaevents.onmicrosoft.com',
+};
+
 /**
  * Scopes you add here will be prompted for user consent during sign-in.
  * By default, MSAL.js will add OIDC scopes (openid, profile, email) to any login request.
@@ -84,7 +89,7 @@ export const msalConfig = {
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
  */
 export const loginRequest = {
-  scopes: [],
+  scopes: ['openid', ...apiConfig.b2cScopes],
 };
 
 /**
@@ -92,7 +97,7 @@ export const loginRequest = {
  * between applications by providing a "login_hint" property.
  */
 export const silentRequest = {
-  scopes: ['openid', 'profile'],
+  scopes: [...apiConfig.b2cScopes],
   loginHint: 'example@domain.net',
   cacheLookupPolicy: CacheLookupPolicy.Default, // will default to CacheLookupPolicy.Default if omitted
 };
