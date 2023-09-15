@@ -19,6 +19,10 @@ module.exports = {
   transformIgnorePatterns: [
     '<rootDir>/node_modules/(?!@azure/msal-react)'
   ],
+  reporters: [
+    'default',
+    ['jest-junit', {outputDirectory: 'reports', outputName: 'report.xml'}],
+  ],
    // to obtain access to the matchers.
   setupFilesAfterEnv: ['<rootDir>/src/tests-utils/setupTests.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
