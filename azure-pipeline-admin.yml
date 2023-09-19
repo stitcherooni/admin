@@ -35,7 +35,7 @@ stages:
               testResultsFiles: '**/testresults.xml'
               searchFolder: '$(Build.ArtifactStagingDirectory)/testresults'
               mergeTestResults: true
-              failTaskOnFailedTests: false
+              #failTaskOnFailedTests: false
               testRunTitle: 'Unit Test Publish'
 
           - task: Bash@3
