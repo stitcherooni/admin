@@ -1,49 +1,36 @@
 FROM node:18.0.0 as build
 WORKDIR /app
 
-COPY package.json ./
+COPY package*.json ./
 RUN npm i
 COPY . ./
-RUN npm run build
-
-FROM node:18.15.0 as test
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm test
+RUN npm run build && npm test
 
 FROM docker.io/httpd:alpine
 WORKDIR /usr/local/apache2/htdocs/
-RUN rm -rf ./*
 
+RUN rm -rf ./*
 COPY --from=build /app/build/ .
-COPY --from=test /app/reports/report.xml /app/testresults/testresults.xml
+COPY --from=build /app/reports/report.xml /app/testresults/testresults.xml
 COPY public/ /var/www/html/
 
 # Enable necessary Apache modules for proxying
-RUN sed -i '/#LoadModule proxy_module/s/^#//g' /usr/local/apache2/conf/httpd.conf
-RUN sed -i '/#LoadModule proxy_http_module/s/^#//g' /usr/local/apache2/conf/httpd.conf
-RUN sed -i '/#LoadModule proxy_connect_module/s/^#//g' /usr/local/apache2/conf/httpd.conf
-RUN sed -i '/#LoadModule ssl_module/s/^#//g' /usr/local/apache2/conf/httpd.conf
-RUN sed -i '/#LoadModule socache_shmcb_module/s/^#//g' /usr/local/apache2/conf/httpd.conf
+RUN sed -i -E '/#?(LoadModule (proxy|ssl|socache_shmcb)_module)/s/#//g' /usr/local/apache2/conf/httpd.conf
 
 # Configure SSL support for the reverse proxy
-RUN echo "SSLProxyEngine On" >> /usr/local/apache2/conf/httpd.conf
-RUN echo "SSLProxyVerify none" >> /usr/local/apache2/conf/httpd.conf
-RUN echo "SSLProxyCheckPeerCN off" >> /usr/local/apache2/conf/httpd.conf
-RUN echo "SSLProxyCheckPeerName off" >> /usr/local/apache2/conf/httpd.conf
-RUN echo "SSLProxyCheckPeerExpire off" >> /usr/local/apache2/conf/httpd.conf
+RUN echo "SSLProxyEngine On" >> /usr/local/apache2/conf/httpd.conf \
+    && echo "SSLProxyVerify none" >> /usr/local/apache2/conf/httpd.conf \
+    && echo "SSLProxyCheckPeerCN off" >> /usr/local/apache2/conf/httpd.conf \
+    && echo "SSLProxyCheckPeerName off" >> /usr/local/apache2/conf/httpd.conf \
+    && echo "SSLProxyCheckPeerExpire off" >> /usr/local/apache2/conf/httpd.conf
 
 # Modify Apache configuration to serve index.html for all routes on port 4000
 RUN sed -i 's#DirectoryIndex index.html#DirectoryIndex index.html\n    ErrorDocument 404 /index.html#' /usr/local/apache2/conf/httpd.conf
 
 # Configure reverse proxy for /api
-RUN echo 'ProxyPass "/api" "https://ptaeventsgateway.azurewebsites.net/api"' >> /usr/local/apache2/conf/httpd.conf
-RUN echo 'ProxyPassReverse "/api" "https://ptaeventsgateway.azurewebsites.net/api"' >> /usr/local/apache2/conf/httpd.conf
-
-# Set the ServerName directive to suppress the warning
-RUN echo "ServerName localhost" >> /usr/local/apache2/conf/httpd.conf
+RUN echo 'ProxyPass "/api" "https://ptaeventsgateway.azurewebsites.net/api/onboarding"' >> /usr/local/apache2/conf/httpd.conf \
+    && echo 'ProxyPassReverse "/api" "https://ptaeventsgateway.azurewebsites.net/api/onboarding"' >> /usr/local/apache2/conf/httpd.conf \
+    && echo "ServerName localhost" >> /usr/local/apache2/conf/httpd.conf
 
 # Expose port 4000
 EXPOSE 4000
