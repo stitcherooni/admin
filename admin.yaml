@@ -1,0 +1,81 @@
+# Deployment Manifest
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $(appName)
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: $(appName)
+  template:
+    metadata:
+      labels:
+        app: $(appName)
+    spec:
+      containers:
+        - name: $(appName)
+          image: azcentralcr.azurecr.io/$(appName):$(tag)
+          ports:
+            - containerPort: 4000
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: "256Mi"
+            limits:
+              cpu: "2"
+              memory: "1.5Gi"
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health #URL PATH HEALTH CHECK
+          #     port: 80
+            # initialDelaySeconds: 10
+            # periodSeconds: 15
+          env:
+            - name: DB_HOST_NAME
+              value: $(dbHostName)
+            - name: DB_HOST_PORT
+              value: "3306"
+
+---
+# Service Manifest
+apiVersion: v1
+kind: Service
+metadata:
+  name: $(appName)
+spec:
+  type: ClusterIP
+  selector:
+    app: $(appName)
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 4000 # containerPort
+
+---
+# Ingress Manifest
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: $(appName)-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: 3m
+    ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: ingress-nginx
+  tls:
+    - hosts:
+        - $(envName)-$(appName).pta-events.com
+      secretName: pta-events.com
+  rules:
+    - host: $(envName)-$(appName).pta-events.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: $(appName)
+                port:
+                  number: 80

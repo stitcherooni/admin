@@ -45,3 +45,76 @@ stages:
               script: |
                 podman login -u $(internalSP) -p $(internalSPSecret) $(acrName)
                 podman push $(appName):$(tag) $(acrName)/$(appName):$(tag)
+
+#Stage Deploy to dev Environment
+  - stage: Deploy_to_dev
+    displayName: Deploy to dev
+    condition: |
+      and(
+        succeeded('Build'), 
+        eq(${{ parameters.dev_env }}, true)
+      )
+    dependsOn: Build
+    jobs:
+    - job: KubernetesDeployment
+      displayName: 'Kubernetes Deployment'
+      variables:
+      - group: dev
+      steps:
+      - task: KubeloginInstaller@0
+        inputs:
+          kubeloginVersion: 'latest'
+
+      - task: replacetokens@5
+        inputs:
+          rootDirectory: '$(Build.SourcesDirectory)'
+          targetFiles: '**/apigateway.yaml'
+          encoding: 'auto'
+          tokenPattern: 'azpipelines'
+          writeBOM: true
+          actionOnMissing: 'warn'
+          keepToken: false
+          actionOnNoFiles: 'warn'
+          enableTransforms: false
+          enableRecursion: false
+          useLegacyPattern: false
+          enableTelemetry: true
+
+      - task: Kubernetes@1
+        displayName: Create Deployment $(appName)
+        inputs:
+          connectionType: 'Azure Resource Manager'
+          azureSubscriptionEndpoint: 'internal-adm-sp'
+          azureResourceGroup: 'internal-ptae-rg-01'
+          kubernetesCluster: 'internal-ptae-aks-01'
+          namespace: $(envName)
+          command: 'apply'
+          arguments: '-f $(Build.SourcesDirectory)/admin.yaml -o yaml'
+          secretType: 'dockerRegistry'
+          containerRegistryType: 'Azure Container Registry'
+
+      # - task: Bash@3
+      #   displayName: API Gateway URL
+      #   inputs:
+      #     targetType: inline
+      #     script: |
+      #       echo "API Gateway URL" https://$(envName)-apigateway.pta-events.com/api/onboarding
+
+#Stage Deploy to qa Environment
+  - stage: Deploy_to_qa
+    displayName: Deploy to qa
+    condition: |
+      and(
+        succeeded('Build'), 
+        eq(${{ parameters.qa_env }}, true)
+      )
+    dependsOn: Build
+    jobs:
+    - job: KubernetesDeployment
+      displayName: 'Kubernetes Deployment'
+      variables:
+      - group: qa
+      steps:
+      - task: KubeloginInstaller@0
+        inputs:
+          kubeloginVersion: 'latest'
