@@ -13,7 +13,7 @@ interface LabelProps {
   text: string;
   inputId: string;
   required?: boolean;
-  content: {
+  content?: {
     title: string;
     text: string;
   };
@@ -38,10 +38,12 @@ const Label = (props: LabelProps) => {
   return (
     <Wrapper className={`label-wrapper ${required ? 'required' : ''}`}>
       <label htmlFor={inputId}>{text}</label>
-      <div className="icon-wrapper" onClick={toggleOpen}>
-        <QuestionIconOutline />
-      </div>
-      {open
+      {!props.content ? null : (
+        <div className="icon-wrapper" onClick={toggleOpen}>
+          <QuestionIconOutline />
+        </div>
+      )}
+      {open && props.content
         ? createPortal(
           <Overlay onClick={handleClose} className="overlay">
             <ModalFaqTooltip {...props.content} toggleOpen={toggleOpen} />
@@ -55,6 +57,7 @@ const Label = (props: LabelProps) => {
 
 Label.defaultProps = {
   required: false,
+  content: null,
 };
 
 export default Label;

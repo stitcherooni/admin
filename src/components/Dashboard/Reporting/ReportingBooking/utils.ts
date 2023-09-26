@@ -98,11 +98,12 @@ interface CreateBookingActions {
   fetchBookingData: (testBookings: boolean) => void;
   tableRef: React.RefObject<HTMLTableElement | null>;
   toggleShowRandom: () => void;
+  sendNewsletter: () => void;
 }
 
 export const createBookingActions = (data: CreateBookingActions) => {
   const { handleCustomize, tableData, headCells, 
-    errorCb, showTestBookings, fetchBookingData, tableRef, toggleShowRandom } = data;
+    errorCb, showTestBookings, fetchBookingData, tableRef, toggleShowRandom, sendNewsletter } = data;
 
   return menuActionsOptions
   .map((item) => {
@@ -167,6 +168,13 @@ export const createBookingActions = (data: CreateBookingActions) => {
           ...item,
           handleClick: () => toggleShowRandom(),
         };
+      }
+
+      case 'email': {
+        return {
+          ...item,
+          handleClick: () => sendNewsletter(),
+        }
       }
 
       default:

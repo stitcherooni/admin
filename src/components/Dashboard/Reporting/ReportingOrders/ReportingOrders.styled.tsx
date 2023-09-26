@@ -205,17 +205,24 @@ export const OrderStatusBadge = styled.p`
     padding: 0 8px;
     border-radius: 8px;
     color: ${(props) => props.theme.colors.main.white};
+    line-height: 21px;
 
-    &.dispatched {
+    &.dispatched,
+    &.completed {
       background-color: ${(props) => props.theme.colors.main.green};
     }
 
-    &.awaiting-dispatch {
-      background-color: ${(props) => props.theme.colors.main.yellow};
+    &.refunded,
+    &.failed,
+    &.deleted {
+      background-color: ${(props) => props.theme.colors.main.pink};
     }
 
-    &.refunded {
-      background-color: ${(props) => props.theme.colors.main.pink};
+    &.partial-refunded,
+    &.awaiting-dispatch,
+    &.reserved,
+    &.test {
+      background-color: ${(props) => props.theme.colors.main.yellow};
     }
   }
 `;

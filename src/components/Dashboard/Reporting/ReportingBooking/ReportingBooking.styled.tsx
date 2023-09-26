@@ -311,6 +311,7 @@ export const TextButton = styled(BaseButton)`
     font-family: ${(props) => props.theme.fonts.mainFont};
     font-size: 14px;
     line-height: 21px;
-    color: ${(props) => props.theme.colors.main.black};
+    color: ${(props) => props.theme.colors.main.purple};
+    text-decoration: underline;
   }
 `;

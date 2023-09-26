@@ -2,18 +2,22 @@ FROM node:18.0.0 as build
 WORKDIR /app
 
 COPY package.json ./
+COPY installTinyMce.js ./
 RUN npm i
+RUN npm run postinstall-tiny-mce
 COPY . ./
 RUN npm run build
 
 FROM node:18.15.0 as test
 WORKDIR /app
 COPY package*.json ./
+COPY installTinyMce.js ./
 RUN npm install
+RUN npm run postinstall-tiny-mce
 COPY . .
 RUN npm test
 
-FROM httpd:alpine
+FROM docker.io/httpd:alpine
 WORKDIR /usr/local/apache2/htdocs/
 RUN rm -rf ./*
 

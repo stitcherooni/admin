@@ -7,7 +7,8 @@
     "start": "webpack-dev-server --config config/webpack.dev.js --open",
     "build": "webpack --config config/webpack.prod.js",
     "lint": "eslint .",
-    "test": "jest --config ./jest.config.js --runInBand"
+    "test": "jest --config ./jest.config.js --runInBand",
+    "postinstall-tiny-mce": "node ./installTinyMce.js"
   },
   "repository": {
     "type": "git",
@@ -36,10 +37,12 @@
     "@mui/styled-engine-sc": "^5.12.0",
     "@mui/x-date-pickers": "^6.10.0",
     "@reduxjs/toolkit": "^1.9.5",
+    "@tinymce/tinymce-react": "^4.3.0",
     "axios": "^1.4.0",
     "dayjs": "^1.11.9",
     "dompurify": "^3.0.3",
     "formik": "^2.2.9",
+    "fs-extra": "^11.1.1",
     "lodash.debounce": "^4.0.8",
     "lodash.orderby": "^4.6.0",
     "react": "^18.2.0",
@@ -50,6 +53,7 @@
     "react-router-dom": "6.10.0",
     "redux-persist": "^6.0.0",
     "styled-components": "^5.3.10",
+    "tinymce": "^6.7.0",
     "yup": "^1.1.1"
   },
   "devDependencies": {

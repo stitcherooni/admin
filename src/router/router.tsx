@@ -6,6 +6,7 @@ import BasicLayout from '../layouts/BasicLayout/BasicLayout';
 import Reporting from '../components/Dashboard/Reporting/Reporting';
 import LoadingOverlay from '../components/shared/LoadingOverlay/LoadingOverlay';
 import { ProtectedRoute } from './ProtectedRoute';
+import Listings from '../components/Dashboard/Listings/Listings';
 
 const Dashboard = lazy(
   () => import(
@@ -44,6 +45,17 @@ export const router = createBrowserRouter([
     <BasicLayout>
       <Suspense fallback={<LoadingOverlay />}>
         <Reporting />
+      </Suspense>
+    </BasicLayout>
+  </ProtectedRoute>,
+  },
+  {
+    path: '/dashboard/listings',
+    element:
+  <ProtectedRoute>
+    <BasicLayout>
+      <Suspense fallback={<LoadingOverlay />}>
+        <Listings />
       </Suspense>
     </BasicLayout>
   </ProtectedRoute>,
