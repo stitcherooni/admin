@@ -140,7 +140,7 @@ const ReportingOrders = () => {
   const manageMenu = useMemo(
     () => menuActionsOptions.map((item) => {
       switch (true) {
-        case item.label === 'Excel':
+        case item.label === 'Export to Excel':
           return {
             ...item,
             handleClick: () => downloadFile(

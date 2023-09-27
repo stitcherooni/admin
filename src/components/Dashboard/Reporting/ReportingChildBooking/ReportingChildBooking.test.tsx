@@ -33,7 +33,7 @@ const selectedFilters = {
 };
 
 describe('Reporting Child Bookings', () => {
-  test('if click by Customize View list should show customize menu', async () => {
+  test('if click by Customise View list should show customize menu', async () => {
     act(() => {
       renderWithProviders(<ReportingChildBooking />, {
         preloadedState: {
@@ -58,7 +58,7 @@ describe('Reporting Child Bookings', () => {
     });
 
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Customize View/));
+    await userEvent.click(screen.getByText(/Customise View/));
 
     await waitFor(() => {
       columnsNames.forEach((item) => {
@@ -83,7 +83,7 @@ describe('Reporting Child Bookings', () => {
     });
 
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Customize View/));
+    await userEvent.click(screen.getByText(/Customise View/));
     await userEvent.click(screen.getByDisplayValue('First Name'));
 
     await waitFor(() => {
@@ -113,7 +113,7 @@ describe('Reporting Child Bookings', () => {
     });
 
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Customize View/));
+    await userEvent.click(screen.getByText(/Customise View/));
     await userEvent.click(screen.getByDisplayValue('First Name'));
     await userEvent.click(screen.getByDisplayValue('First Name'));
 
@@ -143,7 +143,7 @@ describe('Reporting Child Bookings', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Excel/));
+    await userEvent.click(screen.getByText(/Export to Excel/));
 
     server.use(rest.post('/api/Report/childonlybookingsexcel', async (req, res, ctx) => res(ctx.status(400), ctx.json({ message: 'Failed request to load file' }))));
 

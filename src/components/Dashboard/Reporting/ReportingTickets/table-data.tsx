@@ -117,17 +117,17 @@ export const menuActionsOptions = [
   },
   {
     value: 'csv',
-    label: 'Export CSV',
+    label: 'Export to CSV',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {
     value: 'excel',
-    label: 'Export Excel',
+    label: 'Export to Excel',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {
     value: 'pdf',
-    label: 'Export Pdf',
+    label: 'Export to PDF',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
 ];

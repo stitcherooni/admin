@@ -22,7 +22,7 @@ afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 describe('banked reporting', () => {
-  test('if click by Customize View should show customize menu', async () => {
+  test('if click by Customise View should show customize menu', async () => {
     act(() => {
       renderWithProviders(<ReportingBanked />, {
         preloadedState: {
@@ -36,7 +36,7 @@ describe('banked reporting', () => {
     });
 
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Customize View/));
+    await userEvent.click(screen.getByText(/Customise View/));
 
     await waitFor(() => {
       columnsNames.forEach((item) => {
@@ -58,7 +58,7 @@ describe('banked reporting', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Customize View/));
+    await userEvent.click(screen.getByText(/Customise View/));
     await userEvent.click(screen.getByDisplayValue('##'));
 
     await waitFor(() => {
@@ -85,7 +85,7 @@ describe('banked reporting', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Customize View/));
+    await userEvent.click(screen.getByText(/Customise View/));
     await userEvent.click(screen.getByDisplayValue('##'));
     await userEvent.click(screen.getByDisplayValue('##'));
 
@@ -113,7 +113,7 @@ describe('banked reporting', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Export Excel/));
+    await userEvent.click(screen.getByText(/Export to Excel/));
 
     server.use(rest.post('/api/Report/bankedspdf', async (req, res, ctx) => res(ctx.status(400), ctx.json({ message: 'Failed request to load file' }))));
 

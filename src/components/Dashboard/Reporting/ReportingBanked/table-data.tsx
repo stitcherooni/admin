@@ -116,7 +116,7 @@ export const actionsOptions = [
   },
   {
     value: 'customize-view',
-    label: 'Customize View',
+    label: 'Customise View',
     icon: <TuneOutlinedIcon className="customize-view" />,
   },
   {
@@ -126,12 +126,12 @@ export const actionsOptions = [
   },
   {
     value: 'excel',
-    label: 'Export Excel',
+    label: 'Export to Excel',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {
     value: 'pdf',
-    label: 'Export Pdf',
+    label: 'Export to PDF',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
 ];

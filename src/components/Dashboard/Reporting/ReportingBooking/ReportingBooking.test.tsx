@@ -105,7 +105,7 @@ describe('Reporting Bookings', () => {
     });
 
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Customize View/));
+    await userEvent.click(screen.getByText(/Customise View/));
 
     await waitFor(() => {
       columnsNames.forEach((item) => {
@@ -130,7 +130,7 @@ describe('Reporting Bookings', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Customize View/));
+    await userEvent.click(screen.getByText(/Customise View/));
     await userEvent.click(screen.getByDisplayValue('##'));
 
     await waitFor(() => {
@@ -160,7 +160,7 @@ describe('Reporting Bookings', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Customize View/));
+    await userEvent.click(screen.getByText(/Customise View/));
     await userEvent.click(screen.getByDisplayValue('##'));
     await userEvent.click(screen.getByDisplayValue('##'));
 
@@ -191,7 +191,7 @@ describe('Reporting Bookings', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Excel/));
+    await userEvent.click(screen.getByText(/Export to Excel/));
 
     server.use(rest.post('/api/Report/bookingsexcel', async (req, res, ctx) => res(ctx.status(400), ctx.json({ message: 'Failed request to load file' }))));
 
@@ -200,7 +200,7 @@ describe('Reporting Bookings', () => {
     });
   });
 
-  test('if cant download Export Doors Validation List file should show an error', async () => {
+  test('if cant download Export Door Validation List file should show an error', async () => {
     act(() => {
       renderWithProviders(<ReportingBooking />, {
         preloadedState: {
@@ -216,7 +216,7 @@ describe('Reporting Bookings', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Export Doors Validation List/));
+    await userEvent.click(screen.getByText(/Export Door Validation List/));
 
     server.use(rest.post('/api/Report/bookingspdf', async (req, res, ctx) => res(ctx.status(400), ctx.json({ message: 'Failed request to load file' }))));
 
