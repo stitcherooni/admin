@@ -104,11 +104,11 @@ stages:
           containerRegistryType: 'Azure Container Registry'
 
       - task: Bash@3
-        displayName: API Gateway URL
+        displayName: Admin Panel URL
         inputs:
           targetType: inline
           script: |
-            echo "API Gateway URL" https://$(envName)-admin.pta-events.com
+            echo "Admin Panel URL" https://$(envName)-admin.pta-events.com
 
 #Stage Deploy to qa Environment
   - stage: Deploy_to_qa
