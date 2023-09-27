@@ -31,6 +31,10 @@ module.exports = merge(common, {
           from: path.resolve(__dirname, "../public/logo512.png"),
           to: path.resolve(__dirname, "../build"),
         },
+        {
+          from: path.resolve(__dirname, "../public/tinymce"),
+          to: path.resolve(__dirname, "../build/tinymce"),
+        }
       ],
     }),
     new HtmlWebpackPlugin({

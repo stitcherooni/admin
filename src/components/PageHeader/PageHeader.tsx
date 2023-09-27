@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import DashboardIconOutlined from '../../assets/icons/dashboard-icon-outlined';
 import {
   StyledBreadcrumbs, Title, TitleWrapper, Wrapper,
 } from './PageHeader.styled';
 import ReportingIconRounded from '../../assets/icons/reporting-icon-rounded';
+import ListingsRoundIcon from '../../assets/icons/listings-round-icon';
 
 interface PageHeaderProps {
   buttons?: React.ReactNode;
@@ -13,6 +14,7 @@ interface PageHeaderProps {
 
 const PageHeader = (props: PageHeaderProps) => {
   const location = useLocation();
+  const params = useParams();
   const breadCrumbsData = useMemo(() => {
     switch (true) {
       case location.pathname === '/':
@@ -20,9 +22,11 @@ const PageHeader = (props: PageHeaderProps) => {
         return ['Dashboard'];
       case location.pathname === '/dashboard/reporting':
         return ['Dashboard', 'Reporting'];
+      case location.pathname === '/dashboard/listings':
+        return ['Dashboard', 'Listings'];
       default: return [];
     }
-  }, [location.pathname]);
+  }, [location.pathname, params]);
 
   const pageIcon = useMemo(() => {
     switch (true) {
@@ -31,6 +35,8 @@ const PageHeader = (props: PageHeaderProps) => {
         return <DashboardIconOutlined />;
       case location.pathname === '/dashboard/reporting':
         return <ReportingIconRounded />;
+      case location.pathname === '/dashboard/listings':
+        return <ListingsRoundIcon />;
       default: return null;
     }
   }, [location.pathname]);

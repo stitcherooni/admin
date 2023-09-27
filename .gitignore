@@ -1,4 +1,9 @@
 **/.DS_Store
 /node_modules
 /build
+<<<<<<< HEAD
 /reports
+=======
+/reports
+/public/tinymce
+>>>>>>> dev

@@ -98,7 +98,7 @@ export const menuActionsOptions = [
   },
   {
     value: 'customize-view',
-    label: 'Customize View',
+    label: 'Customise View',
     icon: <TuneOutlined className="customize-view" />,
   },
   {
@@ -108,12 +108,12 @@ export const menuActionsOptions = [
   },
   {
     value: 'excel',
-    label: 'Export Excel',
+    label: 'Export to Excel',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {
     value: 'pdf',
-    label: 'Export Pdf',
+    label: 'Export to PDF',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
 ];

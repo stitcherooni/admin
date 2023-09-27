@@ -192,12 +192,12 @@ export const menuActionsOptions = [
   },
   {
     value: 'excel',
-    label: 'Excel',
+    label: 'Export to Excel',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {
     value: 'pdf',
-    label: 'Export Pdf',
+    label: 'Export to PDF',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {

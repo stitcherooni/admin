@@ -23,9 +23,15 @@ export const getAccessToken = async () => {
   if (activeAccount) {
     const accessToken = await msalInstance
       .acquireTokenSilent(silentRequest)
-      .then((data) => data.accessToken)
-      .catch((err) => {
-        throw err;
+      .then(async (data) => {
+        if (!data.accessToken.length) {
+          throw new InteractionRequiredAuthError();
+        }
+
+        return data.accessToken;
+      })
+      .catch(async () => {
+        await msalInstance.logoutPopup();
       });
 
     return accessToken;
@@ -36,8 +42,10 @@ export const getAccessToken = async () => {
 
 export const handleInterceptorError = (error: unknown) => {
   if (error instanceof InteractionRequiredAuthError) {
-    // fallback to interaction when silent call fails
-    return msalInstance.acquireTokenPopup(silentRequest);
+    return msalInstance.acquireTokenPopup(silentRequest)
+      .then((response) => response).catch(async () => {
+        msalInstance.loginRedirect();
+      });
   }
   return Promise.reject(error);
 };

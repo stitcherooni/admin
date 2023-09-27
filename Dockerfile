@@ -2,7 +2,9 @@ FROM node:18.0.0 as build
 WORKDIR /app
 
 COPY package*.json ./
+COPY installTinyMce.js ./
 RUN npm i
+RUN npm run postinstall-tiny-mce
 COPY . ./
 RUN npm run build && npm test
 
@@ -11,7 +13,7 @@ WORKDIR /usr/local/apache2/htdocs/
 
 RUN rm -rf ./*
 COPY --from=build /app/build/ .
-COPY --from=build /app/reports/report.xml /app/testresults/testresults.xml
+COPY --from=test /app/reports/report.xml /app/testresults/testresults.xml
 COPY public/ /var/www/html/
 
 # Enable necessary Apache modules for proxying
@@ -21,8 +23,8 @@ RUN sed -i -E '/#?(LoadModule (proxy|proxy_http|socache_shmcb)_module)/s/#//g' /
 RUN sed -i 's#DirectoryIndex index.html#DirectoryIndex index.html\n    ErrorDocument 404 /index.html#' /usr/local/apache2/conf/httpd.conf
 
 # Configure reverse proxy for /api
-RUN echo 'ProxyPass "/api" "http://apigateway/api/onboarding"' >> /usr/local/apache2/conf/httpd.conf \
-    && echo 'ProxyPassReverse "/api" "http://apigateway/api/onboarding"' >> /usr/local/apache2/conf/httpd.conf \
+RUN echo 'ProxyPass "/api" "http://apigateway/api"' >> /usr/local/apache2/conf/httpd.conf \
+    && echo 'ProxyPassReverse "/api" "http://apigateway/api"' >> /usr/local/apache2/conf/httpd.conf \
     && echo "ServerName localhost" >> /usr/local/apache2/conf/httpd.conf
 
 # Expose port 80

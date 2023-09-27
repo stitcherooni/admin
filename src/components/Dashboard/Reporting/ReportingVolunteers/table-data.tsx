@@ -120,7 +120,7 @@ export const menuActionsOptions = [
   },
   {
     value: 'pdf',
-    label: 'Export Pdf',
+    label: 'Export to PDF',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
 ];

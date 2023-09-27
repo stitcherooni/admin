@@ -40,6 +40,7 @@ import { handleCloseModal } from '../../../../utils/modals';
 import ReportingBookingTableBody from './ReportingBookingTableBody';
 import ReportingBookingFilters from './ReportingBookingFilters/ReportingBookingFilters';
 import { resetSelectedFilters } from '../../../../redux/slices/reporting/bookings.slice';
+import { useNavigate } from 'react-router-dom';
 
 const ReportingBooking = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -103,6 +104,11 @@ const ReportingBooking = () => {
     dispatch(fn());
   };
 
+  const navigate = useNavigate();
+  const sendNewsletter = () => {
+    navigate(`/dashboard/listings?type=booking-newsletter&id=${bookingData.selectedFilters.event.value}`)
+  }
+
   const actionsMenuOptions = useMemo(
     () => createBookingActions({
       handleCustomize: setOpenCustomizeMenu,
@@ -113,6 +119,7 @@ const ReportingBooking = () => {
       tableRef,
       toggleShowRandom,
       errorCb: setError,
+      sendNewsletter,
     }),
     [showTestBookings, table],
   );

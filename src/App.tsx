@@ -27,6 +27,9 @@ export const muiTheme = createTheme({
           '&:-webkit-autofill': {
             WebkitBoxShadow: `0 0 0 100px ${theme.colors.main.white} inset`,
           },
+          '&::-webkit-input-placeholder': {
+            opacity: 1,
+          },
         },
       },
     },

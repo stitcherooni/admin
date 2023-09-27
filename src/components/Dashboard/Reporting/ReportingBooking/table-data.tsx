@@ -403,7 +403,7 @@ export const menuActionsOptions = [
   },
   {
     value: 'customize-view',
-    label: 'Customize View',
+    label: 'Customise View',
     icon: <TuneOutlined className="customize-view" />,
   },
   {
@@ -413,17 +413,17 @@ export const menuActionsOptions = [
   },
   {
     value: 'excel',
-    label: 'Excel',
+    label: 'Export to Excel',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {
     value: 'pdf-customize-view',
-    label: 'Export Doors Validation List',
+    label: 'Export Door Validation List',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {
     value: 'pdf',
-    label: 'Export Pdf',
+    label: 'Export to PDF',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
 ];
