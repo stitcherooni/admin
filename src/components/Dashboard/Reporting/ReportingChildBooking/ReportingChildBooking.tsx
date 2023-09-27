@@ -1,11 +1,7 @@
-import React, {
-  ChangeEvent, SyntheticEvent, useMemo, useRef, useState,
-} from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select';
 import InputAdornment from '@mui/material/InputAdornment';
 import {
   Col,
@@ -25,16 +21,14 @@ import {
 import { Row, StyledTableWrapper } from '../../../shared/Table/Table.styled';
 import { copyTable, useSortingTable } from '../../../shared/Table/utils';
 import { headCells, menuActionsOptions } from './table-data';
-import { Overlay } from '../Reporting.styled';
 import Label from '../../../shared/Label/Label';
 import NestedMenu from '../../../shared/NestedMenu/NestedMenu';
-import DeleteConfirmationModal from '../../../shared/Modals/DeleteConfirmationModal/DeleteConfirmationModal';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import Select from '../../../shared/Select/Select';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { createEventsOptions } from '../ReportingBooking/utils';
-import { getChildBookingStat, sortChildBookingStat } from '../../../../redux/actions/reporting.actions';
+import { sortChildBookingStat } from '../../../../redux/actions/reporting.actions';
 import {
   createSortByOptions, getAvailableColumns,
   getChildBookingItemsIds, getFetchChildBookingsFn, getSortingOrdering,
@@ -44,8 +38,8 @@ import ZoomIconSmall from '../../../../assets/icons/zoom-icon-small';
 import { downloadFile } from '../../../../utils/file';
 import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
 import { updateSelectedFilters } from '../../../../redux/slices/reporting/childBookings.slice';
-import { handleCloseModal } from '../../../../utils/modals';
 import Qflow from '../Qflow/Qflow';
+import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
 
 interface Filter {
   value: number | string;
@@ -79,12 +73,6 @@ const ReportingChildBooking = () => {
     handleChangePage, handleChangeRowsPerPage } = table.pagination;
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const [openUpdateBooking, setOpenUpdateBooking] = useState(false);
-  const toggleOpenUpdateBooking = () => setOpenUpdateBooking(!openUpdateBooking);
-
-  const handleCloseUpdateBooking = (e: SyntheticEvent<HTMLDivElement>) => {
-    handleCloseModal(e, toggleOpenUpdateBooking);
-  };
 
   const handleChooseEvent = (e: any) => {
     const { value, label, rootid } = e.currentTarget.dataset;
@@ -115,39 +103,6 @@ const ReportingChildBooking = () => {
 
   const handleEventChange = (e: any) => handleChooseEvent(e);
   const handleGroupByChange = (e: any) => handleSelectFilters(e);
-
-  const changePage = (e: ChangeEvent, newPage?: number) => {
-    e.preventDefault();
-    dispatch(
-      getChildBookingStat({
-        page: newPage,
-        pageSize: rowsPerPage,
-      }),
-    );
-  };
-
-  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(
-      getChildBookingStat({
-        page: 1,
-        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-      }),
-    );
-  };
-
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
-
-  const toggleOpenDeleteModal = () => setOpenDeleteModal(!openDeleteModal);
-
-  const handleCloseDeleteModal = (e: SyntheticEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-
-    if (!target.className.length) return;
-
-    if (target.className.includes('overlay')) {
-      toggleOpenDeleteModal();
-    }
-  };
 
   const eventOptions = useMemo(
     () => createEventsOptions(childBookingData?.filters?.events ?? ([] as BookingStatEvents[])),
@@ -249,10 +204,7 @@ const ReportingChildBooking = () => {
 
   const actionsMenuRef = useRef(null);
 
-  // group by filter should be array
-  // not need on url product id params
-
-  return (
+  return childBookingData.status === 'loading' ? <LoadingOverlay /> : (
     <Wrapper>
       <Qflow />
       {childBookingData?.error || error ? (
