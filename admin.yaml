@@ -17,7 +17,7 @@ spec:
         - name: $(appName)
           image: azcentralcr.azurecr.io/$(appName):$(tag)
           ports:
-            - containerPort: 4000
+            - containerPort: 80
           resources:
             requests:
               cpu: "0.5"
@@ -50,7 +50,7 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 4000 # containerPort
+      targetPort: 80 # containerPort
 
 ---
 # Ingress Manifest

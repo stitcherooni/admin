@@ -15,22 +15,15 @@ COPY --from=build /app/reports/report.xml /app/testresults/testresults.xml
 COPY public/ /var/www/html/
 
 # Enable necessary Apache modules for proxying
-RUN sed -i -E '/#?(LoadModule (proxy|ssl|socache_shmcb)_module)/s/#//g' /usr/local/apache2/conf/httpd.conf
+RUN sed -i -E '/#?(LoadModule (proxy|proxy_http|socache_shmcb)_module)/s/#//g' /usr/local/apache2/conf/httpd.conf
 
-# Configure SSL support for the reverse proxy
-RUN echo "SSLProxyEngine On" >> /usr/local/apache2/conf/httpd.conf \
-    && echo "SSLProxyVerify none" >> /usr/local/apache2/conf/httpd.conf \
-    && echo "SSLProxyCheckPeerCN off" >> /usr/local/apache2/conf/httpd.conf \
-    && echo "SSLProxyCheckPeerName off" >> /usr/local/apache2/conf/httpd.conf \
-    && echo "SSLProxyCheckPeerExpire off" >> /usr/local/apache2/conf/httpd.conf
-
-# Modify Apache configuration to serve index.html for all routes on port 4000
+# Modify Apache configuration to serve index.html for all routes on port 80
 RUN sed -i 's#DirectoryIndex index.html#DirectoryIndex index.html\n    ErrorDocument 404 /index.html#' /usr/local/apache2/conf/httpd.conf
 
 # Configure reverse proxy for /api
-RUN echo 'ProxyPass "/api" "https://ptaeventsgateway.azurewebsites.net/api/onboarding"' >> /usr/local/apache2/conf/httpd.conf \
-    && echo 'ProxyPassReverse "/api" "https://ptaeventsgateway.azurewebsites.net/api/onboarding"' >> /usr/local/apache2/conf/httpd.conf \
+RUN echo 'ProxyPass "/api" "http://apigateway/api/onboarding"' >> /usr/local/apache2/conf/httpd.conf \
+    && echo 'ProxyPassReverse "/api" "http://apigateway/api/onboarding"' >> /usr/local/apache2/conf/httpd.conf \
     && echo "ServerName localhost" >> /usr/local/apache2/conf/httpd.conf
 
-# Expose port 4000
-EXPOSE 4000
+# Expose port 80
+EXPOSE 80

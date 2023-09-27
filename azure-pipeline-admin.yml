@@ -10,6 +10,16 @@ variables:
 resources:
   - repo: self
 
+parameters:
+- name: dev_env
+  displayName: dev
+  type: boolean
+  default: false
+- name: qa_env
+  displayName: qa
+  type: boolean
+  default: false
+
 stages:
   - stage: Build
     displayName: Build and push stage
@@ -93,12 +103,12 @@ stages:
           secretType: 'dockerRegistry'
           containerRegistryType: 'Azure Container Registry'
 
-      # - task: Bash@3
-      #   displayName: API Gateway URL
-      #   inputs:
-      #     targetType: inline
-      #     script: |
-      #       echo "API Gateway URL" https://$(envName)-apigateway.pta-events.com/api/onboarding
+      - task: Bash@3
+        displayName: API Gateway URL
+        inputs:
+          targetType: inline
+          script: |
+            echo "API Gateway URL" https://$(envName)-admin.pta-events.com
 
 #Stage Deploy to qa Environment
   - stage: Deploy_to_qa
