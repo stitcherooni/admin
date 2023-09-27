@@ -78,13 +78,13 @@ stages:
       - task: replacetokens@5
         inputs:
           rootDirectory: '$(Build.SourcesDirectory)'
-          targetFiles: '**/apigateway.yaml'
+          targetFiles: '**/admin.yaml'
           encoding: 'auto'
           tokenPattern: 'azpipelines'
           writeBOM: true
-          actionOnMissing: 'warn'
+          actionOnMissing: 'fail'
           keepToken: false
-          actionOnNoFiles: 'warn'
+          actionOnNoFiles: 'fail'
           enableTransforms: false
           enableRecursion: false
           useLegacyPattern: false
