@@ -1,0 +1,130 @@
+trigger: none
+
+pool:
+  name: internal-agent
+
+variables:
+  tag: "$(Build.BuildId)"
+  appName: admin
+
+resources:
+  - repo: self
+
+parameters:
+- name: dev_env
+  displayName: dev
+  type: boolean
+  default: false
+- name: qa_env
+  displayName: qa
+  type: boolean
+  default: false
+
+stages:
+  - stage: Build
+    displayName: Build and push stage
+    jobs:
+      - job: Build
+        displayName: Build
+        variables:
+          - group: internal
+        steps:
+          - task: Bash@3
+            displayName: Build and run Unit Test
+            inputs:
+              targetType: inline
+              script: |
+                podman build -f $(Build.SourcesDirectory)/Dockerfile -t $(appName):$(tag) .
+                podman create -ti --name $(appName) $(appName):$(tag)
+                podman cp $(appName):/app/testresults/ $(Build.ArtifactStagingDirectory)/testresults 
+                podman rm -fv $(appName)
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/testresults.xml'
+              searchFolder: '$(Build.ArtifactStagingDirectory)/testresults'
+              mergeTestResults: true
+              #failTaskOnFailedTests: false
+              testRunTitle: 'Unit Test Publish'
+
+          - task: Bash@3
+            displayName: Push Image to Azure Container Registry
+            inputs:
+              targetType: inline
+              script: |
+                podman login -u $(internalSP) -p $(internalSPSecret) $(acrName)
+                podman push $(appName):$(tag) $(acrName)/$(appName):$(tag)
+
+#Stage Deploy to dev Environment
+  - stage: Deploy_to_dev
+    displayName: Deploy to dev
+    condition: |
+      and(
+        succeeded('Build'), 
+        eq(${{ parameters.dev_env }}, true)
+      )
+    dependsOn: Build
+    jobs:
+    - job: KubernetesDeployment
+      displayName: 'Kubernetes Deployment'
+      variables:
+      - group: dev
+      steps:
+      - task: KubeloginInstaller@0
+        inputs:
+          kubeloginVersion: 'latest'
+
+      - task: replacetokens@5
+        inputs:
+          rootDirectory: '$(Build.SourcesDirectory)'
+          targetFiles: '**/admin.yaml'
+          encoding: 'auto'
+          tokenPattern: 'azpipelines'
+          writeBOM: true
+          actionOnMissing: 'fail'
+          keepToken: false
+          actionOnNoFiles: 'fail'
+          enableTransforms: false
+          enableRecursion: false
+          useLegacyPattern: false
+          enableTelemetry: true
+
+      - task: Kubernetes@1
+        displayName: Create Deployment $(appName)
+        inputs:
+          connectionType: 'Azure Resource Manager'
+          azureSubscriptionEndpoint: 'internal-adm-sp'
+          azureResourceGroup: 'internal-ptae-rg-01'
+          kubernetesCluster: 'internal-ptae-aks-01'
+          namespace: $(envName)
+          command: 'apply'
+          arguments: '-f $(Build.SourcesDirectory)/admin.yaml -o yaml'
+          secretType: 'dockerRegistry'
+          containerRegistryType: 'Azure Container Registry'
+
+      - task: Bash@3
+        displayName: Admin Panel URL
+        inputs:
+          targetType: inline
+          script: |
+            echo "Admin Panel URL" https://$(envName)-admin.pta-events.com
+
+#Stage Deploy to qa Environment
+  - stage: Deploy_to_qa
+    displayName: Deploy to qa
+    condition: |
+      and(
+        succeeded('Build'), 
+        eq(${{ parameters.qa_env }}, true)
+      )
+    dependsOn: Build
+    jobs:
+    - job: KubernetesDeployment
+      displayName: 'Kubernetes Deployment'
+      variables:
+      - group: qa
+      steps:
+      - task: KubeloginInstaller@0
+        inputs:
+          kubeloginVersion: 'latest'
