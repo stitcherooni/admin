@@ -35,7 +35,6 @@ const EmailUserForm = () => {
   const formik = useFormik({
     initialValues: {
       subject: '',
-      notification: '',
       attachment1: {} as File,
       attachment2: {} as File,
     },
@@ -47,11 +46,9 @@ const EmailUserForm = () => {
       setLoading(true);
       await axiosInstance.post('/Report/sendcustomeremail', {
         subject: formik.values.subject,
-        appNotification: formik.values.notification,
         message: editorRef.current?.getContent(),
         attachment: formik.values.attachment1,
         attachment2: formik.values.attachment2,
-        sendVia: 'App',
         token: await msalInstance.acquireTokenSilent(silentRequest).then((res) => res.accessToken),
       }).then((data) => {
         if (error) setError(null);
@@ -125,26 +122,6 @@ const EmailUserForm = () => {
               onChange={formik.handleChange}
             />
             {formik.errors.subject ? <StyledError>{formik.errors.subject}</StyledError> : null}
-          </Row>
-          <Row className="row">
-            <Label
-              text="App notification"
-              inputId="notification"
-              content={{
-                title: 'App notification',
-                text: 'This is the content that will be pushed to the device(s) of your customers. Max length: 297 characters.',
-              }}
-            />
-            <StyledTextarea
-              name="notification"
-              id="subject"
-              value={formik.values.notification}
-              onChange={formik.handleChange}
-              minRows={3}
-              placeholder="Enter your preview content"
-            />
-            {formik.errors.notification
-              ? <StyledError>{formik.errors.notification}</StyledError> : null}
           </Row>
           <Divider />
           <Row className="row">
