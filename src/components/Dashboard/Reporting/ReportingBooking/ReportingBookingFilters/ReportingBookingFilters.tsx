@@ -10,7 +10,7 @@ import Label from '../../../../shared/Label/Label';
 import NestedMenu from '../../../../shared/NestedMenu/NestedMenu';
 import Select from '../../../../shared/Select/Select';
 import ZoomIconSmall from '../../../../../assets/icons/zoom-icon-small';
-import ActionsMenu from '../../../../shared/ActionsMenu/ActionsMenu';
+import ActionsMenu, { ActionsMenuOption } from '../../../../shared/ActionsMenu/ActionsMenu';
 import { AppDispatch, RootState } from '../../../../../redux/store';
 import { updateSelectedFilters } from '../../../../../redux/slices/reporting/bookings.slice';
 import { sortBookingStat } from '../../../../../redux/actions/reporting.actions';
@@ -34,7 +34,7 @@ export interface ReportingBookingsFilters {
 interface ReportingBookingFiltersProps {
   actionsMenuRef: React.MutableRefObject<null>;
   updateSearchText: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  actionsMenuOptions: any;
+  actionsMenuOptions: ActionsMenuOption[];
 }
 
 const ReportingBookingFilters = (props: ReportingBookingFiltersProps) => {

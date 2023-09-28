@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -30,33 +30,14 @@ const ReportingProductTableHorizontal = () => {
     [productQuestionsData.data],
   );
   const table = useSortingTable<ProductQuestionHorizontal>(convertedRows, {
-    totalCount: productQuestionsData.totalCount,
-    totalPages: productQuestionsData.totalPages,
-    pageSize: productQuestionsData.pageSize,
-    currentPage: productQuestionsData.currentPage,
+    columns: headCells,
+    totalCount: convertedRows.length,
   });
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
   const {
-    page, pagesCount, rowsPerPage,
+    page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
   } = table.pagination;
-
-  const dispatch = useDispatch<AppDispatch>();
-
-  const changePage = (e: ChangeEvent, newPage?: number) => {
-    e.preventDefault();
-    dispatch(getProductQuestionsStat({
-      page: newPage,
-      pageSize: rowsPerPage,
-    }));
-  };
-
-  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(getProductQuestionsStat({
-      page: 1,
-      pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-    }));
-  };
 
   return (
     <TableWrapper>
@@ -66,7 +47,7 @@ const ReportingProductTableHorizontal = () => {
             numSelected={selected.length}
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
-            rowCount={rows.length}
+            rowCount={totalRows}
             cells={mergeColumns(
               headCells,
               convertQuestionsToColumns(productQuestionsData.questions),
@@ -118,8 +99,8 @@ const ReportingProductTableHorizontal = () => {
         </Table>
       </TableContainer>
       <TablePagination
-        handleChangePage={changePage}
-        handleChangeRowsPerPage={changeRowsPerPage}
+        handleChangePage={handleChangePage}
+        handleChangeRowsPerPage={handleChangeRowsPerPage}
         page={page}
         pagesCount={pagesCount}
         rowsPerPage={rowsPerPage}

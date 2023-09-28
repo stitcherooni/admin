@@ -1,12 +1,9 @@
-import React, {
-  ChangeEvent, SyntheticEvent, useMemo, useState,
-} from 'react';
+import React, { SyntheticEvent, useMemo, useState } from 'react';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select';
+import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import {
   TableCell,
@@ -34,9 +31,7 @@ import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import FilteringReportingEmailsModal from './FIlteringReportingEmailsModal/FIlteringReportingEmailsModal';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import StatisticBar from '../StatisticBar/StatisticBar';
-import { AppDispatch, RootState } from '../../../../redux/store';
-import { getEmailTrackerStat } from '../../../../redux/actions/reporting.actions';
-import { Order } from '../../../../types/reporting/orders';
+import { RootState } from '../../../../redux/store';
 import { EmailTrackerStatItem } from '../../../../types/reporting/emailTracker';
 import { handleCloseModal } from '../../../../utils/modals';
 
@@ -55,36 +50,15 @@ const getStatusIcon = (row: any, field: string) => {
 };
 
 const ReportingEmailTracker = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const emailtrackerData = useSelector((state: RootState) => state.reporting.emailTracker);
   const table = useSortingTable<EmailTrackerStatItem>(emailtrackerData.data, {
-    totalCount: emailtrackerData.totalCount,
-    totalPages: emailtrackerData.totalPages,
-    pageSize: emailtrackerData.pageSize,
-    currentPage: emailtrackerData.currentPage,
+    columns: headCells,
+    totalCount: emailtrackerData.data.length,
   });
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const { page, pagesCount, rowsPerPage } = table.pagination;
-
-  const changePage = (e: ChangeEvent, newPage?: number) => {
-    e.preventDefault();
-    dispatch(
-      getEmailTrackerStat({
-        page: newPage,
-        pageSize: rowsPerPage,
-      }),
-    );
-  };
-
-  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(
-      getEmailTrackerStat({
-        page: 1,
-        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-      }),
-    );
-  };
+  const { page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage } =
+    table.pagination;
 
   const [openEmailDetails, setOpenEmailDetails] = useState(false);
   const [emailDetails, setEmailDetails] = useState<EmailTrackerStatItem | null>(null);
@@ -146,12 +120,8 @@ const ReportingEmailTracker = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{`${emailtrackerData.totalCount} `}</strong>
-            {`${
-              emailtrackerData.totalCount === 0 || emailtrackerData.totalCount > 1
-                ? 'Entries'
-                : 'Entry'
-            }`}
+            <strong>{`${totalRows} `}</strong>
+            {`${totalRows === 0 || totalRows > 1 ? 'Entries' : 'Entry'}`}
           </p>
           <SearchBarWrapper className="search-wrapper">
             <SecondaryButton
@@ -210,8 +180,8 @@ const ReportingEmailTracker = () => {
             </Table>
           </TableContainer>
           <TablePagination
-            handleChangePage={changePage}
-            handleChangeRowsPerPage={changeRowsPerPage}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
             page={page}
             pagesCount={pagesCount}
             rowsPerPage={rowsPerPage}
@@ -220,11 +190,11 @@ const ReportingEmailTracker = () => {
         </TableWrapper>
         {openEmailDetails
           ? createPortal(
-            <Overlay onClick={handleCloseEmailDetails} className="overlay">
-              <ReportingEmailDetails data={emailDetails as any} />
-            </Overlay>,
-            document.body,
-          )
+              <Overlay onClick={handleCloseEmailDetails} className="overlay">
+                <ReportingEmailDetails data={emailDetails as any} />
+              </Overlay>,
+              document.body
+            )
           : null}
         <StyledDrawer anchor="right" open={filteringDrawerOpen} onClose={handleFilteringDrawer}>
           <DrawerOverlay handleClick={handleFilteringDrawer} handleKeydown={handleFilteringDrawer}>

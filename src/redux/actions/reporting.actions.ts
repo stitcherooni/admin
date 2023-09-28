@@ -123,7 +123,7 @@ export const getProductQuestionsFilters = createAsyncThunk('reporting/getProduct
 });
 
 export const sortProductQuestionsStat = createAsyncThunk('reporting/sortProductQuestionsStat', async (params: any = null) => {
-  const baseUrl = '/api/Report/sortrroductquestions?';
+  const baseUrl = '/api/Report/sortproductquestions';
   const response = await fetch(baseUrl + createQueryString(params));
   const data = await response.json();
   return data;

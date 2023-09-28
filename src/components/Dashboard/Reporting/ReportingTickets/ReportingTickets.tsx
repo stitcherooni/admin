@@ -57,17 +57,15 @@ const ReportingTickets = () => {
   const dispatch = useDispatch<AppDispatch>();
   const ticketsData = useSelector((state: RootState) => state.reporting.tickets);
   const table = useSortingTable<TicketItem>(ticketsData.data, {
-    totalCount: ticketsData.totalCount,
-    totalPages: ticketsData.totalPages,
-    pageSize: ticketsData.pageSize,
-    currentPage: ticketsData.currentPage,
+    columns: headCells,
+    totalCount: ticketsData.data.length,
   });
   const {
     selected, handleSelectAllClick, handleClick, checkIsSelected,
   } = table.selection;
   const { handleRequestSort } = table.sorting;
   const {
-    page, pagesCount, rowsPerPage,
+    page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
   } = table.pagination;
   const [filters, setSelectedFilters] = useState<ReportingFilters>({
     event: {
@@ -124,25 +122,6 @@ const ReportingTickets = () => {
     if (target.className.includes('overlay')) {
       toggleOpen();
     }
-  };
-
-  const changePage = (e: ChangeEvent, newPage?: number) => {
-    e.preventDefault();
-    dispatch(
-      getTicketsStat({
-        page: newPage,
-        pageSize: rowsPerPage,
-      }),
-    );
-  };
-
-  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(
-      getTicketsStat({
-        page: 1,
-        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-      }),
-    );
   };
 
   const eventOptions = useMemo(
@@ -207,8 +186,8 @@ const ReportingTickets = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{`${ticketsData.totalCount} `}</strong>
-            {`${ticketsData.totalCount === 0 || ticketsData.totalCount > 1 ? 'Tickets' : 'Ticket'}`}
+            <strong>{`${totalRows} `}</strong>
+            {`${totalRows === 0 || totalRows > 1 ? 'Tickets' : 'Ticket'}`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -282,8 +261,8 @@ const ReportingTickets = () => {
             </Table>
           </TableContainer>
           <TablePagination
-            handleChangePage={changePage}
-            handleChangeRowsPerPage={changeRowsPerPage}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
             page={page}
             pagesCount={pagesCount}
             rowsPerPage={rowsPerPage}

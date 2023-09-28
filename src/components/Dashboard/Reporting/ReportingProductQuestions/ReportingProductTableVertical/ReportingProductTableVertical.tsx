@@ -21,34 +21,15 @@ const ReportingProductTableVertical = () => {
   const table = useSortingTable<ProductQuestionVertical>(
     productQuestionsData.data as ProductQuestionVertical[],
     {
-      totalCount: productQuestionsData.totalCount,
-      totalPages: productQuestionsData.totalPages,
-      pageSize: productQuestionsData.pageSize,
-      currentPage: productQuestionsData.currentPage,
-    }
+      columns: headCells,
+      totalCount: productQuestionsData.data.length,
+    },
   );
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const { page, pagesCount, rowsPerPage } = table.pagination;
-
-  const changePage = (e: ChangeEvent, newPage?: number) => {
-    e.preventDefault();
-    dispatch(
-      getProductQuestionsStat({
-        page: newPage,
-        pageSize: rowsPerPage,
-      }),
-    );
-  };
-
-  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(
-      getProductQuestionsStat({
-        page: 1,
-        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-      }),
-    );
-  };
+  const {
+    page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
+  } = table.pagination;
 
   return (
     <TableWrapper>
@@ -58,7 +39,7 @@ const ReportingProductTableVertical = () => {
             numSelected={selected.length}
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
-            rowCount={rows.length}
+            rowCount={totalRows}
             cells={headCells}
             className="table-head"
             checkbox={false}
@@ -109,8 +90,8 @@ const ReportingProductTableVertical = () => {
         </Table>
       </TableContainer>
       <TablePagination
-        handleChangePage={changePage}
-        handleChangeRowsPerPage={changeRowsPerPage}
+        handleChangePage={handleChangePage}
+        handleChangeRowsPerPage={handleChangeRowsPerPage}
         page={page}
         pagesCount={pagesCount}
         rowsPerPage={rowsPerPage}

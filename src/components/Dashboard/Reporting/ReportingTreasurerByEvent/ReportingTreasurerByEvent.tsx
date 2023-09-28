@@ -68,15 +68,17 @@ const data = [
 ];
 
 const ReportingTreasurerByEvent = () => {
-  const table = useSortingTable(rows);
+  const table = useSortingTable(rows, {
+    columns: headCells,
+    totalCount: rows.length,
+  });
   const {
     selected, handleSelectAllClick, handleClick, checkIsSelected,
   } = table.selection;
   const { handleRequestSort } = table.sorting;
   const {
-    page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
+    page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
   } = table.pagination;
-
   const [open, setOpen] = useState(false);
 
   const toggleOpen = () => setOpen(!open);
@@ -167,9 +169,8 @@ const ReportingTreasurerByEvent = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>32</strong>
-            {' '}
-            Entries
+            <strong>{`${totalRows} `}</strong>
+            {`${totalRows === 0 || totalRows > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -179,7 +180,7 @@ const ReportingTreasurerByEvent = () => {
                 numSelected={selected.length}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={rows.length}
+                rowCount={totalRows}
                 cells={headCells}
                 className="table-head"
                 checkbox={false}

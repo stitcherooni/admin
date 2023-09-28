@@ -1,21 +1,18 @@
 /* eslint-disable react/jsx-one-expression-per-line */
-import React, {
-  useMemo, useState, ChangeEvent, useRef,
-} from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select';
 import InputAdornment from '@mui/material/InputAdornment';
 import {
   TableContent, Head, Wrapper, StyledAlert, StyledInput,
 } from './ReportingBanked.styled';
 import { SearchBarWrapper, TableCaption, TableWrapper } from '../../../shared/Table/Table.styled';
 import { copyTable, useSortingTable } from '../../../shared/Table/utils';
-import { actionsOptions, headCells, rows } from './table-data';
+import { actionsOptions, headCells } from './table-data';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import StatisticBar from '../StatisticBar/StatisticBar';
-import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
+import ActionsMenu, { ActionsMenuOption } from '../../../shared/ActionsMenu/ActionsMenu';
 import { AppDispatch, RootState } from '../../../../redux/store';
 import { BankedItem } from '../../../../types/reporting/banked';
 import { getCurrencyByCode } from '../../../../utils/currency';
@@ -42,43 +39,25 @@ const ReportingBanked = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [showTestTransactions, setShowTestTransactions] = useState(false);
   const bankedData: BankedInitialState = useSelector((state: RootState) => state.reporting.banked);
+  const rows = useMemo(
+    () => (!showTestTransactions ? bankedData?.data ?? [] : bankedData.testTransactions ?? []),
+    [showTestTransactions, bankedData?.data, bankedData.testTransactions],
+  );
   const table = useSortingTable<BankedItem>(
     !showTestTransactions ? bankedData?.data ?? [] : bankedData.testTransactions ?? [],
     {
-      totalCount: bankedData.totalCount,
-      totalPages: bankedData.totalPages,
-      pageSize: bankedData.pageSize,
-      currentPage: bankedData.currentPage,
       columns: headCells,
+      totalCount: rows.length,
     },
     convertBankedItems,
   );
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const { page, pagesCount, rowsPerPage } = table.pagination;
+  const {
+    page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
+  } = table.pagination;
   const { columnsOptions, visibleColumns, updateColumnsOptions } = table.customization;
   const { updateSearchText, isFound, isSearching } = table.search;
-
-  const changePage = (e: ChangeEvent, newPage?: number) => {
-    e.preventDefault();
-    const fn = getFetchBankedFn(showTestTransactions);
-    dispatch(
-      fn({
-        page: newPage,
-        pageSize: rowsPerPage,
-      }),
-    );
-  };
-
-  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    const fn = getFetchBankedFn(showTestTransactions);
-    dispatch(
-      fn({
-        page: 1,
-        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-      }),
-    );
-  };
 
   const {
     totalOrdersCount, totalSalesAmount, totalBankedFee, totalPlatformFees,
@@ -91,15 +70,24 @@ const ReportingBanked = () => {
       },
       {
         label: 'Total:',
-        value: `${getCurrencyByCode(totalSalesAmount?.currency, !totalSalesAmount?.amount ? 0 : totalSalesAmount.amount)}`,
+        value: `${getCurrencyByCode(
+          totalSalesAmount?.currency,
+          !totalSalesAmount?.amount ? 0 : totalSalesAmount.amount,
+        )}`,
       },
       {
         label: 'Banked Fee:',
-        value: `${getCurrencyByCode(totalBankedFee?.currency, !totalBankedFee?.amount ? 0 : totalBankedFee.amount)}`,
+        value: `${getCurrencyByCode(
+          totalBankedFee?.currency,
+          !totalBankedFee?.amount ? 0 : totalBankedFee.amount,
+        )}`,
       },
       {
         label: 'Platform Fee:',
-        value: `${getCurrencyByCode(totalPlatformFees?.currency, !totalPlatformFees?.amount ? 0 : totalPlatformFees.amount)}`,
+        value: `${getCurrencyByCode(
+          totalPlatformFees?.currency,
+          !totalPlatformFees?.amount ? 0 : totalPlatformFees.amount,
+        )}`,
       },
     ],
     [totalOrdersCount, totalSalesAmount, totalBankedFee, totalPlatformFees],
@@ -123,72 +111,72 @@ const ReportingBanked = () => {
   };
   const tableRef = useRef(null);
   const actionsMenuOptions = useMemo(
-    () => actionsOptions.map((item) => {
-      switch (item.value) {
-        case 'customize-view':
-          return { ...item, handleClick: () => setOpenCustomizeMenu(true) };
-        case 'excel':
-          return {
-            ...item,
-            handleClick: () => downloadFile(
-              '/Report/bankedsexcel',
-              'excel.xls',
-              {
-                ids: getBankedItemsIds(table.visibleRows),
-                columns: getAvailableColumns(table.customization.visibleColumns),
-                ordering: getSortingOrdering(
-                  table.sorting.filters,
-                  headCells,
-                ), // objects, key - field name, value - asc | desc
-              },
-              setError,
-            ),
-          };
-        case 'pdf':
-          return {
-            ...item,
-            handleClick: () => downloadFile(
-              '/Report/bankedspdf',
-              'report.pdf',
-              {
-                ids: getBankedItemsIds(table.visibleRows),
-                columns: getAvailableColumns(table.customization.visibleColumns),
-                ordering: getSortingOrdering(
-                  table.sorting.filters,
-                  headCells,
-                ), // objects, key - field name, value - asc | desc
-              },
-              setError,
-            ),
-          };
-        case 'test-transactions':
-          return !showTestTransactions ? {
-            ...item,
-            handleClick: () => {
-              const fn = getFetchBankedFn(true);
-              setShowTestTransactions(true);
-              dispatch(fn({ page: 1, pageSize: rowsPerPage }));
-            },
-          } : null;
-        case 'live-transactions':
-          return showTestTransactions ? {
-            ...item,
-            handleClick: () => {
-              const fn = getFetchBankedFn(false);
-              setShowTestTransactions(false);
-              dispatch(fn({ page: 1, pageSize: rowsPerPage }));
-            },
-          } : null;
-        case 'copy': {
-          return {
-            ...item,
-            handleClick: () => copyTable(tableRef),
-          };
+    () => actionsOptions
+      .map((item) => {
+        switch (item.value) {
+          case 'customize-view':
+            return { ...item, handleClick: () => setOpenCustomizeMenu(true) };
+          case 'excel':
+            return {
+              ...item,
+              handleClick: () => downloadFile(
+                '/Report/bankedsexcel',
+                'excel.xls',
+                {
+                  ids: getBankedItemsIds(table.visibleRows),
+                  columns: getAvailableColumns(table.customization.visibleColumns),
+                  ordering: getSortingOrdering(table.sorting.filters, headCells),
+                },
+                setError,
+              ),
+            };
+          case 'pdf':
+            return {
+              ...item,
+              handleClick: () => downloadFile(
+                '/Report/bankedspdf',
+                'report.pdf',
+                {
+                  ids: getBankedItemsIds(table.visibleRows),
+                  columns: getAvailableColumns(table.customization.visibleColumns),
+                  ordering: getSortingOrdering(table.sorting.filters, headCells),
+                },
+                setError,
+              ),
+            };
+          case 'test-transactions':
+            return !showTestTransactions
+              ? {
+                ...item,
+                handleClick: () => {
+                  const fn = getFetchBankedFn(true);
+                  setShowTestTransactions(true);
+                  dispatch(fn({ page: 1, pageSize: rowsPerPage }));
+                },
+              }
+              : null;
+          case 'live-transactions':
+            return showTestTransactions
+              ? {
+                ...item,
+                handleClick: () => {
+                  const fn = getFetchBankedFn(false);
+                  setShowTestTransactions(false);
+                  dispatch(fn({ page: 1, pageSize: rowsPerPage }));
+                },
+              }
+              : null;
+          case 'copy': {
+            return {
+              ...item,
+              handleClick: () => copyTable(tableRef),
+            };
+          }
+          default:
+            return item;
         }
-        default:
-          return item;
-      }
-    }).filter((item) => item),
+      })
+      .filter((item) => item),
     [actionsOptions, showTestTransactions],
   );
 
@@ -196,7 +184,11 @@ const ReportingBanked = () => {
     <LoadingOverlay />
   ) : (
     <Wrapper>
-      {bankedData?.error ? <StyledAlert type="error">{process.env.NODE_ENV === 'development' ? bankedData?.error : 'Something went wrong'}</StyledAlert> : null}
+      {bankedData?.error ? (
+        <StyledAlert type="error">
+          {process.env.NODE_ENV === 'development' ? bankedData?.error : 'Something went wrong'}
+        </StyledAlert>
+      ) : null}
       {!showTestTransactions ? null : (
         <StyledAlert type="warning" testid="test-transactions">
           Warning: You are viewing <strong>test</strong> Banked transactions
@@ -215,8 +207,8 @@ const ReportingBanked = () => {
         )}
         <TableCaption>
           <p>
-            <strong>{`${bankedData.totalCount} `}</strong>
-            {`${bankedData.totalCount === 0 || bankedData.totalCount > 1 ? 'Entries' : 'Entry'}`}
+            <strong>{`${totalRows} `}</strong>
+            {`${totalRows === 0 || totalRows > 1 ? 'Entries' : 'Entry'}`}
           </p>
           <SearchBarWrapper className="search-wrapper" ref={actionsMenuRef}>
             <StyledInput
@@ -231,7 +223,7 @@ const ReportingBanked = () => {
               }}
               onChange={updateSearchText}
             />
-            <ActionsMenu options={actionsMenuOptions} />
+            <ActionsMenu options={actionsMenuOptions as ActionsMenuOption[]} />
           </SearchBarWrapper>
         </TableCaption>
         <TableWrapper>
@@ -258,8 +250,8 @@ const ReportingBanked = () => {
           </TableContainer>
           {!table.visibleRows.length ? null : (
             <TablePagination
-              handleChangePage={changePage}
-              handleChangeRowsPerPage={changeRowsPerPage}
+              handleChangePage={handleChangePage}
+              handleChangeRowsPerPage={handleChangeRowsPerPage}
               page={page}
               pagesCount={pagesCount}
               rowsPerPage={rowsPerPage}

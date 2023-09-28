@@ -183,7 +183,7 @@ const ReportingProductQuestions = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{productQuestionsData.totalCount}</strong>
+            <strong>{productQuestionsData.data.length}</strong>
             {` ${productQuestionsData.totalCount === 0 || productQuestionsData.totalCount > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>

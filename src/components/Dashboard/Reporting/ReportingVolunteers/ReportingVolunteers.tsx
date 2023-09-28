@@ -44,13 +44,16 @@ interface ReportingFilters {
 }
 
 const ReportingVolunteers = () => {
-  const table = useSortingTable(rows);
+  const table = useSortingTable(rows, {
+    columns: headCells,
+    totalCount: rows.length,
+  });
   const {
     selected, handleSelectAllClick, checkIsSelected,
   } = table.selection;
   const { handleRequestSort } = table.sorting;
   const {
-    page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage,
+    page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
   } = table.pagination;
   const [filters, setSelectedFilters] = useState<ReportingFilters>({
     event: {
@@ -126,9 +129,8 @@ const ReportingVolunteers = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{rows.length}</strong>
-            {' '}
-            Volunteers
+            <strong>{`${totalRows} `}</strong>
+            {`${totalRows === 0 || totalRows > 1 ? 'Volunteers' : 'Volunteer'}`}
           </p>
           <EventCaption>
             <p>Event name</p>

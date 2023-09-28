@@ -1,9 +1,8 @@
-import React, { ChangeEvent } from 'react';
+import React from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
-import { SelectChangeEvent } from '@mui/material/Select';
 import {
   StyledAlert,
   TableCaption,
@@ -16,27 +15,21 @@ import { Row, StyledTableWrapper, TableWrapper } from '../../../shared/Table/Tab
 import { useSortingTable } from '../../../shared/Table/utils';
 import { headCells, rows } from './table-data'; 
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
-import { AppDispatch, RootState } from '../../../../redux/store';
+import { RootState } from '../../../../redux/store';
 import { getCurrencyByCode } from '../../../../utils/currency';
-import { getInvoicesStat } from '../../../../redux/actions/reporting.actions';
 import { InvoiceStatItem } from '../../../../types/reporting/invoices';
 
 const ReportingInvoices = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const invoicesData = useSelector((state: RootState) => state.reporting.invoices);
-  const table = useSortingTable<InvoiceStatItem>(invoicesData.data);
+  const table = useSortingTable<InvoiceStatItem>(invoicesData.data, {
+    columns: headCells,
+    totalCount: invoicesData.data.length,
+  });
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const { page, pagesCount, rowsPerPage } = table.pagination;
-
-  const changePage = (e: ChangeEvent, newPage?: number) => {
-    e.preventDefault();
-    dispatch(getInvoicesStat());
-  };
-
-  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(getInvoicesStat());
-  };
+  const {
+    page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
+  } = table.pagination;
 
   // please add protocol to invoice url
 
@@ -54,8 +47,8 @@ const ReportingInvoices = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{`${invoicesData.data.length} `}</strong>
-            {`${invoicesData.data.length === 0 || invoicesData.data.length > 1 ? 'Entries' : 'Entry'}`}
+            <strong>{`${totalRows} `}</strong>
+            {`${totalRows === 0 || totalRows > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>
         <TableWrapper>
@@ -105,8 +98,8 @@ const ReportingInvoices = () => {
             </Table>
           </StyledTableWrapper>
           <TablePagination
-            handleChangePage={changePage}
-            handleChangeRowsPerPage={changeRowsPerPage}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
             page={page}
             pagesCount={pagesCount}
             rowsPerPage={rowsPerPage}

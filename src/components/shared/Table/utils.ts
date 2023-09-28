@@ -152,7 +152,7 @@ const useTableSorting = () => {
 };
 
 export const useSortingTable = <T extends {}>(rows: T[],
-  other?: SortingTableProps, convertCb?: (data: any[], currency?: string) => any[]) => {
+  other: SortingTableProps, convertCb?: (data: any[], currency?: string) => any[]) => {
   const [selected, setSelected] = useState<readonly string[]>([]);
   const {
     foundData, searchText, isFound, isSearching, updateSearchText,

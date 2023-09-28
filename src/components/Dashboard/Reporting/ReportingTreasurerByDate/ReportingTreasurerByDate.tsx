@@ -47,11 +47,17 @@ const data = [
 ];
 
 const ReportingTreasurerByDate = () => {
-  const table = useSortingTable(rows);
-  const { selected, handleSelectAllClick, handleClick, checkIsSelected } = table.selection;
+  const table = useSortingTable(rows, {
+    columns: headCells,
+    totalCount: rows.length,
+  });
+  const {
+    selected, handleSelectAllClick, handleClick, checkIsSelected,
+  } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const { page, pagesCount, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
-    table.pagination;
+  const {
+    page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
+  } = table.pagination;
 
   const [open, setOpen] = useState(false);
 
@@ -81,7 +87,8 @@ const ReportingTreasurerByDate = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{rows.length}</strong> Entries
+            <strong>{`${totalRows} `}</strong>
+            {`${totalRows === 0 || totalRows > 1 ? 'Entries' : 'Entry'}`}
           </p>
           <SearchBarWrapper className="search-wrapper">
             <ActionsMenu options={menuActionsOptions} />
@@ -94,17 +101,17 @@ const ReportingTreasurerByDate = () => {
                 numSelected={selected.length}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
-                rowCount={rows.length}
+                rowCount={totalRows}
                 cells={headCells}
                 className="table-head"
                 checkbox={false}
               />
               <TableBody>
-                {table.visibleRows.map((row, index) => {
-                  // const isItemSelected = checkIsSelected(row.id);
-                  // const labelId = `enhanced-table-checkbox-${index}`;
+                {table.visibleRows.map((row, index) =>
+                // const isItemSelected = checkIsSelected(row.id);
+                // const labelId = `enhanced-table-checkbox-${index}`;
 
-                  return (
+                  (
                     <Row
                       // hover
                       // onClick={(event) => handleClick(event, row.id)}
@@ -112,8 +119,6 @@ const ReportingTreasurerByDate = () => {
                       // aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
-                      // selected={isItemSelected}
-                      // sx={{ cursor: 'pointer' }}
                     >
                       {/* <TableCell className="checkbox">
                         <StyledCheckbox
@@ -167,8 +172,7 @@ const ReportingTreasurerByDate = () => {
                         <p>{`${getCurrencyByCode(row.currency, (row as any).price)}`}</p>
                       </TableCell>
                     </Row>
-                  );
-                })}
+                  ))}
                 <Row sx={{ cursor: 'pointer' }}>
                   <TableCell className="checkbox hidden" />
                   <TableCell className="row-id hidden" />
@@ -189,7 +193,7 @@ const ReportingTreasurerByDate = () => {
                     <p>{getCurrencyByCode('GBP', 0)}</p>
                   </TableCell>
                   <TableCell className="gift-aid hidden">
-                    <p></p>
+                    <p />
                   </TableCell>
                   <TableCell className="refunded hidden">
                     <p>{getCurrencyByCode('GBP', 0)}</p>

@@ -7,7 +7,7 @@ import ShevronUp from '../../../assets/icons/shevron-up';
 import ShevronDown from '../../../assets/icons/shevron-down';
 import { theme } from '../../../styles/defaultTheme';
 
-interface Option {
+export interface ActionsMenuOption {
   value: number | string;
   label: number | string;
   icon?: JSX.Element;
@@ -15,7 +15,7 @@ interface Option {
 }
 
 interface ActionsMenuProps {
-  options: Option[];
+  options: ActionsMenuOption[];
   menuName?: string;
   children?: ReactNode;
 }

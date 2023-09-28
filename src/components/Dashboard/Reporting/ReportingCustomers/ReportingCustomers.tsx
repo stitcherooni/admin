@@ -1,13 +1,12 @@
 import React, {
-  ChangeEvent, SyntheticEvent, useMemo, useState,
+  SyntheticEvent, useMemo, useState,
 } from 'react';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { SelectChangeEvent } from '@mui/material/Select';
+import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import {
   TableCell, TableContent, Head, Wrapper,
@@ -15,7 +14,6 @@ import {
 import {
   Row,
   SearchBarWrapper,
-  StyledCheckbox,
   TableCaption,
   TableWrapper,
 } from '../../../shared/Table/Table.styled';
@@ -40,39 +38,16 @@ import { CustomerStatItem } from '../../../../types/reporting/customers';
 import { handleCloseModal } from '../../../../utils/modals';
 
 const ReportingCustomers = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const customersData = useSelector((state: RootState) => state.reporting.customers);
   const table = useSortingTable<CustomerStatItem>(customersData.data, {
-    totalCount: customersData.totalCount,
-    totalPages: customersData.totalPages,
-    pageSize: customersData.pageSize,
-    currentPage: customersData.currentPage,
     columns: headCells,
+    totalCount: customersData.data.length,
   });
-  const {
-    selected, handleSelectAllClick, checkIsSelected, handleClick,
-  } = table.selection;
+  const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
-  const { page, pagesCount, rowsPerPage } = table.pagination;
-
-  const changePage = (e: ChangeEvent, newPage?: number) => {
-    e.preventDefault();
-    dispatch(
-      getCustomersStat({
-        page: newPage,
-        pageSize: rowsPerPage,
-      }),
-    );
-  };
-
-  const changeRowsPerPage = (e: SelectChangeEvent<unknown>) => {
-    dispatch(
-      getCustomersStat({
-        page: 1,
-        pageSize: parseInt((e.target as HTMLSelectElement).value, 10),
-      }),
-    );
-  };
+  const {
+    page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
+  } = table.pagination;
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
@@ -104,20 +79,26 @@ const ReportingCustomers = () => {
     setFilteringDrawerOpen(!filteringDrawerOpen);
   };
 
-  const statistic = useMemo(() => [
-    {
-      label: 'Total Customers:',
-      value: 'n/a',
-    },
-    {
-      label: 'Total Orders:',
-      value: customersData.totalOrdersNumber,
-    },
-    {
-      label: 'Total Order Value:',
-      value: `${getCurrencyByCode(customersData.totalOrderValue.currency, !customersData.totalOrderValue ? 0 : customersData.totalOrderValue.amount)}`,
-    },
-  ], [customersData.totalOrderValue, customersData.totalOrdersNumber]);
+  const statistic = useMemo(
+    () => [
+      {
+        label: 'Total Customers:',
+        value: 'n/a',
+      },
+      {
+        label: 'Total Orders:',
+        value: customersData.totalOrdersNumber,
+      },
+      {
+        label: 'Total Order Value:',
+        value: `${getCurrencyByCode(
+          customersData.totalOrderValue.currency,
+          !customersData.totalOrderValue ? 0 : customersData.totalOrderValue.amount,
+        )}`,
+      },
+    ],
+    [customersData.totalOrderValue, customersData.totalOrdersNumber],
+  );
 
   // to do
   // actions (approve, remove, tinymce integration)
@@ -134,9 +115,9 @@ const ReportingCustomers = () => {
       <TableContent>
         <TableCaption>
           <p>
-            <strong>{`${customersData.totalCount} `}</strong>
+            <strong>{`${totalRows} `}</strong>
             {`${
-              customersData.totalCount === 0 || customersData.totalCount > 1
+              totalRows === 0 || totalRows > 1
                 ? 'Customers'
                 : 'Customer'
             }`}
@@ -158,66 +139,46 @@ const ReportingCustomers = () => {
                 checkbox={false}
               />
               <TableBody>
-                {table.visibleRows.map((row, index) => {
-                  // const isItemSelected = checkIsSelected(row.id);
-                  // const labelId = `enhanced-table-checkbox-${index}`;
-
-                  return (
-                    <Row
-                      // hover
-                      // onClick={(event) => handleClick(event, row.id)}
-                      // role="checkbox"
-                      // aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
-                      // selected={isItemSelected}
-                      // sx={{ cursor: 'pointer' }}
-                    >
-                      {/* <TableCell className="checkbox">
-                        <StyledCheckbox
-                          checked={isItemSelected}
-                          inputProps={{
-                            'aria-labelledby': labelId,
-                          }}
-                          size="small"
-                        />
-                      </TableCell> */}
-                      <TableCell className="row-id">
-                        <p>{row.num}</p>
-                      </TableCell>
-                      <TableCell className="id">
-                        <Link to={`/dashboard/customers/${row.id}`}>{row.id}</Link>
-                      </TableCell>
-                      <TableCell className="first-name">
-                        <p>{row.firstName}</p>
-                      </TableCell>
-                      <TableCell className="last-name">
-                        <p>{row.lastName}</p>
-                      </TableCell>
-                      <TableCell className="date">
-                        <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
-                      </TableCell>
-                      <TableCell className="approved">
-                        <SecondaryButton>{(row as any).approved ? 'Yes' : 'No'}</SecondaryButton>
-                      </TableCell>
-                      <TableCell className="orders">
-                        <p>{row.orders}</p>
-                      </TableCell>
-                      <TableCell className="order-value">
-                        <p>{`${getCurrencyByCode(row.value.currency, row.value.amount)}`}</p>
-                      </TableCell>
-                      <TableCell className="actions">
-                        <ActionsMenu options={actionsOptions} />
-                      </TableCell>
-                    </Row>
-                  );
-                })}
+                {table.visibleRows.map((row) => (
+                  <Row
+                    tabIndex={-1}
+                    key={row.id}
+                  >
+                    <TableCell className="row-id">
+                      <p>{row.num}</p>
+                    </TableCell>
+                    <TableCell className="id">
+                      <Link to={`/dashboard/customers/${row.id}`}>{row.id}</Link>
+                    </TableCell>
+                    <TableCell className="first-name">
+                      <p>{row.firstName}</p>
+                    </TableCell>
+                    <TableCell className="last-name">
+                      <p>{row.lastName}</p>
+                    </TableCell>
+                    <TableCell className="date">
+                      <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
+                    </TableCell>
+                    <TableCell className="approved">
+                      <SecondaryButton>{(row as any).approved ? 'Yes' : 'No'}</SecondaryButton>
+                    </TableCell>
+                    <TableCell className="orders">
+                      <p>{row.orders}</p>
+                    </TableCell>
+                    <TableCell className="order-value">
+                      <p>{`${getCurrencyByCode(row.value.currency, row.value.amount)}`}</p>
+                    </TableCell>
+                    <TableCell className="actions">
+                      <ActionsMenu options={actionsOptions} />
+                    </TableCell>
+                  </Row>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
           <TablePagination
-            handleChangePage={changePage}
-            handleChangeRowsPerPage={changeRowsPerPage}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
             page={page}
             pagesCount={pagesCount}
             rowsPerPage={rowsPerPage}

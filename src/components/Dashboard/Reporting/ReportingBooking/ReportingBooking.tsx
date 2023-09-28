@@ -1,32 +1,21 @@
-/* eslint-disable react/jsx-one-expression-per-line */
 import React, {
   SyntheticEvent, useEffect, useMemo, useRef, useState,
 } from 'react';
 import Table from '@mui/material/Table';
 import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
-  StyledAlert,
-  TableCaption,
-  TableContent,
-  Head,
-  Wrapper,
+  StyledAlert, TableCaption, TableContent, Head, Wrapper,
 } from './ReportingBooking.styled';
-import {
-  StyledTableWrapper,
-  TableWrapper,
-} from '../../../shared/Table/Table.styled';
+import { StyledTableWrapper, TableWrapper } from '../../../shared/Table/Table.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
 import { headCells } from './table-data';
 import { Overlay, StyledDrawer } from '../Reporting.styled';
 import BookingEditModal from './BookingEditModal/BookingEditModal';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import {
-  convertBookingItems,
-  createBookingActions,
-  getFetchBookingsFn,
-} from './utils';
+import { convertBookingItems, createBookingActions, getFetchBookingsFn } from './utils';
 import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import { BookingStatItem } from '../../../../types/reporting/bookings';
@@ -40,7 +29,7 @@ import { handleCloseModal } from '../../../../utils/modals';
 import ReportingBookingTableBody from './ReportingBookingTableBody';
 import ReportingBookingFilters from './ReportingBookingFilters/ReportingBookingFilters';
 import { resetSelectedFilters } from '../../../../redux/slices/reporting/bookings.slice';
-import { useNavigate } from 'react-router-dom';
+import { ActionsMenuOption } from '../../../shared/ActionsMenu/ActionsMenu';
 
 const ReportingBooking = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -48,7 +37,10 @@ const ReportingBooking = () => {
 
   const bookingData = useSelector((state: RootState) => state.reporting.bookings);
   // eslint-disable-next-line max-len
-  const rows = useMemo(() => (!showTestBookings ? bookingData.data ?? [] : bookingData.testData ?? []), [showTestBookings, bookingData]);
+  const rows = useMemo(
+    () => (!showTestBookings ? bookingData.data ?? [] : bookingData.testData ?? []),
+    [showTestBookings, bookingData.data, bookingData.testData],
+  );
   const table = useSortingTable<BookingStatItem>(
     rows,
     {
@@ -106,8 +98,10 @@ const ReportingBooking = () => {
 
   const navigate = useNavigate();
   const sendNewsletter = () => {
-    navigate(`/dashboard/listings?type=booking-newsletter&id=${bookingData.selectedFilters.event.value}`)
-  }
+    navigate(
+      `/dashboard/listings?type=booking-newsletter&id=${bookingData.selectedFilters.event.value}`,
+    );
+  };
 
   const actionsMenuOptions = useMemo(
     () => createBookingActions({
@@ -126,7 +120,9 @@ const ReportingBooking = () => {
 
   const actionsMenuRef = useRef(null);
 
-  useEffect(() => { dispatch(resetSelectedFilters()); }, []);
+  useEffect(() => {
+    dispatch(resetSelectedFilters());
+  }, []);
 
   return bookingData.status === 'loading' ? (
     <LoadingOverlay />
@@ -140,7 +136,11 @@ const ReportingBooking = () => {
       ) : null}
       {!showTestBookings ? null : (
         <StyledAlert type="warning" testid="test-bookings">
-          Warning: You are viewing <strong>test</strong> bookings
+          Warning: You are viewing
+          {' '}
+          <strong>test</strong>
+          {' '}
+          bookings
         </StyledAlert>
       )}
       {!table.visibleRows.length ? (
@@ -149,7 +149,7 @@ const ReportingBooking = () => {
       <ReportingBookingFilters
         actionsMenuRef={actionsMenuRef}
         updateSearchText={updateSearchText}
-        actionsMenuOptions={actionsMenuOptions}
+        actionsMenuOptions={actionsMenuOptions as ActionsMenuOption[]}
       />
       <TableContent>
         {!error ? null : (
@@ -161,9 +161,7 @@ const ReportingBooking = () => {
         <TableCaption>
           <p>
             <strong>{`${totalRows} `}</strong>
-            {`${
-              totalRows === 0 || totalRows > 1 ? 'Entries' : 'Entry'
-            }`}
+            {`${totalRows === 0 || totalRows > 1 ? 'Entries' : 'Entry'}`}
           </p>
         </TableCaption>
         <TableWrapper>
