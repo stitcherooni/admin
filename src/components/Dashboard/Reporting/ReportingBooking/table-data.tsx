@@ -418,7 +418,7 @@ export const menuActionsOptions = [
   },
   {
     value: 'pdf-customize-view',
-    label: 'Export Door Validation List',
+    label: 'Door Validation List',
     icon: <ButtonIconPdf color={theme.colors.main.black} />,
   },
   {

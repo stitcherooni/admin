@@ -216,7 +216,7 @@ describe('Reporting Bookings', () => {
       });
     });
     await userEvent.click(screen.getByText(/Actions/));
-    await userEvent.click(screen.getByText(/Export Door Validation List/));
+    await userEvent.click(screen.getByText(/Door Validation List/));
 
     server.use(rest.post('/api/Report/bookingspdf', async (req, res, ctx) => res(ctx.status(400), ctx.json({ message: 'Failed request to load file' }))));
 
