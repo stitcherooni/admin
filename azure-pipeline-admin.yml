@@ -128,3 +128,38 @@ stages:
       - task: KubeloginInstaller@0
         inputs:
           kubeloginVersion: 'latest'
+
+      - task: replacetokens@5
+        inputs:
+          rootDirectory: '$(Build.SourcesDirectory)'
+          targetFiles: '**/admin.yaml'
+          encoding: 'auto'
+          tokenPattern: 'azpipelines'
+          writeBOM: true
+          actionOnMissing: 'fail'
+          keepToken: false
+          actionOnNoFiles: 'fail'
+          enableTransforms: false
+          enableRecursion: false
+          useLegacyPattern: false
+          enableTelemetry: true
+
+      - task: Kubernetes@1
+        displayName: Create Deployment $(appName)
+        inputs:
+          connectionType: 'Azure Resource Manager'
+          azureSubscriptionEndpoint: 'internal-adm-sp'
+          azureResourceGroup: 'internal-ptae-rg-01'
+          kubernetesCluster: 'internal-ptae-aks-01'
+          namespace: $(envName)
+          command: 'apply'
+          arguments: '-f $(Build.SourcesDirectory)/admin.yaml -o yaml'
+          secretType: 'dockerRegistry'
+          containerRegistryType: 'Azure Container Registry'
+
+      - task: Bash@3
+        displayName: Admin Panel URL
+        inputs:
+          targetType: inline
+          script: |
+            echo "Admin Panel URL" https://$(envName)-admin.pta-events.com
