@@ -65,7 +65,7 @@ const ReportingBookingTableBody = (props: ReportingBookingTableBodyProps) => (
         ) : null}
         {props.columnsOptions.get('price')?.checked ? (
           <TableCell className="price">
-            <p>{row.price}</p>
+            <p>{`${getCurrencyByCode(row?.currency ?? 'GBP', row.price)}`}</p>
           </TableCell>
         ) : null}
         {props.columnsOptions.get('quantity')?.checked ? (
@@ -84,7 +84,7 @@ const ReportingBookingTableBody = (props: ReportingBookingTableBodyProps) => (
         ) : null}
         {props.columnsOptions.get('date')?.checked ? (
           <TableCell className="order-date">
-            <p>{row.date}</p>
+            <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
           </TableCell>
         ) : null}
         {props.columnsOptions.get('customerName')?.checked ? (

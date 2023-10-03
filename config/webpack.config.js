@@ -71,7 +71,7 @@ module.exports = {
     historyApiFallback: true,
     proxy: {      
       '/api': {
-        target: 'https://dev-apigateway.pta-events.com/api',
+        target: 'https://ptaeventsgateway.azurewebsites.net/api',
         secure: false,
         pathRewrite: { '^/api': '' },
         changeOrigin: true

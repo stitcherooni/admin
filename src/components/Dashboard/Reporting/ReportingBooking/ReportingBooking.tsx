@@ -31,10 +31,6 @@ import ReportingBookingFilters from './ReportingBookingFilters/ReportingBookingF
 import { resetSelectedFilters } from '../../../../redux/slices/reporting/bookings.slice';
 import { ActionsMenuOption } from '../../../shared/ActionsMenu/ActionsMenu';
 
-export interface ConvertedBooking extends Omit<BookingStatItem, 'price'> {
-  price: string;
-}
-
 const ReportingBooking = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [showTestBookings, setShowTestBookings] = useState(false);
@@ -45,12 +41,13 @@ const ReportingBooking = () => {
     () => (!showTestBookings ? bookingData.data ?? [] : bookingData.testData ?? []),
     [showTestBookings, bookingData.data, bookingData.testData],
   );
-  const table = useSortingTable<ConvertedBooking>(
-    convertBookingItems(rows),
+  const table = useSortingTable<BookingStatItem>(
+    rows,
     {
       columns: headCells,
       totalCount: rows.length,
     },
+    convertBookingItems,
   );
   const {
     page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,

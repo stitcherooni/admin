@@ -14,7 +14,6 @@ import { getBookingStat, getTestBookingStat } from '../../../../redux/actions/re
 import { menuActionsOptions } from './table-data';
 import { downloadFile } from '../../../../utils/file';
 import { copyTable } from '../../../shared/Table/utils';
-import { ConvertedBooking } from './ReportingBooking';
 
 const convertEventToOptions = (data: BookingEventStatFilter[]) => data.map((item) => ({ value: item.eventId, label: item.eventName }));
 
@@ -77,18 +76,18 @@ export const getSortingOrdering = (
 
 export const getFetchBookingsFn = (showTestBookings: boolean) => (showTestBookings ? getTestBookingStat : getBookingStat);
 
-export const downloadBookingFile = ({
-  url, fileName, tableData, errorCb, headCells,
-}) => downloadFile(
-  url,
-  fileName,
-  {
-    ids: getBookingItemsIds(tableData.visibleRows),
-    columns: getAvailableColumns(tableData.customization.visibleColumns),
-    ordering: getSortingOrdering(tableData.sorting.filters, headCells), // objects, key - field name, value - asc | desc
-  },
-  errorCb,
-);
+export const downloadBookingFile = ({url, fileName, tableData, errorCb, headCells }) => {
+  return downloadFile(
+    url,
+    fileName,
+    {
+      ids: getBookingItemsIds(tableData.visibleRows),
+      columns: getAvailableColumns(tableData.customization.visibleColumns),
+      ordering: getSortingOrdering(tableData.sorting.filters, headCells), // objects, key - field name, value - asc | desc
+    },
+    errorCb,
+  );
+};
 
 interface CreateBookingActions {
   handleCustomize: (flag: boolean) => void;
@@ -103,90 +102,84 @@ interface CreateBookingActions {
 }
 
 export const createBookingActions = (data: CreateBookingActions) => {
-  const {
-    handleCustomize, tableData, headCells,
-    errorCb, showTestBookings, fetchBookingData, toggleShowRandom, sendNewsletter,
-  } = data;
-
-  const { search, visibleRows, allRows, visibleColumns } = tableData;
-
-  const rows = search.isSearching ? visibleRows : allRows;
+  const { handleCustomize, tableData, headCells, 
+    errorCb, showTestBookings, fetchBookingData, tableRef, toggleShowRandom, sendNewsletter } = data;
 
   return menuActionsOptions
-    .map((item) => {
-      switch (item.value) {
-        case 'customize-view':
-          return { ...item, handleClick: () => handleCustomize(true) };
-        case 'excel':
-          return {
+  .map((item) => {
+    switch (item.value) {
+      case 'customize-view':
+        return { ...item, handleClick: () => handleCustomize(true) };
+      case 'excel':
+        return {
+          ...item,
+          handleClick: () => downloadBookingFile({
+            url: '/Report/bookingsexcel',
+            fileName: 'excel.xls',
+            tableData,
+            errorCb,
+            headCells
+          }),
+        };
+      case 'pdf':
+        return {
+          ...item,
+          handleClick: () => downloadBookingFile({
+            url: '/Report/bookingspdf?format=table',
+            fileName: 'report.pdf',
+            tableData,
+            errorCb,
+            headCells
+          }),
+        };
+      case 'pdf-customize-view':
+        return {
+          ...item,
+          handleClick: () => downloadBookingFile({
+            url: '/Report/bookingspdf?format=doorValidation',
+            fileName: 'report.pdf',
+            tableData,
+            errorCb,
+            headCells
+          }),
+        };
+      case 'test-bookings':
+        return !showTestBookings
+          ? {
             ...item,
-            handleClick: () => downloadBookingFile({
-              url: '/Report/bookingsexcel',
-              fileName: 'excel.xls',
-              tableData,
-              errorCb,
-              headCells,
-            }),
-          };
-        case 'pdf':
-          return {
+            handleClick: () => fetchBookingData(true),
+          }
+          : null;
+      case 'live-bookings':
+        return showTestBookings
+          ? {
             ...item,
-            handleClick: () => downloadBookingFile({
-              url: '/Report/bookingspdf?format=table',
-              fileName: 'report.pdf',
-              tableData,
-              errorCb,
-              headCells,
-            }),
-          };
-        case 'pdf-customize-view':
-          return {
-            ...item,
-            handleClick: () => downloadBookingFile({
-              url: '/Report/bookingspdf?format=doorValidation',
-              fileName: 'report.pdf',
-              tableData,
-              errorCb,
-              headCells,
-            }),
-          };
-        case 'test-bookings':
-          return !showTestBookings
-            ? {
-              ...item,
-              handleClick: () => fetchBookingData(true),
-            }
-            : null;
-        case 'live-bookings':
-          return showTestBookings
-            ? {
-              ...item,
-              handleClick: () => fetchBookingData(false),
-            }
-            : null;
-        case 'copy': {
-          return {
-            ...item,
-            handleClick: () => copyTable(rows, tableData.visibleColumns),
-          };
-        }
-        case 'random': {
-          return {
-            ...item,
-            handleClick: () => toggleShowRandom(),
-          };
-        }
-
-        case 'email': {
-          return {
-            ...item,
-            handleClick: () => sendNewsletter(),
-          };
-        }
-
-        default:
-          return item;
+            handleClick: () => fetchBookingData(false),
+          }
+          : null;
+      case 'copy': {
+        return {
+          ...item,
+          handleClick: () => copyTable(tableRef),
+        };
       }
-    })
-    .filter((item) => item);
-};
+      case 'random': {
+        return {
+          ...item,
+          handleClick: () => toggleShowRandom(),
+        };
+      }
+
+      case 'email': {
+        return {
+          ...item,
+          handleClick: () => sendNewsletter(),
+        }
+      }
+
+      default:
+        return item;
+    }
+  })
+  .filter((item) => item)
+}
