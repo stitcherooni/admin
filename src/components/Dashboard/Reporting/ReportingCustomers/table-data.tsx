@@ -28,11 +28,6 @@ export const headCells = [
     label: 'Last Name',
     className: 'last-name',
   },
-  // {
-  //   id: 'child',
-  //   label: 'Child',
-  //   className: 'child',
-  // },
   {
     id: 'date',
     label: 'Reg Date',
@@ -54,9 +49,14 @@ export const headCells = [
     className: 'order-value',
   },
   {
-    id: 'actions',
-    label: 'Actions',
-    className: 'actions',
+    id: 'send-email',
+    label: 'Send Email',
+    className: 'send-email',
+  },
+  {
+    id: 'delete-customer',
+    label: 'Delete',
+    className: 'delete-customer',
   },
 ];
 

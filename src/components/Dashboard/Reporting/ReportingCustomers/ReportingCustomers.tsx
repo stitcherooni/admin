@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import {
-  TableCell, TableContent, Head, Wrapper,
+  TableCell, TableContent, Head, Wrapper, RowButton,
 } from './ReportingCustomers.styled';
 import {
   Row,
@@ -37,6 +37,10 @@ import { getCurrencyByCode } from '../../../../utils/currency';
 import { CustomerStatItem } from '../../../../types/reporting/customers';
 import { handleCloseModal } from '../../../../utils/modals';
 import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
+import { EmailIcon } from '../ReportingEmailTracker/ReportingEmailDetails/ReportingEmailStepper/ReportingEmailStepper.styled';
+import MessageIcon from '../../../../assets/icons/message-icon';
+import DeleteIcon from '../../../../assets/icons/delete-icon';
+import { theme } from '../../../../styles/defaultTheme';
 
 const ReportingCustomers = () => {
   const customersData = useSelector((state: RootState) => state.reporting.customers);
@@ -161,7 +165,7 @@ const ReportingCustomers = () => {
                       <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
                     </TableCell>
                     <TableCell className="approved">
-                      <SecondaryButton>{(row as any).approved ? 'Yes' : 'No'}</SecondaryButton>
+                      <RowButton>{(row as any).approved ? 'Yes' : 'No'}</RowButton>
                     </TableCell>
                     <TableCell className="orders">
                       <p>{row.orders}</p>
@@ -169,8 +173,11 @@ const ReportingCustomers = () => {
                     <TableCell className="order-value">
                       <p>{`${getCurrencyByCode(customersData.currency, row.value)}`}</p>
                     </TableCell>
-                    <TableCell className="actions">
-                      <ActionsMenu options={actionsOptions} />
+                    <TableCell className="send-email">
+                      <RowButton startIcon={<MessageIcon color={theme.colors.main.green} />} />
+                    </TableCell>
+                    <TableCell className="delete-customer">
+                      <RowButton startIcon={<DeleteIcon color={theme.colors.main.green} />} />
                     </TableCell>
                   </Row>
                 ))}
