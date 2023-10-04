@@ -1,10 +1,17 @@
 import { SyntheticEvent } from 'react';
-import { BookingEventStatFilter, BookingStatEvents, BookingStatGroupByFilter, ChildBookingStatItem } from '../../../../types/reporting/bookings';
+import {
+  BookingEventStatFilter,
+  BookingStatEvents,
+  BookingStatGroupByFilter,
+  ChildBookingStatItem,
+} from '../../../../types/reporting/bookings';
 import { CellProps } from '../../../shared/Table/TableHead/TableHead';
-import { getChildBookingStat, getTestChildBookingStat } from '../../../../redux/actions/reporting.actions';
+import {
+  getChildBookingStat,
+  getTestChildBookingStat,
+} from '../../../../redux/actions/reporting.actions';
 
-const convertEventToOptions = (data: BookingEventStatFilter[]) =>
-  data.map((item) => ({ value: item.eventId, label: item.eventName }));
+const convertEventToOptions = (data: BookingEventStatFilter[]) => data.map((item) => ({ value: item.eventId, label: item.eventName }));
 
 export const createEventsOptions = (data: BookingStatEvents[]) => {
   if (!data.length) return [];
@@ -29,12 +36,43 @@ export const createSortByOptions = (data: BookingStatGroupByFilter[]) => {
   return data.map((item) => ({ value: item.id, label: item.name }));
 };
 
-export const getChildBookingItemsIds = (rowsList: ChildBookingStatItem[]) => {
-  return rowsList.map((item) => item.id);
-};
+export const createChildBookingsCopyData = (
+  data: ChildBookingStatItem[],
+  columnsOptions: Map<any, any>,
+) => data.map((item) => {
+  const row = [];
+
+  if (columnsOptions.get('firstName')?.checked) {
+    row.push(item.firstName);
+  }
+
+  if (columnsOptions.get('lastName')?.checked) {
+    row.push(item.lastName);
+  }
+
+  if (columnsOptions.get('class')?.checked) {
+    row.push(item.class);
+  }
+
+  if (columnsOptions.get('bookedBy')?.checked) {
+    row.push(item.bookedBy);
+  }
+
+  if (columnsOptions.get('allergies')?.checked) {
+    row.push(item.allergies);
+  }
+
+  if (columnsOptions.get('phone')?.checked) {
+    row.push(item.phone);
+  }
+
+  return row;
+});
+
+export const getChildBookingItemsIds = (rowsList: ChildBookingStatItem[]) => rowsList.map((item) => item.id);
 export const getAvailableColumns = (cols: CellProps[]) => cols.map((col) => col.id);
 export const getSortingOrdering = (
-  data: { orders: string[], fields: string[] },
+  data: { orders: string[]; fields: string[] },
   columns: CellProps[],
 ) => {
   const { fields, orders } = data;
@@ -52,6 +90,4 @@ export const getSortingOrdering = (
   return res;
 };
 
-export const getFetchChildBookingsFn = (showTestBookings: boolean) => {
-  return showTestBookings ? getTestChildBookingStat : getChildBookingStat;
-};
+export const getFetchChildBookingsFn = (showTestBookings: boolean) => (showTestBookings ? getTestChildBookingStat : getChildBookingStat);

@@ -53,31 +53,27 @@ export const sortBookingStat = createAsyncThunk('reporting/sortBookingStat', asy
 });
 
 export const getChildBookingStat = createAsyncThunk('reporting/getChildBookingsStat', async (params: any = null) => {
-  const url = `/api/Report/datareport?SchoolId=1&Type=child_only_bookings&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
+  const url = `/Report/datareport?SchoolId=1&Type=child_only_bookings&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
+  const response = await axiosInstance.get(url);
+  return response.data;
 });
 
 export const getChildBookingFilters = createAsyncThunk('reporting/getChildBookingsFilters', async (organizationId: number) => {
-  const url = `/api/Report/bookingsfilters?OrganizationId=${organizationId}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
+  const url = `/Report/bookingsfilters?OrganizationId=${organizationId}`;
+  const response = await axiosInstance.get(url);
+  return response.data;
 });
 
 export const sortChildBookingStat = createAsyncThunk('reporting/sortChildBookingStat', async (params: any) => {
-  const baseUrl = '/api/Report/sortchildbookings';
-  const response = await fetch(baseUrl + createQueryString(params));
-  const data = await response.json();
-  return data;
+  const baseUrl = '/Report/sortchildbookings';
+  const response = await axiosInstance.get(baseUrl + createQueryString(params));
+  return response.data;
 });
 
 export const getTestChildBookingStat = createAsyncThunk('reporting/getTestChildBookingStat', async (params: any) => {
-  const baseUrl = '/api/Report/sortchildbookings';
-  const response = await fetch(baseUrl + createQueryString(params));
-  const data = await response.json();
-  return data;
+  const baseUrl = '/Report/sortchildbookings';
+  const response = await axiosInstance.get(baseUrl + createQueryString(params));
+  return response.data;
 });
 
 export const getCustomersStat = createAsyncThunk('reporting/getCustomersStat', async (params: any = null) => {

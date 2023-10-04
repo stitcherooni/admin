@@ -30,6 +30,7 @@ import { AppDispatch, RootState } from '../../../../redux/store';
 import { createEventsOptions } from '../ReportingBooking/utils';
 import { sortChildBookingStat } from '../../../../redux/actions/reporting.actions';
 import {
+  createChildBookingsCopyData,
   createSortByOptions, getAvailableColumns,
   getChildBookingItemsIds, getFetchChildBookingsFn, getSortingOrdering,
 } from './utils';
@@ -66,11 +67,13 @@ const ReportingChildBooking = () => {
 
     return headCells;
   }, [childBookingData.selectedFilters.groupBy, headCells]);
-  const rows = useMemo(() => (!showTestBookings ? childBookingData.data ??
-     [] : childBookingData.testData ?? []), [showTestBookings, childBookingData]);
+  const rows = useMemo(() => (!showTestBookings ? childBookingData.data
+     ?? [] : childBookingData.testData ?? []), [showTestBookings, childBookingData]);
   const table = useSortingTable<ChildBookingStatItem>(rows, { columns: headCols, totalCount: rows.length });
-  const { page, pagesCount, rowsPerPage, totalRows, 
-    handleChangePage, handleChangeRowsPerPage } = table.pagination;
+  const {
+    page, pagesCount, rowsPerPage, totalRows,
+    handleChangePage, handleChangeRowsPerPage,
+  } = table.pagination;
   const { selected, handleSelectAllClick } = table.selection;
   const { handleRequestSort } = table.sorting;
 
@@ -126,80 +129,93 @@ const ReportingChildBooking = () => {
   const [error, setError] = useState<null | string>(null);
 
   const actionsMenuOptions = useMemo(
-    () => menuActionsOptions
-      .map((item) => {
-        switch (item.value) {
-          case 'customize-view':
-            return { ...item, handleClick: () => setOpenCustomizeMenu(true) };
-          case 'excel':
-            return {
-              ...item,
-              handleClick: () => downloadFile(
-                '/Report/childonlybookingsexcel',
-                'excel.xls',
-                {
-                  ids: getChildBookingItemsIds(table.visibleRows),
-                  columns: getAvailableColumns(table.customization.visibleColumns),
-                  ordering: getSortingOrdering(table.sorting.filters, headCols), // objects, key - field name, value - asc | desc
-                },
-                setError,
-              ),
-            };
-          case 'pdf':
-            return {
-              ...item,
-              handleClick: () => downloadFile(
-                '/Report/childonlybookingspdf',
-                'report.pdf',
-                {
-                  ids: getChildBookingItemsIds(table.visibleRows),
-                  columns: getAvailableColumns(table.customization.visibleColumns),
-                  ordering: getSortingOrdering(table.sorting.filters, headCols), // objects, key - field name, value - asc | desc
-                },
-                setError,
-              ),
-            };
-          case 'test-bookings':
-            return !showTestBookings
-              ? {
-                ...item,
-                handleClick: () => {
-                  const fn = getFetchChildBookingsFn(true);
-                  setShowTestBookings(true);
-                  dispatch(fn({
-                    eventIds: childBookingData.selectedFilters.event?.value ?? '',
-                    groupBy: childBookingData.selectedFilters.groupBy ?? '',
-                  }));
-                },
-              }
-              : null;
-          case 'live-bookings':
-            return showTestBookings
-              ? {
-                ...item,
-                handleClick: () => {
-                  const fn = getFetchChildBookingsFn(false);
-                  setShowTestBookings(false);
-                  dispatch(fn({
-                    eventIds: childBookingData.selectedFilters.event?.value ?? '',
-                    groupBy: childBookingData.selectedFilters.groupBy ?? '',
-                  }));
-                },
-              }
-              : null;
-          case 'copy': {
-            return {
-              ...item,
-              handleClick: () => copyTable(tableRef),
-            };
-          }
+    () => {
+      const {
+        search, visibleRows, allRows, customization,
+      } = table;
 
-          default:
-            return item;
-        }
-      })
-      .filter((item) => item),
-    [menuActionsOptions, showTestBookings],
+      const rows = search.isSearching ? visibleRows : allRows;
+      return menuActionsOptions
+        .map((item) => {
+          switch (item.value) {
+            case 'customize-view':
+              return { ...item, handleClick: () => setOpenCustomizeMenu(true) };
+            case 'excel':
+              return {
+                ...item,
+                handleClick: () => downloadFile(
+                  '/Report/childonlybookingsexcel',
+                  'excel.xls',
+                  {
+                    ids: getChildBookingItemsIds(table.visibleRows),
+                    columns: getAvailableColumns(table.customization.visibleColumns),
+                    ordering: getSortingOrdering(table.sorting.filters, headCols), // objects, key - field name, value - asc | desc
+                  },
+                  setError,
+                ),
+              };
+            case 'pdf':
+              return {
+                ...item,
+                handleClick: () => downloadFile(
+                  '/Report/childonlybookingspdf',
+                  'report.pdf',
+                  {
+                    ids: getChildBookingItemsIds(table.visibleRows),
+                    columns: getAvailableColumns(table.customization.visibleColumns),
+                    ordering: getSortingOrdering(table.sorting.filters, headCols), // objects, key - field name, value - asc | desc
+                  },
+                  setError,
+                ),
+              };
+            case 'test-bookings':
+              return !showTestBookings
+                ? {
+                  ...item,
+                  handleClick: () => {
+                    const fn = getFetchChildBookingsFn(true);
+                    setShowTestBookings(true);
+                    dispatch(fn({
+                      eventIds: childBookingData.selectedFilters.event?.value ?? '',
+                      groupBy: childBookingData.selectedFilters.groupBy ?? '',
+                    }));
+                  },
+                }
+                : null;
+            case 'live-bookings':
+              return showTestBookings
+                ? {
+                  ...item,
+                  handleClick: () => {
+                    const fn = getFetchChildBookingsFn(false);
+                    setShowTestBookings(false);
+                    dispatch(fn({
+                      eventIds: childBookingData.selectedFilters.event?.value ?? '',
+                      groupBy: childBookingData.selectedFilters.groupBy ?? '',
+                    }));
+                  },
+                }
+                : null;
+            case 'copy': {
+              return {
+                ...item,
+                handleClick: () => copyTable(
+                  createChildBookingsCopyData(
+                    rows as unknown as ChildBookingStatItem[],
+                    table.customization.columnsOptions,
+                  ),
+                  table.customization.visibleColumns,
+                ),
+              };
+            }
+
+            default:
+              return item;
+          }
+        })
+        .filter((item) => item);
+    },
+    [menuActionsOptions, showTestBookings, table, table.customization.columnsOptions],
   );
 
   const actionsMenuRef = useRef(null);

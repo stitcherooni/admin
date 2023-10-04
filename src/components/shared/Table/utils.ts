@@ -5,12 +5,12 @@ import _orderBy from 'lodash.orderby';
 import { CellProps } from './TableHead/TableHead';
 import { SortingTableData, SortingTableProps, TableOrder } from './types';
 
-export const copyTable = (data: Array<string[]>, columns: CellProps[]) => {
+export const copyTable = (data: Array<string | number>[], columns: CellProps[]) => {
   const columnsName = columns.map((column) => column.label);
   const rows = [columnsName, ...data];
   let table = '';
   rows.forEach((row) => {
-    table += `${row.join('\t ')}\n`;
+    table += `${row.join('\t')}\n`;
   });
   navigator.clipboard.writeText(table);
 };

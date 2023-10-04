@@ -36,6 +36,7 @@ import { getCustomersStat } from '../../../../redux/actions/reporting.actions';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import { CustomerStatItem } from '../../../../types/reporting/customers';
 import { handleCloseModal } from '../../../../utils/modals';
+import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
 
 const ReportingCustomers = () => {
   const customersData = useSelector((state: RootState) => state.reporting.customers);
@@ -109,7 +110,7 @@ const ReportingCustomers = () => {
   // needs fields: approved, currency
   // need separate value for total customers count
 
-  return (
+  return customersData.status === 'loading' ? <LoadingOverlay /> : (
     <Wrapper>
       <StatisticBar data={statistic} />
       <TableContent>
