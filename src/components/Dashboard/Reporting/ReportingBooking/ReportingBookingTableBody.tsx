@@ -1,9 +1,7 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import TableBody from '@mui/material/TableBody';
 import { Row } from '../../../shared/Table/Table.styled';
 import { TableCell, TextButton } from './ReportingBooking.styled';
-import { getCurrencyByCode } from '../../../../utils/currency';
 import { BookingStatItem } from '../../../../types/reporting/bookings';
 import { Order } from '../../../../types/reporting/orders';
 

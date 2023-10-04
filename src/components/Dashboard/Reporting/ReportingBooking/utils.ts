@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-import { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import {
   BookingEventStatFilter,
@@ -14,7 +13,7 @@ import { getBookingStat, getTestBookingStat } from '../../../../redux/actions/re
 import { menuActionsOptions } from './table-data';
 import { downloadFile } from '../../../../utils/file';
 import { copyTable } from '../../../shared/Table/utils';
-import { ConvertedBooking } from './ReportingBooking';
+import { TransformedBooking } from './ReportingBooking';
 import { SortingTableData } from '../../../shared/Table/types';
 
 const convertEventToOptions = (data: BookingEventStatFilter[]) => data.map((item) => ({ value: item.eventId, label: item.eventName }));
@@ -115,30 +114,75 @@ interface CreateBookingActions {
   sendNewsletter: () => void;
 }
 
-const createBookingsCopyData = (data: ConvertedBooking[]) => {
-  const rows: Array<string[]> = [];
-  data.forEach((item) => {
-    rows.push([
-      item.num,
-      item.firstName,
-      item.lastName,
-      item.bookingName,
-      item.class,
-      item.bookingInfo,
-      item.sku,
-      item.product.name,
-      item.price,
-      item.quantity,
-      item.orderId,
-      item.date,
-      item.customerName,
-      // item.phone,
-      // item.email,
-      // item.paymentMethod,
-    ]);
-  });
-  return rows;
-};
+const createBookingsCopyData = (data: TransformedBooking[], columnsOptions: Map<any, any>) => data.map((item) => {
+  const row = [];
+
+  if (columnsOptions.get('num')?.checked) {
+    row.push(item.num);
+  }
+
+  if (columnsOptions.get('firstName')?.checked) {
+    row.push(item.firstName);
+  }
+
+  if (columnsOptions.get('lastName')?.checked) {
+    row.push(item.lastName);
+  }
+
+  if (columnsOptions.get('bookingName')?.checked) {
+    row.push(item.bookingName);
+  }
+
+  if (columnsOptions.get('class')?.checked) {
+    row.push(item.class);
+  }
+
+  if (columnsOptions.get('bookingInfo')?.checked) {
+    row.push(item.bookingInfo);
+  }
+
+  if (columnsOptions.get('sku')?.checked) {
+    row.push(item.sku);
+  }
+
+  if (columnsOptions.get('product.name')?.checked) {
+    row.push(item.product.name);
+  }
+
+  if (columnsOptions.get('price')?.checked) {
+    row.push(item.price);
+  }
+
+  if (columnsOptions.get('quantity')?.checked) {
+    row.push(item.quantity);
+  }
+
+  if (columnsOptions.get('orderId')?.checked) {
+    row.push(item.orderId);
+  }
+
+  if (columnsOptions.get('date')?.checked) {
+    row.push(item.date);
+  }
+
+  if (columnsOptions.get('customerName')?.checked) {
+    row.push(item.customerName);
+  }
+
+  if (columnsOptions.get('phone')?.checked) {
+    row.push(item.phone);
+  }
+
+  if (columnsOptions.get('email')?.checked) {
+    row.push(item.email);
+  }
+
+  if (columnsOptions.get('paymentMethod')?.checked) {
+    row.push(item.paymentMethod);
+  }
+
+  return row;
+});
 
 export const createBookingActions = (data: CreateBookingActions) => {
   const {
@@ -214,7 +258,7 @@ export const createBookingActions = (data: CreateBookingActions) => {
           return {
             ...item,
             handleClick: () => copyTable(
-              createBookingsCopyData(rows),
+              createBookingsCopyData(rows as unknown as TransformedBooking[], customization.columnsOptions),
               customization.visibleColumns,
             ),
           };

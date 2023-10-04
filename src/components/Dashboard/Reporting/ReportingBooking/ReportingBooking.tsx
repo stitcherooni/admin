@@ -20,7 +20,6 @@ import OrderDetails from '../ReportingOrders/OrderDetails/OrderDetails';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import { BookingStatItem } from '../../../../types/reporting/bookings';
 import { Order } from '../../../../types/reporting/orders';
-import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
 import BookingRandomModal from './BookingRandomModal/BookingRandomModal';
 import CustomizeTableColumnsPopup from '../../../shared/Table/CustomizeTableColumnsPopup/CustomizeTableColumnsPopup';
 import Alert from '../../../shared/Alert/Alert';
@@ -30,8 +29,9 @@ import ReportingBookingTableBody from './ReportingBookingTableBody';
 import ReportingBookingFilters from './ReportingBookingFilters/ReportingBookingFilters';
 import { resetSelectedFilters } from '../../../../redux/slices/reporting/bookings.slice';
 import { ActionsMenuOption } from '../../../shared/ActionsMenu/ActionsMenu';
+import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
 
-export interface ConvertedBooking extends Omit<BookingStatItem, 'price'> {
+export interface TransformedBooking extends Omit<BookingStatItem, 'price'> {
   price: string;
 }
 
@@ -45,7 +45,7 @@ const ReportingBooking = () => {
     () => (!showTestBookings ? bookingData.data ?? [] : bookingData.testData ?? []),
     [showTestBookings, bookingData.data, bookingData.testData],
   );
-  const table = useSortingTable<ConvertedBooking>(
+  const table = useSortingTable<TransformedBooking>(
     convertBookingItems(rows),
     {
       columns: headCells,
