@@ -3,38 +3,16 @@ import {
 } from 'react';
 import _orderBy from 'lodash.orderby';
 import { CellProps } from './TableHead/TableHead';
+import { SortingTableData, SortingTableProps, TableOrder } from './types';
 
-interface SortingTableProps {
-  columns?: CellProps[];
-  totalCount?: number;
-}
-
-type Order = 'desc' | 'asc';
-
-export const copyTable = (table: RefObject<HTMLTableElement | null>) => {
-  if (!table.current) return;
-  let range;
-  let selectedData;
-
-  // Ensure that range and selection are supported by the browsers
-  if (document.createRange && window.getSelection) {
-    range = document.createRange();
-    selectedData = window.getSelection();
-    // unselect any element in the page
-    if (selectedData) selectedData.removeAllRanges();
-
-    try {
-      range.selectNodeContents(table.current);
-      if (selectedData) selectedData.addRange(range);
-    } catch (e) {
-      range.selectNode(table.current);
-      if (selectedData) selectedData.addRange(range);
-    }
-
-    document.execCommand('copy');
-  }
-
-  if (selectedData) selectedData.removeAllRanges();
+export const copyTable = (data: Array<string[]>, columns: CellProps[]) => {
+  const columnsName = columns.map((column) => column.label);
+  const rows = [columnsName, ...data];
+  let table = '';
+  rows.forEach((row) => {
+    table += `${row.join('\t ')}\n`;
+  });
+  navigator.clipboard.writeText(table);
 };
 
 const createCellsOptions = (cells: CellProps[]) => {
@@ -48,7 +26,7 @@ const createCellsOptions = (cells: CellProps[]) => {
   return options;
 };
 
-const useTableSearching = <T extends { rows: any[], converted: any[] }>(data: T,
+const useTableSearching = <T>(rows: T[],
   columns: string[]) => {
   const [searchText, setSearchText] = useState('');
   // eslint-disable-next-line max-len
@@ -68,12 +46,12 @@ const useTableSearching = <T extends { rows: any[], converted: any[] }>(data: T,
 
   const searchRows = useMemo(() => {
     const rowMap = new Map();
-    data.converted.forEach((item, i) => {
+    rows.forEach((item, i) => {
       const dataItem = prepare(item).toString();
-      rowMap.set(dataItem, data.rows[i]);
+      rowMap.set(dataItem, rows[i]);
     });
     return rowMap;
-  }, [data]);
+  }, [rows]);
 
   const foundData: T[] = useMemo(() => {
     const result = [] as T[];
@@ -119,8 +97,8 @@ const useTableCustomization = (columns: CellProps[]) => {
 };
 
 const useTableSorting = () => {
-  const [sort, setSort] = useState<Array<string | Order>[]>([]);
-  const handleRequestSort = (property: string, order: Order) => {
+  const [sort, setSort] = useState<Array<string | TableOrder>[]>([]);
+  const handleRequestSort = (property: string, order: TableOrder) => {
     setSort((sortState) => {
       let arr = [...sortState];
       const isFilterExists = arr.find((item) => item[0] === property);
@@ -136,11 +114,11 @@ const useTableSorting = () => {
   };
   const convertedSort = useMemo(() => {
     const fields: string[] = [];
-    const orders: Order[] = [];
+    const orders: TableOrder[] = [];
     sort.forEach((item) => {
       const [field, order] = item;
       fields.push(field);
-      orders.push(order as Order);
+      orders.push(order as TableOrder);
     });
 
     return { fields, orders };
@@ -152,15 +130,12 @@ const useTableSorting = () => {
 };
 
 export const useSortingTable = <T extends {}>(rows: T[],
-  other: SortingTableProps, convertCb?: (data: any[], currency?: string) => any[]) => {
+  other: SortingTableProps): SortingTableData<T> => {
   const [selected, setSelected] = useState<readonly string[]>([]);
   const {
     foundData, searchText, isFound, isSearching, updateSearchText,
   } = useTableSearching(
-    {
-      rows,
-      converted: convertCb ? convertCb(rows) : rows,
-    },
+    rows,
     other?.columns?.map((item) => item.id) ?? [],
   );
   const [page, setPage] = useState(1);
@@ -251,6 +226,7 @@ export const useSortingTable = <T extends {}>(rows: T[],
       totalRows: !searchText.length ? other?.totalCount : foundData.length,
     },
     visibleRows: !searchText.length ? visibleRows : foundData as unknown as T[],
+    allRows: rows,
     customization: {
       columnsOptions,
       updateColumnsOptions,
