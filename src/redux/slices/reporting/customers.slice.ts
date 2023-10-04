@@ -1,6 +1,5 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { CustomersStatProps } from '../../../types/reporting/customers';
-import { Price } from '../../../types/reporting';
 import { getCustomersStat } from '../../actions/reporting.actions';
 
 interface ReportingInitialState extends CustomersStatProps {
@@ -10,12 +9,10 @@ interface ReportingInitialState extends CustomersStatProps {
 const initialState: ReportingInitialState = {
   status: 'loading',
   data: [],
-  totalCount: 10,
-  totalPages: 1,
-  currentPage: 1,
-  pageSize: 10,
   totalOrdersNumber: 0,
-  totalOrderValue: {} as Price,
+  totalOrderValue: 0,
+  customersCount: 0,
+  currency: '',
 };
 
 const customersSlice = createSlice({
@@ -34,13 +31,11 @@ const customersSlice = createSlice({
           ...state,
           status: 'succeeded',
           data: action.payload.data,
-          totalCount: action.payload.totalCount,
-          totalPages: action.payload.totalPages,
-          currentPage: action.payload.currentPage,
-          pageSize: action.payload.pageSize,
           totalOrdersNumber: action.payload.totalOrdersNumber,
           totalOrderValue: action.payload.totalOrderValue,
-        })
+          currency: action.payload.currency,
+          customersCount: action.payload.customersCount,
+        }),
       )
       .addCase(getCustomersStat.rejected, (state, action) => ({
         ...state,

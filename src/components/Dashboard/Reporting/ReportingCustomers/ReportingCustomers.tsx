@@ -84,7 +84,7 @@ const ReportingCustomers = () => {
     () => [
       {
         label: 'Total Customers:',
-        value: 'n/a',
+        value: customersData.customersCount,
       },
       {
         label: 'Total Orders:',
@@ -93,12 +93,12 @@ const ReportingCustomers = () => {
       {
         label: 'Total Order Value:',
         value: `${getCurrencyByCode(
-          customersData.totalOrderValue.currency,
-          !customersData.totalOrderValue ? 0 : customersData.totalOrderValue.amount,
+          customersData.currency,
+          !customersData.totalOrderValue ? 0 : customersData.totalOrderValue,
         )}`,
       },
     ],
-    [customersData.totalOrderValue, customersData.totalOrdersNumber],
+    [customersData.totalOrderValue, customersData.totalOrdersNumber, customersData.customersCount],
   );
 
   // to do
@@ -158,7 +158,7 @@ const ReportingCustomers = () => {
                       <p>{row.lastName}</p>
                     </TableCell>
                     <TableCell className="date">
-                      <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
+                      <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
                     </TableCell>
                     <TableCell className="approved">
                       <SecondaryButton>{(row as any).approved ? 'Yes' : 'No'}</SecondaryButton>
@@ -167,7 +167,7 @@ const ReportingCustomers = () => {
                       <p>{row.orders}</p>
                     </TableCell>
                     <TableCell className="order-value">
-                      <p>{`${getCurrencyByCode(row.value.currency, row.value.amount)}`}</p>
+                      <p>{`${getCurrencyByCode(customersData.currency, row.value)}`}</p>
                     </TableCell>
                     <TableCell className="actions">
                       <ActionsMenu options={actionsOptions} />

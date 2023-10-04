@@ -77,10 +77,9 @@ export const getTestChildBookingStat = createAsyncThunk('reporting/getTestChildB
 });
 
 export const getCustomersStat = createAsyncThunk('reporting/getCustomersStat', async (params: any = null) => {
-  const url = `/api/Report/datareport?Type=customers&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
+  const url = `/Report/datareport?Type=customers&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
+  const response = await axiosInstance.get(url);
+  return response.data;
 });
 
 export const getEmailTrackerStat = createAsyncThunk('reporting/getEmailTrackerStat', async (params: any = null) => {

@@ -31,7 +31,7 @@ import {
 
 const Reporting = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [activeReportType, setActiveReportType] = useState(ReportTypes.BOOKINGS);
+  const [activeReportType, setActiveReportType] = useState(ReportTypes.CUSTOMERS);
 
   const handleChangeReportType = (e: SelectChangeEvent<any>) => setActiveReportType(e.target.value);
 
