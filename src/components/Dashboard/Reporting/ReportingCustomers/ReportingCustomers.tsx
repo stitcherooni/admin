@@ -1,11 +1,11 @@
 import React, {
-  SyntheticEvent, useMemo, useState,
+  SyntheticEvent, useCallback, useEffect, useMemo, useState,
 } from 'react';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import {
@@ -30,7 +30,7 @@ import ApproveCustomerModal from './ApproveCustomerModal/ApproveCustomerModal';
 import DeleteCustomerModal from './DeleteCustomerModal/DeleteCustomerModal';
 import StatisticBar from '../StatisticBar/StatisticBar';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { toggleApproveCustomer } from '../../../../redux/actions/reporting.actions';
+import { getCustomersStat, toggleApproveCustomer } from '../../../../redux/actions/reporting.actions';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import { CustomerStatItem } from '../../../../types/reporting/customers';
 import { handleCloseModal } from '../../../../utils/modals';
@@ -51,6 +51,7 @@ const ReportingCustomers = () => {
   const {
     page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
   } = table.pagination;
+  const { updateSearchText } = table.search;
 
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerStatItem | null>(null);
 
@@ -120,6 +121,38 @@ const ReportingCustomers = () => {
     setOpenApprovalModal(false);
   };
 
+  const [params] = useSearchParams();
+
+  const urlQuery = useMemo(() => {
+    const query = {};
+    if (!params.size) return null;
+    for (const param of params.entries()) {
+      query[param[0]] = param[1];
+    }
+
+    return query;
+  }, [params]);
+
+  useEffect(() => {
+    if (urlQuery) {
+      dispatch(getCustomersStat(urlQuery));
+    }
+  }, [urlQuery]);
+
+  const menuActions = useMemo(() => menuActionsOptions.map((item) => {
+    switch (item.value) {
+      case 'search':
+        return {
+          ...item,
+          handleClick: () => {
+            setFilteringDrawerOpen(true);
+          },
+        };
+    }
+
+    return item;
+  }), [menuActionsOptions]);
+
   // to do
   // actions (approve, remove, tinymce integration)
   // sorting
@@ -153,7 +186,7 @@ const ReportingCustomers = () => {
             }`}
           </p>
           <SearchBarWrapper className="search-wrapper">
-            <ActionsMenu options={menuActionsOptions} />
+            <ActionsMenu options={menuActions} />
           </SearchBarWrapper>
         </TableCaption>
         <TableWrapper>
@@ -194,7 +227,7 @@ const ReportingCustomers = () => {
                     </TableCell>
                     <TableCell className="send-email">
                       <Link to={`/dashboard/listings?type=customer-email&to=${row.firstName} ${row.lastName}`}>
-                        <RowButton startIcon={<MessageIcon color={theme.colors.main.green} />} /> 
+                        <RowButton startIcon={<MessageIcon color={theme.colors.main.green} />} />
                       </Link>
                     </TableCell>
                     <TableCell className="delete-customer">
@@ -259,9 +292,10 @@ const ReportingCustomers = () => {
         )
         : null}
       <StyledDrawer anchor="right" open={filteringDrawerOpen} onClose={handleFilteringDrawer}>
-        <DrawerOverlay handleClick={handleFilteringDrawer} handleKeydown={handleFilteringDrawer}>
-          <FilteringReportingCustomersModal />
-        </DrawerOverlay>
+        <FilteringReportingCustomersModal
+          updateSearchText={updateSearchText}
+          handleClose={setFilteringDrawerOpen}
+        />
       </StyledDrawer>
     </Wrapper>
   );

@@ -13,7 +13,7 @@ interface DatePickerProps {
 
 const DatePicker = (props: DatePickerProps) => {
   const [value, setValue] = React.useState<Dayjs | null>(!props.defaultDate
-    ? dayjs() : props.defaultDate);
+    ? null : props.defaultDate);
   const handleChange = (date: Dayjs) => {
     if (props.onChange) {
       setValue(value);
