@@ -1,5 +1,5 @@
 import React, {
-  SyntheticEvent, useMemo, useRef, useState,
+  SyntheticEvent, useMemo, useState,
 } from 'react';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
@@ -17,31 +17,27 @@ import {
   TableCaption,
   TableWrapper,
 } from '../../../shared/Table/Table.styled';
-import { SecondaryButton } from '../../../shared/Buttons/Buttons.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
 import {
-  actionsOptions, headCells, menuActionsOptions, rows,
+  headCells, menuActionsOptions, rows,
 } from './table-data';
 import { Overlay, StyledDrawer } from '../Reporting.styled';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import FilteringReportingCustomersModal from './FIlteringReportingCustomersModal/FIlteringReportingOrdersModal';
-import DeleteConfirmationModal from '../../../shared/Modals/DeleteConfirmationModal/DeleteConfirmationModal';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import ApproveCustomerModal from './ApproveCustomerModal/ApproveCustomerModal';
 import DeleteCustomerModal from './DeleteCustomerModal/DeleteCustomerModal';
 import StatisticBar from '../StatisticBar/StatisticBar';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { getCustomersStat, removeCustomer, toggleApproveCustomer } from '../../../../redux/actions/reporting.actions';
+import { toggleApproveCustomer } from '../../../../redux/actions/reporting.actions';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import { CustomerStatItem } from '../../../../types/reporting/customers';
 import { handleCloseModal } from '../../../../utils/modals';
 import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
-import { EmailIcon } from '../ReportingEmailTracker/ReportingEmailDetails/ReportingEmailStepper/ReportingEmailStepper.styled';
 import MessageIcon from '../../../../assets/icons/message-icon';
 import DeleteIcon from '../../../../assets/icons/delete-icon';
 import { theme } from '../../../../styles/defaultTheme';
-import { OverlayWrapper } from '../../../shared/Modals/DeleteConfirmationModal/DeleteConfirmationModal.styled';
 
 const ReportingCustomers = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -176,7 +172,7 @@ const ReportingCustomers = () => {
                 {table.visibleRows.map((row) => (
                   <Row
                     tabIndex={-1}
-                    key={row.id}
+                    key={row.num}
                   >
                     <TableCell className="row-id">
                       <p>{row.num}</p>
@@ -196,20 +192,22 @@ const ReportingCustomers = () => {
                     <TableCell className="approved">
                       <RowButton onClick={() => toggleOpenApprovalModal(row)}>{row.approved ? 'Yes' : 'No'}</RowButton>
                     </TableCell>
-                    <TableCell className="orders">
-                      <p>{row.orders}</p>
-                    </TableCell>
-                    <TableCell className="order-value">
-                      <p>{`${getCurrencyByCode(customersData.currency, row.value)}`}</p>
-                    </TableCell>
                     <TableCell className="send-email">
-                      <RowButton startIcon={<MessageIcon color={theme.colors.main.green} />} />
+                      <Link to={`/dashboard/listings?type=customer-email&to=${row.firstName} ${row.lastName}`}>
+                        <RowButton startIcon={<MessageIcon color={theme.colors.main.green} />} /> 
+                      </Link>
                     </TableCell>
                     <TableCell className="delete-customer">
                       <RowButton
                         startIcon={<DeleteIcon color={theme.colors.main.green} />}
                         onClick={() => toggleOpenDeleteModal(row)}
                       />
+                    </TableCell>
+                    <TableCell className="orders">
+                      <p>{row.orders}</p>
+                    </TableCell>
+                    <TableCell className="order-value">
+                      <p>{`${getCurrencyByCode(customersData.currency, row.value)}`}</p>
                     </TableCell>
                   </Row>
                 ))}
