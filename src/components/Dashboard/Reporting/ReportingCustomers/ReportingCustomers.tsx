@@ -6,10 +6,10 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import dayjs from 'dayjs';
 import {
-  TableCell, TableContent, Head, Wrapper,
+  TableCell, TableContent, Head, Wrapper, RowButton, ApproveModalOverlay, StyledAlert,
 } from './ReportingCustomers.styled';
 import {
   Row,
@@ -17,28 +17,30 @@ import {
   TableCaption,
   TableWrapper,
 } from '../../../shared/Table/Table.styled';
-import { SecondaryButton } from '../../../shared/Buttons/Buttons.styled';
 import { useSortingTable } from '../../../shared/Table/utils';
 import {
-  actionsOptions, headCells, menuActionsOptions, rows,
+  headCells, menuActionsOptions, rows,
 } from './table-data';
 import { Overlay, StyledDrawer } from '../Reporting.styled';
 import ActionsMenu from '../../../shared/ActionsMenu/ActionsMenu';
 import DrawerOverlay from '../DrawerOverlay/DrawerOverlay';
 import FilteringReportingCustomersModal from './FIlteringReportingCustomersModal/FIlteringReportingOrdersModal';
-import DeleteConfirmationModal from '../../../shared/Modals/DeleteConfirmationModal/DeleteConfirmationModal';
 import TablePagination from '../../../shared/Table/TablePagination/TablePagination';
 import ApproveCustomerModal from './ApproveCustomerModal/ApproveCustomerModal';
 import DeleteCustomerModal from './DeleteCustomerModal/DeleteCustomerModal';
 import StatisticBar from '../StatisticBar/StatisticBar';
 import { AppDispatch, RootState } from '../../../../redux/store';
-import { getCustomersStat } from '../../../../redux/actions/reporting.actions';
+import { toggleApproveCustomer } from '../../../../redux/actions/reporting.actions';
 import { getCurrencyByCode } from '../../../../utils/currency';
 import { CustomerStatItem } from '../../../../types/reporting/customers';
 import { handleCloseModal } from '../../../../utils/modals';
 import LoadingOverlay from '../../../shared/LoadingOverlay/LoadingOverlay';
+import MessageIcon from '../../../../assets/icons/message-icon';
+import DeleteIcon from '../../../../assets/icons/delete-icon';
+import { theme } from '../../../../styles/defaultTheme';
 
 const ReportingCustomers = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const customersData = useSelector((state: RootState) => state.reporting.customers);
   const table = useSortingTable<CustomerStatItem>(customersData.data, {
     columns: headCells,
@@ -50,9 +52,14 @@ const ReportingCustomers = () => {
     page, pagesCount, rowsPerPage, totalRows, handleChangePage, handleChangeRowsPerPage,
   } = table.pagination;
 
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerStatItem | null>(null);
+
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-  const toggleOpenDeleteModal = () => setOpenDeleteModal(!openDeleteModal);
+  const toggleOpenDeleteModal = (customer?: CustomerStatItem) => {
+    setSelectedCustomer(customer ?? null);
+    setOpenDeleteModal(!openDeleteModal);
+  };
 
   const handleCloseDeletePopup = (e: SyntheticEvent<HTMLDivElement>) => {
     handleCloseModal(e, toggleOpenDeleteModal);
@@ -60,7 +67,10 @@ const ReportingCustomers = () => {
 
   const [openApprovalModal, setOpenApprovalModal] = useState(false);
 
-  const toggleOpenApprovalModal = () => setOpenApprovalModal(!openApprovalModal);
+  const toggleOpenApprovalModal = (customer?: CustomerStatItem) => {
+    setSelectedCustomer(customer ?? null);
+    setOpenApprovalModal(!openApprovalModal);
+  };
 
   const handleCloseApprovalModal = (e: SyntheticEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
@@ -84,7 +94,7 @@ const ReportingCustomers = () => {
     () => [
       {
         label: 'Total Customers:',
-        value: 'n/a',
+        value: customersData.customersCount,
       },
       {
         label: 'Total Orders:',
@@ -93,13 +103,22 @@ const ReportingCustomers = () => {
       {
         label: 'Total Order Value:',
         value: `${getCurrencyByCode(
-          customersData.totalOrderValue.currency,
-          !customersData.totalOrderValue ? 0 : customersData.totalOrderValue.amount,
+          customersData.currency,
+          !customersData.totalOrderValue ? 0 : customersData.totalOrderValue,
         )}`,
       },
     ],
-    [customersData.totalOrderValue, customersData.totalOrdersNumber],
+    [customersData.totalOrderValue, customersData.totalOrdersNumber, customersData.customersCount],
   );
+
+  const handleApproveCustomer = () => {
+    if (!selectedCustomer) return;
+    dispatch(toggleApproveCustomer({
+      userId: selectedCustomer?.id,
+      isApprove: !selectedCustomer?.approved,
+    }));
+    setOpenApprovalModal(false);
+  };
 
   // to do
   // actions (approve, remove, tinymce integration)
@@ -112,6 +131,16 @@ const ReportingCustomers = () => {
 
   return customersData.status === 'loading' ? <LoadingOverlay /> : (
     <Wrapper>
+      {customersData?.error ? (
+        <StyledAlert type="error" className="customers-error">
+          {process.env.NODE_ENV === 'development' ? customersData?.error : 'Something went wrong'}
+        </StyledAlert>
+      ) : null}
+      {!customersData?.error && customersData.message ? (
+        <StyledAlert type="success" className="customers-error">
+          {customersData?.message}
+        </StyledAlert>
+      ) : null}
       <StatisticBar data={statistic} />
       <TableContent>
         <TableCaption>
@@ -143,7 +172,7 @@ const ReportingCustomers = () => {
                 {table.visibleRows.map((row) => (
                   <Row
                     tabIndex={-1}
-                    key={row.id}
+                    key={row.num}
                   >
                     <TableCell className="row-id">
                       <p>{row.num}</p>
@@ -158,19 +187,27 @@ const ReportingCustomers = () => {
                       <p>{row.lastName}</p>
                     </TableCell>
                     <TableCell className="date">
-                      <p>{dayjs(row.date).format('DD/MM/YYYY HH:MM')}</p>
+                      <p>{dayjs(row.date).format('DD/MM/YYYY HH:mm')}</p>
                     </TableCell>
                     <TableCell className="approved">
-                      <SecondaryButton>{(row as any).approved ? 'Yes' : 'No'}</SecondaryButton>
+                      <RowButton onClick={() => toggleOpenApprovalModal(row)}>{row.approved ? 'Yes' : 'No'}</RowButton>
+                    </TableCell>
+                    <TableCell className="send-email">
+                      <Link to={`/dashboard/listings?type=customer-email&to=${row.firstName} ${row.lastName}`}>
+                        <RowButton startIcon={<MessageIcon color={theme.colors.main.green} />} /> 
+                      </Link>
+                    </TableCell>
+                    <TableCell className="delete-customer">
+                      <RowButton
+                        startIcon={<DeleteIcon color={theme.colors.main.green} />}
+                        onClick={() => toggleOpenDeleteModal(row)}
+                      />
                     </TableCell>
                     <TableCell className="orders">
                       <p>{row.orders}</p>
                     </TableCell>
                     <TableCell className="order-value">
-                      <p>{`${getCurrencyByCode(row.value.currency, row.value.amount)}`}</p>
-                    </TableCell>
-                    <TableCell className="actions">
-                      <ActionsMenu options={actionsOptions} />
+                      <p>{`${getCurrencyByCode(customersData.currency, row.value)}`}</p>
                     </TableCell>
                   </Row>
                 ))}
@@ -190,33 +227,37 @@ const ReportingCustomers = () => {
       {openDeleteModal
         ? createPortal(
           <Overlay onClick={handleCloseDeletePopup} className="overlay">
-            <DeleteConfirmationModal
-              confirm={console.log}
-              cancel={() => handleCloseDeletePopup}
-              confirmButtonName="Yes - Delete"
-              cancelButtonName="No - Cancel"
-            >
-              <DeleteCustomerModal />
-            </DeleteConfirmationModal>
+            <DeleteCustomerModal
+              firstName={selectedCustomer?.firstName ?? ''}
+              lastName={selectedCustomer?.lastName ?? ''}
+              userId={selectedCustomer?.id ?? 0}
+              cancel={toggleOpenDeleteModal}
+            />
           </Overlay>,
           document.body,
         )
         : null}
-      {/* {openApprovalModal
+      {openApprovalModal
         ? createPortal(
           <Overlay onClick={handleCloseApprovalModal} className="overlay">
-            <DeleteConfirmationModal
-              confirm={console.log}
-              cancel={handleCloseApprovalModal}
-              confirmButtonName={'Approve' ?? 'Unapprove'}
+            <ApproveModalOverlay
+              confirm={handleApproveCustomer}
+              cancel={toggleOpenApprovalModal}
+              confirmButtonName={!selectedCustomer?.approved ? 'Approve' : 'Unapprove'}
               cancelButtonName="Cancel"
+              className="approve-modal"
             >
-              <ApproveCustomerModal type={'approve' ?? 'unapprove'} />
-            </DeleteConfirmationModal>
+              <ApproveCustomerModal
+                type={!selectedCustomer?.approved ? 'approve' : 'unapprove'}
+                firstName={selectedCustomer?.firstName ?? ''}
+                lastName={selectedCustomer?.lastName ?? ''}
+                userId={selectedCustomer?.id ?? 0}
+              />
+            </ApproveModalOverlay>
           </Overlay>,
           document.body,
         )
-        : null} */}
+        : null}
       <StyledDrawer anchor="right" open={filteringDrawerOpen} onClose={handleFilteringDrawer}>
         <DrawerOverlay handleClick={handleFilteringDrawer} handleKeydown={handleFilteringDrawer}>
           <FilteringReportingCustomersModal />

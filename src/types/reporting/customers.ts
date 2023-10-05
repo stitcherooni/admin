@@ -1,13 +1,9 @@
-import { Price } from '.';
-
 export interface CustomersStatProps {
   data: CustomerStatItem[];
   totalOrdersNumber: number;
-  totalOrderValue: Price;
-  totalCount: number;
-  totalPages: number;
-  currentPage: number;
-  pageSize: number;
+  totalOrderValue: number;
+  customersCount: number;
+  currency: string;
 }
 
 export interface CustomerStatItem {
@@ -18,5 +14,6 @@ export interface CustomerStatItem {
   child: string;
   date: string;
   orders: number;
-  value: Price;
+  value: number;
+  approved: boolean;
 }

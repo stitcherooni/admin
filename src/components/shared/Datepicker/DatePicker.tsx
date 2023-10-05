@@ -6,14 +6,28 @@ import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import InputAdornment from '@mui/material/InputAdornment';
 import { CustomDatePicker, DatePickerStyles } from './DatePicker.styled';
 
-const DatePicker = () => {
-  const [value, setValue] = React.useState<Dayjs | null>(dayjs('2022-04-17'));
+interface DatePickerProps {
+  onChange: (date: Dayjs) => void;
+  defaultDate?: Dayjs;
+}
+
+const DatePicker = (props: DatePickerProps) => {
+  const [value, setValue] = React.useState<Dayjs | null>(!props.defaultDate
+    ? dayjs() : props.defaultDate);
+  const handleChange = (date: Dayjs) => {
+    if (props.onChange) {
+      setValue(value);
+      props.onChange(dayjs(date));
+    } else {
+      setValue(value);
+    }
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <CustomDatePicker
         value={value}
-        onChange={(newValue) => setValue(newValue as Dayjs)}
+        onChange={(newValue) => handleChange(newValue as Dayjs)}
         dayOfWeekFormatter={(day) => `${day}`}
         showDaysOutsideCurrentMonth
         slotProps={{

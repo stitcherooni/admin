@@ -9,7 +9,7 @@ import ShevronRight from '../../../../assets/icons/shevron-right';
 
 export const headCells = [
   {
-    id: 'row-id',
+    id: 'num',
     label: '##',
     className: 'row-id',
   },
@@ -28,11 +28,6 @@ export const headCells = [
     label: 'Last Name',
     className: 'last-name',
   },
-  // {
-  //   id: 'child',
-  //   label: 'Child',
-  //   className: 'child',
-  // },
   {
     id: 'date',
     label: 'Reg Date',
@@ -44,19 +39,24 @@ export const headCells = [
     className: 'approved',
   },
   {
-    id: 'count',
+    id: 'send-email',
+    label: 'Send Email',
+    className: 'send-email',
+  },
+  {
+    id: 'delete-customer',
+    label: 'Delete',
+    className: 'delete-customer',
+  },
+  {
+    id: 'orders',
     label: 'Orders',
     className: 'orders',
   },
   {
-    id: 'amount',
+    id: 'value',
     label: 'Order Value',
     className: 'order-value',
-  },
-  {
-    id: 'actions',
-    label: 'Actions',
-    className: 'actions',
   },
 ];
 

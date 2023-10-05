@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 import { Cell } from '../../../shared/Table/Table.styled';
 import TableHeadSorting from '../../../shared/Table/TableHeadSorting/TableHeadSorting';
+import { SecondaryButton } from '../../../shared/Buttons/Buttons.styled';
+import DeleteConfirmationModal from '../../../shared/Modals/DeleteConfirmationModal/DeleteConfirmationModal';
+import Alert from '../../../shared/Alert/Alert';
 
 export const Wrapper = styled.div`
   & .statistic {
@@ -29,11 +32,12 @@ export const Head = styled(TableHeadSorting)`
       width: 140px;
     }
 
+    & .send-email,
     & .approved,
     & .orders,
     & .order-value,
-    & .actions {
-      width: 150px;
+    & .delete-customer {
+      width: 130px;
     }
   }
 
@@ -52,12 +56,13 @@ export const Head = styled(TableHeadSorting)`
         min-width: 140px;
       }
 
+      & .send-email,
       & .approved,
       & .orders,
       & .order-value,
-      & .actions {
+      & .delete-customer {
         width: 12%;
-        min-width: 150px;
+        min-width: 120px;
       }
     }
   }
@@ -80,11 +85,19 @@ export const TableCell = styled(Cell)`
     width: 140px;
   }
 
+  &.send-email,
   &.approved,
   &.orders,
   &.order-value,
-  &.actions {
-    width: 150px;
+  &.delete-customer {
+    width: 130px;
+  }
+
+  &.delete-customer,
+  &.send-email,
+  &.approved {
+    display: flex;
+    justify-content: center;
   }
 
   @media screen and (min-width: 1280px) {
@@ -101,12 +114,43 @@ export const TableCell = styled(Cell)`
       min-width: 140px;
     }
 
+    &.send-email,
     &.approved,
     &.orders,
     &.order-value,
-    &.actions {
+    &.delete-customer {
       width: 12%;
-      min-width: 150px;
+      min-width: 120px;
+    }
+  }
+`;
+
+export const RowButton = styled(SecondaryButton)`
+  &.MuiButtonBase-root.MuiButton-root {
+    height: 42px;
+  }
+
+  & .MuiButton-startIcon {
+    margin: 0;
+  }
+`;
+
+export const ApproveModalOverlay = styled(DeleteConfirmationModal)`
+  &.approve-modal {
+    height: initial;
+  }
+`;
+
+export const StyledAlert = styled(Alert)`
+  margin: 16px 0;
+
+  &.customers-error {
+    margin-right: 16px;
+  }
+
+  @media screen and (min-width: 1280px) {
+    &.customers-error {
+      margin: 24px 0 0 0;
     }
   }
 `;
