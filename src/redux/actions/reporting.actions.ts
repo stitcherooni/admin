@@ -82,6 +82,36 @@ export const getCustomersStat = createAsyncThunk('reporting/getCustomersStat', a
   return response.data;
 });
 
+interface ToggleApproveCustomerParams {
+  userId: number;
+  isApprove: boolean;
+}
+
+export const toggleApproveCustomer = createAsyncThunk('reporting/toggleApproveCustomer', async ({ userId, isApprove }: ToggleApproveCustomerParams) => {
+  const url = '/Report/toggleapprovaluser';
+  const response = await axiosInstance.put(url, {
+    userId,
+    isApprove,
+  });
+  return { userId, isApprove, message: response.data.message };
+});
+
+interface RemoveUserParams {
+  userId: number;
+  erasureDate: string;
+}
+
+export const removeCustomer = createAsyncThunk('reporting/removeCustomer', async (params: RemoveUserParams) => {
+  const url = '/Report/removeuser';
+  const response = await axiosInstance.delete(url, {
+    data: {
+      userId: params.userId,
+      erasureDate: params.erasureDate,
+    },
+  });
+  return { userId: params.userId, message: response.data.message };
+});
+
 export const getEmailTrackerStat = createAsyncThunk('reporting/getEmailTrackerStat', async (params: any = null) => {
   const url = `/api/Report/datareport?SchoolId=1&Type=email_tracker&page=${!params?.page ? 1 : params?.page}&pageSize=${!params?.pageSize ? 10 : params?.pageSize}`;
   const response = await fetch(url);

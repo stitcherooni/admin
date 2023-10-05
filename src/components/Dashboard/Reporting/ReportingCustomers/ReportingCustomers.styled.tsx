@@ -2,6 +2,8 @@ import styled from 'styled-components';
 import { Cell } from '../../../shared/Table/Table.styled';
 import TableHeadSorting from '../../../shared/Table/TableHeadSorting/TableHeadSorting';
 import { SecondaryButton } from '../../../shared/Buttons/Buttons.styled';
+import DeleteConfirmationModal from '../../../shared/Modals/DeleteConfirmationModal/DeleteConfirmationModal';
+import Alert from '../../../shared/Alert/Alert';
 
 export const Wrapper = styled.div`
   & .statistic {
@@ -26,8 +28,7 @@ export const Head = styled(TableHeadSorting)`
 
     & .first-name,
     & .last-name,
-    & .date
-     {
+    & .date {
       width: 140px;
     }
 
@@ -36,7 +37,7 @@ export const Head = styled(TableHeadSorting)`
     & .orders,
     & .order-value,
     & .delete-customer {
-      width: 120px;
+      width: 130px;
     }
   }
 
@@ -50,8 +51,7 @@ export const Head = styled(TableHeadSorting)`
 
       & .first-name,
       & .last-name,
-      & .date
-       {
+      & .date {
         width: 12.77%;
         min-width: 140px;
       }
@@ -81,8 +81,7 @@ export const TableCell = styled(Cell)`
 
   &.first-name,
   &.last-name,
-  &.date
-   {
+  &.date {
     width: 140px;
   }
 
@@ -91,7 +90,7 @@ export const TableCell = styled(Cell)`
   &.orders,
   &.order-value,
   &.delete-customer {
-    width: 120px;
+    width: 130px;
   }
 
   &.delete-customer,
@@ -110,8 +109,7 @@ export const TableCell = styled(Cell)`
 
     &.first-name,
     &.last-name,
-    &.date
-     {
+    &.date {
       width: 12.77%;
       min-width: 140px;
     }
@@ -135,4 +133,24 @@ export const RowButton = styled(SecondaryButton)`
   & .MuiButton-startIcon {
     margin: 0;
   }
-`
+`;
+
+export const ApproveModalOverlay = styled(DeleteConfirmationModal)`
+  &.approve-modal {
+    height: initial;
+  }
+`;
+
+export const StyledAlert = styled(Alert)`
+  margin: 16px 0;
+
+  &.customers-error {
+    margin-right: 16px;
+  }
+
+  @media screen and (min-width: 1280px) {
+    &.customers-error {
+      margin: 24px 0 0 0;
+    }
+  }
+`;

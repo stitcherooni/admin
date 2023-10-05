@@ -8,13 +8,14 @@ interface DeleteConfirmationModalProps {
   children: React.ReactNode;
   cancelButtonName: string;
   confirmButtonName: string;
+  className: string;
 }
 
 const DeleteConfirmationModal = (props: DeleteConfirmationModalProps) => (
-  <OverlayWrapper>
+  <OverlayWrapper className={props.className ?? ''}>
     {props.children}
     <div className="buttons-wrapper">
-      <GreenButton onClick={props.confirm}>{props.confirmButtonName}</GreenButton>
+      <GreenButton type="submit" onClick={props.confirm}>{props.confirmButtonName}</GreenButton>
       <SecondaryButton onClick={props.cancel}>{props.cancelButtonName}</SecondaryButton>
     </div>
   </OverlayWrapper>
